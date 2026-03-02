@@ -48,7 +48,6 @@ const GH = {
           "Authorization": `Bearer ${cfg.token}`,
           "Accept": "application/vnd.github+json",
           "X-GitHub-Api-Version": "2022-11-28",
-          "Cache-Control": "no-cache",
         }
       });
       if (res.status === 404) return { content: null, sha: null }; // file non ancora creato
