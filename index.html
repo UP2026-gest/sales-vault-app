@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sales Vault – Opportunità</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="bar">
+    <div>
+      <h1>Sales Vault</h1>
+      <div id="status" class="muted">Pronto (salvataggio automatico in questo browser)</div>
+      <div id="backupInfo" class="muted"></div>
+      <div id="ghStatus" class="ghStatus info">☁️ GitHub Sync non configurato</div>
+    </div>
+    <div class="actions">
+      <button id="ghSyncBtn" style="background:#1a7a3a; color:white; border-color:#1a7a3a;">☁️ GitHub Sync</button>
+      <button id="newOppBtn">+ Nuova opportunità</button>
+      <button id="exportBtn">Esporta backup</button>
+      <button id="importBtn">Importa backup</button>
+      <button id="exportCsvBtn">Esporta Excel (CSV)</button>
+      <input id="importFile" type="file" accept="application/json" hidden />
+    </div>
+  </header>
+
+  <main class="grid">
+    <section class="card">
+      <h2>Filtri</h2>
+
+      <label class="row">
+        <span>Ricerca</span>
+        <input id="q" placeholder="cliente, opportunità, note..." />
+      </label>
+
+      <label class="row">
+        <span>Stato</span>
+        <select id="statusFilter"></select>
+      </label>
+
+      <label class="row">
+        <span>Fase</span>
+        <select id="phaseFilter"></select>
+      </label>
+
+      <label class="row">
+        <span>Prodotto</span>
+        <select id="productFilter"></select>
+      </label>
+
+      <label class="row">
+        <span>Commerciale</span>
+        <select id="ownerFilter"></select>
+      </label>
+
+      <div class="row" style="margin-top:6px;">
+        <span></span>
+        <button id="manageOwnersBtn" type="button">Gestisci commerciali</button>
+      </div>
+
+      <label class="row">
+        <span>Azioni</span>
+        <select id="dueFilter">
+          <option value="all">(tutte)</option>
+          <option value="overdue">scadute</option>
+          <option value="today">oggi</option>
+          <option value="next7">prossimi 7 giorni</option>
+        </select>
+      </label>
+
+<label class="row">
+  <span>Fatture prog.</span>
+  <select id="invPlannedFilter">
+    <option value="all">(tutte)</option>
+<option value="lastMonth">mese scorso</option>
+    <option value="thisMonth">di questo mese</option>
+    <option value="nextMonth">del mese prossimo</option>
+    <option value="year">questo anno solare</option>
+  </select>
+</label>
+
+<label class="row">
+  <span>Fatture emesse</span>
+  <select id="invIssuedFilter">
+    <option value="all">(tutte)</option>
+    <option value="thisMonth">mese corrente</option>
+    <option value="lastMonth">mese scorso</option>
+    <option value="year">questo anno solare</option>
+  </select>
+</label>
+
+      <hr/>
+
+      <h2>Cruscotto</h2>
+      <div class="muted" id="kpiBox"></div>
+
+      <hr/>
+
+      <div class="muted">
+        Dati salvati automaticamente in Chrome. Per usarli su altri PC: <b>Esporta backup</b> su OneDrive e poi <b>Importa backup</b>.
+      </div>
+    </section>
+
+    <section class="card">
+  <h2>Opportunità</h2>
+  <div id="oppCounter" class="muted" style="margin:-6px 0 10px 0;"></div>
+  <div id="oppList" class="list muted">Nessuna opportunità.</div>
+</section>
+
+    <section class="card">
+      <h2>Dettaglio opportunità</h2>
+
+<div id="dirtyHint" class="warn" style="display:none; margin:-6px 0 10px 0;">
+  ⚠️ Hai modifiche non salvate: premi “Salva” prima di cambiare opportunità.
+</div>
+
+     <form id="oppForm">
+
+<div class="formActions top">
+  <button id="saveBtn" type="submit">Salva</button>
+  <button id="deleteBtn" type="button" class="danger">Elimina</button>
+</div>
+
+  <div class="two">
+    <label class="row">
+      <span>Lead</span>
+      <input id="lead" list="leadList" placeholder="Scrivi o seleziona un lead…" />
+      <datalist id="leadList"></datalist>
+    </label>
+
+    <label class="row">
+      <span>Referente</span>
+      <input id="leadContactName" placeholder="Nome persona di riferimento" />
+    </label>
+  </div>
+
+  <div class="two">
+    <label class="row">
+      <span>Telefono</span>
+      <input id="leadPhone" placeholder="+39…" />
+    </label>
+
+    <label class="row">
+      <span>Email</span>
+      <input id="leadEmail" placeholder="nome@azienda.it" />
+    </label>
+  </div>
+
+  <label>
+    Data creazione
+    <input id="createdAt" type="date" required />
+  </label>
+
+  <label>
+    Commerciale
+    <select id="owner" required></select>
+  </label>
+    
+        <label>
+          Nome opportunità
+          <input id="oppName" required placeholder="es. Corso blended per team commerciale" />
+        </label>
+
+        <div class="two">
+          <label>
+            Stato
+            <select id="oppStatus" required></select>
+          </label>
+          <label>
+            Fase
+            <select id="oppPhase" required></select>
+          </label>
+        </div>
+
+        <div class="two">
+          <label>
+            Prodotto
+            <select id="product" required></select>
+          </label>
+          <label>
+            Probabilità successo
+            <select id="probability" required></select>
+          </label>
+        </div>
+
+        <div class="two">
+          <label>
+            Valore (previsto) €
+            <input id="valueExpected" type="number" min="0" step="0.01" placeholder="es. 2500" />
+          </label>
+          <div></div>
+        </div>
+
+        <div class="two">
+          <label>
+            Prossima azione commerciale
+            <input id="nextAction" placeholder="es. chiamare per follow-up, inviare CTR..." />
+          </label>
+          <label>
+            Data prossima azione
+            <input id="nextActionDate" type="date" />
+          </label>
+        </div>
+
+        <label>
+          Note
+          <textarea id="notes" rows="5" placeholder="contesto, obiezioni, dettagli, decision maker..."></textarea>
+        </label>
+
+        <div class="card inner">
+          <h3>Fatture (pianificate + emesse)</h3>
+
+          <div class="two">
+            <label>
+              Costo erogazione servizio € (totale opportunità)
+              <input id="serviceCost" type="number" min="0" step="0.01" placeholder="es. 800" />
+            </label>
+            <div class="muted" style="margin-top:22px;">
+              MOL = Fatturato emesso − costo erogazione
+            </div>
+          </div>
+
+          <hr/>
+
+          <div class="two">
+            <label>
+              Tipo riga
+              <select id="invStatus">
+                <option value="pianificata">Fattura pianificata (da emettere)</option>
+                <option value="emessa">Fattura emessa</option>
+              </select>
+            </label>
+            <div class="muted" style="margin-top:22px;">
+              Usa “pianificata” quando sai che dovrai fatturare più avanti.
+            </div>
+          </div>
+
+          <div class="two">
+            <label>
+              Data prevista (solo per pianificata)
+              <input id="invPlannedDate" type="date" />
+            </label>
+            <label>
+              Importo previsto € (solo per pianificata)
+              <input id="invPlannedAmount" type="number" min="0" step="0.01" placeholder="es. 1200" />
+            </label>
+          </div>
+
+          <div class="two">
+            <label>
+              Numero fattura (solo per emessa)
+              <input id="invNumber" placeholder="es. 12/2026" />
+            </label>
+            <label>
+              Data fattura (solo per emessa)
+              <input id="invDate" type="date" />
+            </label>
+          </div>
+
+          <div class="two">
+            <label>
+              Importo fatturato € (solo per emessa)
+              <input id="invAmount" type="number" min="0" step="0.01" placeholder="es. 1200" />
+            </label>
+            <div class="row" style="margin-top:22px;">
+              <button id="addInvBtn" type="button">Aggiungi riga</button>
+            </div>
+          </div>
+
+          <div id="invList" class="list muted">Nessuna riga fattura.</div>
+
+          <hr/>
+          <div class="muted" id="calcBox"></div>
+        </div>
+     
+        <div id="fileInfo" class="muted"></div>
+      </form>
+    </section>
+  </main>
+
+  <!-- Modal promemoria -->
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <strong>Promemoria</strong>
+        <button id="modalCloseBtn" type="button">Chiudi</button>
+      </div>
+      <div id="modalBody" class="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
