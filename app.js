@@ -177,17 +177,14 @@ async function ghPullAndMerge(silent = false) {
     if (!silent) setGhStatus("Nessun dato remoto — verrà creato al primo salvataggio", "info");
     return true;
   }
+  const remoteHasNewData = result.sha !== _ghCurrentSha;
   _ghCurrentSha = result.sha;
   const remote = ensureDbShape(result.content);
-
-  const localTs = db?.updatedAt || "";
   const remoteTs = remote?.updatedAt || "";
   const localHasData = (db?.opportunities?.length || 0) > 0;
 
-  // Accetta i dati remoti se:
-  // 1. Il PC locale non ha ancora dati (primo avvio su questo browser), OPPURE
-  // 2. Il timestamp remoto è più recente di quello locale
-  const shouldApplyRemote = !localHasData || remoteTs > localTs;
+  // Aggiorna se: lo SHA e' cambiato (qualcuno ha salvato) OPPURE non abbiamo dati locali
+  const shouldApplyRemote = remoteHasNewData || !localHasData;
 
   if (shouldApplyRemote) {
     db = remote;
@@ -197,10 +194,11 @@ async function ghPullAndMerge(silent = false) {
     renderAll();
     if (!silent) setGhStatus(`Sincronizzato — ${fmtItDateTime(remoteTs)}`, "ok");
   } else {
-    if (!silent) setGhStatus(`Già aggiornato — ${fmtItDateTime(localTs)}`, "ok");
+    if (!silent) setGhStatus(`Già aggiornato — ${fmtItDateTime(remoteTs)}`, "ok");
   }
   return true;
 }
+
 
 // Carica il db su GitHub dopo ogni salvataggio locale
 async function ghPush() {
