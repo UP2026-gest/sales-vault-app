@@ -10,7 +10,7 @@ h1 { margin: 0; font-size: 20px; }
 .actions button { width: auto; }
 
 .grid {
-  display:grid; grid-template-columns: 320px 1fr 1fr;
+  display:grid; grid-template-columns: 300px minmax(0, 1fr) minmax(0, 1.4fr);
   gap: 12px; padding: 12px; align-items: start;
 }
 .card {
