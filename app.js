@@ -200,36 +200,72 @@ async function ghPullAndMerge(silent = false) {
 }
 
 
+// Unisce le opportunita' remote con quelle locali: per ogni opportunita' vince quella con updatedAt piu' recente
+function mergeOpportunities(localOpps, remoteOpps) {
+  const map = new Map();
+  // Prima metti tutte le remote
+  for (const o of remoteOpps) {
+    map.set(o.id, o);
+  }
+  // Poi sovrascrive con le locali solo se piu' recenti
+  for (const o of localOpps) {
+    const existing = map.get(o.id);
+    if (!existing || (o.updatedAt || "") >= (existing.updatedAt || "")) {
+      map.set(o.id, o);
+    }
+  }
+  return Array.from(map.values());
+}
+
 // Carica il db su GitHub dopo ogni salvataggio locale
 async function ghPush() {
   if (!GH.isConfigured()) return;
   setGhStatus("Salvataggio sul server…", "syncing");
 
-  // Se non abbiamo uno SHA valido in memoria, fai prima un pull per ottenerlo
-  if (!_ghCurrentSha) {
-    const fresh = await GH.pull();
-    if (fresh && fresh.sha) {
-      _ghCurrentSha = fresh.sha;
+  // SEMPRE fare pull prima del push per non sovrascrivere il lavoro degli altri
+  const fresh = await GH.pull();
+  if (fresh && fresh.content) {
+    // File esiste: unisci le opportunita' remote con quelle locali
+    const remote = ensureDbShape(fresh.content);
+    const merged = mergeOpportunities(db.opportunities, remote.opportunities);
+    // Unisci anche i leads (prendi tutti, senza duplicati per nome)
+    const leadMap = new Map();
+    for (const l of [...(remote.leads || []), ...(db.leads || [])]) {
+      leadMap.set((l.name || "").toLowerCase().trim(), l);
     }
-    // se fresh.content === null il file non esiste ancora: push di creazione, sha non serve
+    db.opportunities = merged;
+    db.leads = Array.from(leadMap.values());
+    db.updatedAt = nowIso();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+    _ghCurrentSha = fresh.sha;
+  } else if (fresh && fresh.content === null) {
+    // File non esiste ancora: primo push, nessun merge necessario
+    _ghCurrentSha = null;
   }
+  // Se pull fallisce del tutto (rete), proviamo lo stesso con lo SHA che abbiamo
 
   const ok = await GH.push(db, _ghCurrentSha);
   if (ok) {
     const cfg = GH.getConfig();
     _ghCurrentSha = cfg?._lastSha || _ghCurrentSha;
+    // Aggiorna la UI con i dati merged
+    refreshOwnerSelects();
+    refreshLeadDatalist();
+    renderAll();
     setGhStatus(`Salvato sul server — ${new Date().toLocaleTimeString("it-IT")}`, "ok");
   } else {
-    // Potrebbe essere un conflitto SHA: riscarica lo SHA corrente e riprova una volta
-    setGhStatus("Risoluzione conflitto SHA…", "syncing");
-    const fresh = await GH.pull();
-    if (fresh && fresh.sha) {
-      _ghCurrentSha = fresh.sha;
+    // Ultimo tentativo: riprova con SHA fresco
+    const fresh2 = await GH.pull();
+    if (fresh2 && fresh2.sha) {
+      _ghCurrentSha = fresh2.sha;
       const retry = await GH.push(db, _ghCurrentSha);
       if (retry) {
         const cfg = GH.getConfig();
         _ghCurrentSha = cfg?._lastSha || _ghCurrentSha;
-        setGhStatus(`Salvato sul server (retry) — ${new Date().toLocaleTimeString("it-IT")}`, "ok");
+        refreshOwnerSelects();
+        refreshLeadDatalist();
+        renderAll();
+        setGhStatus(`Salvato sul server — ${new Date().toLocaleTimeString("it-IT")}`, "ok");
         return;
       }
     }
