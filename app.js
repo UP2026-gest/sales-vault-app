@@ -190,7 +190,7 @@ function defaultDb(){
   return {
     version: DB_VERSION,
     updatedAt: nowIso(),
-    nextOppSeq: 1,         // ← contatore progressivo OPP-NNN
+    nextOppSeqByYear: {},  // ← { "26": 4, "25": 12, … } progressivo per anno
     opportunities: [],
     leads: [],
     salespeople: ["Renato", "Clizia", "Jelena"],
@@ -203,7 +203,25 @@ function normalizeSalespeopleList(list){
     .sort((a,b)=>a.localeCompare(b,"it"));
 }
 
-/** Migrazione automatica: aggiunge oppSeq e versione al db importato/precedente */
+/** Estrae le ultime 2 cifre dell'anno da una stringa data YYYY-MM-DD o ISO */
+function yearCode(dateStr){
+  const s = String(dateStr||"");
+  // supporta "2026-03-05" e "2026-03-05T..." e anche solo "26"
+  const m = s.match(/^(\d{4})/);
+  if(m) return m[1].slice(2); // "2026" → "26"
+  return String(new Date().getFullYear()).slice(2);
+}
+
+/** Costruisce oppId leggibile dal codice anno e numero progressivo */
+function buildOppId(yy, seq){ return `OPP-${yy}-${pad3(seq)}`; }
+
+/**
+ * Migrazione automatica + riassegnazione progressivi.
+ * - Ordina le opportunità per createdAt (poi createdAtTs come spareggio)
+ * - Raggruppa per anno di creazione
+ * - Riassegna oppSeq e oppId in ordine crescente per ogni anno
+ * - Aggiorna nextOppSeqByYear al massimo+1 per ogni anno
+ */
 function migrateDb(d){
   if(!d || typeof d !== "object") return defaultDb();
   if(!Array.isArray(d.opportunities)) d.opportunities = [];
@@ -213,30 +231,47 @@ function migrateDb(d){
   d.salespeople = normalizeSalespeopleList(d.salespeople);
   if(!d.meta || typeof d.meta !== "object") d.meta = defaultDb().meta;
   if(typeof d.meta.lastBackupExportedAt !== "string") d.meta.lastBackupExportedAt = "";
-
-  // Aggiorna campo version
   d.version = DB_VERSION;
 
-  // Migrazione ID leggibili: assegna oppSeq a opportunità che non ce l'hanno
-  let maxSeq = typeof d.nextOppSeq === "number" ? d.nextOppSeq : 1;
-
-  for(const o of d.opportunities){
-    if(!o.oppSeq){
-      // Cerca se c'è già un oppId nel formato OPP-NNN e recupera il numero
-      const m = String(o.oppId||"").match(/^OPP-(\d+)$/);
-      if(m){
-        o.oppSeq = parseInt(m[1], 10);
-        maxSeq = Math.max(maxSeq, o.oppSeq + 1);
-      } else {
-        o.oppSeq = maxSeq++;
-      }
-    } else {
-      maxSeq = Math.max(maxSeq, o.oppSeq + 1);
-    }
-    // Assicura oppId coerente
-    o.oppId = `OPP-${pad3(o.oppSeq)}`;
+  // Normalizza nextOppSeqByYear (può arrivare come nextOppSeq numerico da versioni vecchie)
+  if(!d.nextOppSeqByYear || typeof d.nextOppSeqByYear !== "object" || Array.isArray(d.nextOppSeqByYear)){
+    d.nextOppSeqByYear = {};
   }
-  d.nextOppSeq = maxSeq;
+
+  // ── Riassegnazione completa progressivi ──────────────────────
+  // Ordina per (createdAt, createdAtTs) per assegnare i numeri
+  // in ordine cronologico reale
+  const sorted = [...d.opportunities].sort((a, b) => {
+    const da = (a.createdAt||"9999") + "|" + (a.createdAtTs||"");
+    const db_ = (b.createdAt||"9999") + "|" + (b.createdAtTs||"");
+    return da.localeCompare(db_);
+  });
+
+  // Contatori progressivi per anno durante la riassegnazione
+  const seqByYear = {};
+
+  // Mappa id → { oppSeq, oppId } risultante
+  const reassigned = new Map();
+  for(const o of sorted){
+    const yy  = yearCode(o.createdAt || todayStr());
+    seqByYear[yy] = (seqByYear[yy] || 0) + 1;
+    const seq = seqByYear[yy];
+    reassigned.set(o.id || o, { oppSeq: seq, oppId: buildOppId(yy, seq) });
+  }
+
+  // Applica i nuovi ID a tutte le opportunità (nell'ordine originale del db)
+  for(const o of d.opportunities){
+    const r = reassigned.get(o.id || o);
+    if(r){ o.oppSeq = r.oppSeq; o.oppId = r.oppId; }
+  }
+
+  // nextOppSeqByYear = massimo assegnato + 1 per ogni anno
+  for(const [yy, seq] of Object.entries(seqByYear)){
+    d.nextOppSeqByYear[yy] = Math.max(
+      d.nextOppSeqByYear[yy] || 0,
+      seq + 1
+    );
+  }
 
   return d;
 }
@@ -266,7 +301,7 @@ function normalizeOpp(o){
   return {
     id:             o.id || uid(),
     oppSeq:         o.oppSeq || 0,
-    oppId:          o.oppId || (o.oppSeq ? `OPP-${pad3(o.oppSeq)}` : ""),
+    oppId:          o.oppId || (o.oppSeq ? buildOppId(yearCode(o.createdAt||todayStr()), o.oppSeq) : ""),
     lead:           o.lead || "",
     createdAt:      o.createdAt || todayStr(),
     owner:          safeOwner,
@@ -368,11 +403,12 @@ function mergeDb(local, remote){
   }
   merged.leads = [...leadMap.values()];
 
-  // nextOppSeq: massimo tra locale e remoto
-  merged.nextOppSeq = Math.max(
-    typeof local.nextOppSeq === "number" ? local.nextOppSeq : 1,
-    typeof remote.nextOppSeq === "number" ? remote.nextOppSeq : 1
-  );
+  // nextOppSeqByYear: per ogni anno prende il massimo tra locale e remoto
+  const mergedSeq = { ...(remote.nextOppSeqByYear||{}) };
+  for(const [yy, v] of Object.entries(local.nextOppSeqByYear||{})){
+    mergedSeq[yy] = Math.max(mergedSeq[yy]||0, v);
+  }
+  merged.nextOppSeqByYear = mergedSeq;
 
   // meta: manteniamo il nostro
   merged.meta = local.meta || defaultDb().meta;
@@ -679,15 +715,26 @@ function initSelects(){
 // ID PROGRESSIVO
 // ═══════════════════════════════════════════════════════════════
 
-function allocateOppSeq(){
-  if(typeof db.nextOppSeq !== "number" || db.nextOppSeq < 1) db.nextOppSeq = 1;
-  // trova il massimo esistente per sicurezza
-  for(const o of db.opportunities)
-    if(typeof o.oppSeq === "number" && o.oppSeq >= db.nextOppSeq)
-      db.nextOppSeq = o.oppSeq + 1;
-  const seq = db.nextOppSeq++;
-  return { oppSeq: seq, oppId: `OPP-${pad3(seq)}` };
+function allocateOppSeq(createdAt){
+  const yy = yearCode(createdAt || todayStr());
+  if(!d_nextSeqByYear()) db.nextOppSeqByYear = {};
+
+  // Calcola il massimo effettivamente usato per questo anno (sicurezza anti-duplicati)
+  let maxUsed = 0;
+  for(const o of db.opportunities){
+    if(yearCode(o.createdAt) === yy && typeof o.oppSeq === "number")
+      maxUsed = Math.max(maxUsed, o.oppSeq);
+  }
+  const counter = Math.max(db.nextOppSeqByYear[yy] || 1, maxUsed + 1);
+  db.nextOppSeqByYear[yy] = counter + 1;
+
+  const seq   = counter;
+  const oppId = buildOppId(yy, seq);
+  return { oppSeq: seq, oppId };
 }
+
+/** Helper: restituisce true se nextOppSeqByYear è un oggetto valido */
+function d_nextSeqByYear(){ return db.nextOppSeqByYear && typeof db.nextOppSeqByYear === "object" && !Array.isArray(db.nextOppSeqByYear); }
 
 // ═══════════════════════════════════════════════════════════════
 // LEADS (rubrica)
@@ -748,7 +795,7 @@ function oppToForm(o){
 function formToOpp(){
   const existing = db.opportunities.find(x => x.id === currentOppId);
   const inv = existing?.invoices || [];
-  const seqData = existing ? { oppSeq: existing.oppSeq, oppId: existing.oppId } : allocateOppSeq();
+  const seqData = existing ? { oppSeq: existing.oppSeq, oppId: existing.oppId } : allocateOppSeq(ui.createdAt.value || todayStr());
   return normalizeOpp({
     id:             currentOppId || uid(),
     ...seqData,
@@ -783,7 +830,11 @@ function newOpp(){
   currentOppId = null;
   ui.oppForm.reset();
   ui.createdAt.value    = todayStr();
-  if(ui.owner) ui.owner.value = db.salespeople?.[0]||"";
+  // Commerciale di default: Renato (se presente nell'elenco), altrimenti il primo disponibile
+  if(ui.owner){
+    const owners = normalizeSalespeopleList(db.salespeople);
+    ui.owner.value = owners.includes("Renato") ? "Renato" : (owners[0]||"");
+  }
   ui.oppStatus.value    = "aperta";
   ui.oppPhase.value     = "contatto iniziale";
   ui.product.value      = "da definire";
@@ -865,6 +916,46 @@ function clearNextActionDateForOpp(idx){
   }
 }
 
+/**
+ * Aggiorna automaticamente stato, fase e probabilità in base alle fatture presenti.
+ * Regole (in ordine di priorità):
+ *   - almeno una fattura EMESSA  → stato "chiusa vinta", fase "conseguita - fatturata",    prob. "100%"
+ *   - almeno una fattura PIANIFICATA (e nessuna emessa) → stato "chiusa vinta", fase "conseguita - non fatturata", prob. "100%"
+ *   - nessuna fattura → nessuna modifica automatica
+ * Aggiorna sia il db che i controlli del form aperto.
+ */
+function applyInvoiceAutoStatus(idx){
+  const opp = db.opportunities?.[idx];
+  if(!opp) return;
+
+  const invoices = (opp.invoices||[]).map(normalizeInvoice);
+  const hasIssued   = invoices.some(i => i.status === "emessa");
+  const hasPlanned  = invoices.some(i => i.status === "pianificata");
+
+  if(!hasIssued && !hasPlanned) return; // nessuna fattura: non toccare nulla
+
+  let newStatus, newPhase;
+  if(hasIssued){
+    newStatus = "chiusa vinta";
+    newPhase  = "conseguita - fatturata";
+  } else {
+    newStatus = "chiusa vinta";
+    newPhase  = "conseguita - non fatturata";
+  }
+  const newProb = "100%";
+
+  opp.status      = newStatus;
+  opp.phase       = newPhase;
+  opp.probability = newProb;
+
+  // Aggiorna il form se è l'opportunità correntemente aperta
+  if(opp.id === currentOppId){
+    if(ui.oppStatus)   ui.oppStatus.value   = newStatus;
+    if(ui.oppPhase)    ui.oppPhase.value     = newPhase;
+    if(ui.probability) ui.probability.value  = newProb;
+  }
+}
+
 function addInvoice(){
   if(!currentOppId){ alert("Salva prima l'opportunità, poi aggiungi le fatture."); return; }
   const kind = ui.invStatus?.value || "emessa";
@@ -887,6 +978,7 @@ function addInvoice(){
 
   db.opportunities[idx].updatedAt = nowIso();
   clearNextActionDateForOpp(idx);
+  applyInvoiceAutoStatus(idx);
   renderInvoices(db.opportunities[idx].invoices);
   saveDb();
   renderAll();
@@ -899,6 +991,7 @@ function deleteInvoice(invId){
   if(idx === -1) return;
   db.opportunities[idx].invoices = (db.opportunities[idx].invoices||[]).map(normalizeInvoice).filter(x=>x.id!==invId);
   db.opportunities[idx].updatedAt = nowIso();
+  applyInvoiceAutoStatus(idx);
   saveDb();
   renderAll();
 }
@@ -915,6 +1008,7 @@ function markPlannedAsIssued(invId){
   const newInvoices = opp.invoices.map(x => x.id !== invId ? x : normalizeInvoice({ ...x, status:"emessa", number:num.trim(), date:(dt||"").trim(), amount:toNum(amtStr), updatedAt:nowIso() }));
   db.opportunities[idx] = normalizeOpp({ ...opp, invoices:newInvoices, updatedAt:nowIso() });
   clearNextActionDateForOpp(idx);
+  applyInvoiceAutoStatus(idx);
   saveDb();
   renderAll();
 }
@@ -939,6 +1033,7 @@ function saveOpp(e){
 
   const savedIdx = db.opportunities.findIndex(x => x.id === o.id);
   clearNextActionDateForOpp(savedIdx);
+  applyInvoiceAutoStatus(savedIdx);
 
   currentOppId = o.id;
   ui.deleteBtn.disabled = false;
@@ -965,7 +1060,7 @@ function duplicateOpp(id){
   const o = db.opportunities.find(x => x.id === id);
   if(!o) return;
   const base   = normalizeOpp(o);
-  const seqData = allocateOppSeq();
+  const seqData = allocateOppSeq(todayStr());
   const copy   = normalizeOpp({ ...base, id:uid(), ...seqData, name:`${base.name} (copia)`, createdAt:todayStr(), createdAtTs:nowIso(), updatedAt:nowIso(), invoices:[] });
   db.opportunities.unshift(copy);
   saveDb();
