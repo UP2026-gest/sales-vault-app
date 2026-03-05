@@ -10,9 +10,8 @@
   <header class="bar">
     <div>
       <h1>Sales Vault</h1>
-      <div id="status" class="muted">Pronto (salvataggio automatico in questo browser)</div>
-      <div id="backupInfo" class="muted"></div>
-      <div id="ghStatus" class="ghStatus info">☁️ GitHub Sync non configurato</div>
+      <div id="status" class="muted">Inizializzazione…</div>
+      <div id="ghStatus" class="ghStatus syncing">🔄 Connessione a GitHub…</div>
     </div>
     <div class="actions">
       <button id="ghSyncBtn" style="background:#1a7a3a; color:white; border-color:#1a7a3a;">☁️ GitHub Sync</button>
@@ -30,7 +29,7 @@
 
       <label class="row">
         <span>Ricerca</span>
-        <input id="q" placeholder="cliente, opportunità, note..." />
+        <input id="q" placeholder="cliente, opportunità, note…" />
       </label>
 
       <label class="row">
@@ -68,26 +67,26 @@
         </select>
       </label>
 
-<label class="row">
-  <span>Fatture prog.</span>
-  <select id="invPlannedFilter">
-    <option value="all">(tutte)</option>
-<option value="lastMonth">mese scorso</option>
-    <option value="thisMonth">di questo mese</option>
-    <option value="nextMonth">del mese prossimo</option>
-    <option value="year">questo anno solare</option>
-  </select>
-</label>
+      <label class="row">
+        <span>Fatture prog.</span>
+        <select id="invPlannedFilter">
+          <option value="all">(tutte)</option>
+          <option value="lastMonth">mese scorso</option>
+          <option value="thisMonth">di questo mese</option>
+          <option value="nextMonth">del mese prossimo</option>
+          <option value="year">questo anno solare</option>
+        </select>
+      </label>
 
-<label class="row">
-  <span>Fatture emesse</span>
-  <select id="invIssuedFilter">
-    <option value="all">(tutte)</option>
-    <option value="thisMonth">mese corrente</option>
-    <option value="lastMonth">mese scorso</option>
-    <option value="year">questo anno solare</option>
-  </select>
-</label>
+      <label class="row">
+        <span>Fatture emesse</span>
+        <select id="invIssuedFilter">
+          <option value="all">(tutte)</option>
+          <option value="thisMonth">mese corrente</option>
+          <option value="lastMonth">mese scorso</option>
+          <option value="year">questo anno solare</option>
+        </select>
+      </label>
 
       <hr/>
 
@@ -97,65 +96,65 @@
       <hr/>
 
       <div class="muted">
-        Dati salvati automaticamente in Chrome. Per usarli su altri PC: <b>Esporta backup</b> su OneDrive e poi <b>Importa backup</b>.
+        Dati sincronizzati automaticamente via GitHub. Configura il sync con il pulsante <b>☁️ GitHub Sync</b>.
       </div>
     </section>
 
     <section class="card">
-  <h2>Opportunità</h2>
-  <div id="oppCounter" class="muted" style="margin:-6px 0 10px 0;"></div>
-  <div id="oppList" class="list muted">Nessuna opportunità.</div>
-</section>
+      <h2>Opportunità</h2>
+      <div id="oppCounter" class="muted" style="margin:-6px 0 10px 0;"></div>
+      <div id="oppList" class="list muted">Nessuna opportunità.</div>
+    </section>
 
     <section class="card">
       <h2>Dettaglio opportunità</h2>
 
-<div id="dirtyHint" class="warn" style="display:none; margin:-6px 0 10px 0;">
-  ⚠️ Hai modifiche non salvate: premi “Salva” prima di cambiare opportunità.
-</div>
+      <div id="dirtyHint" class="warn" style="display:none; margin:-6px 0 10px 0;">
+        ⚠️ Hai modifiche non salvate: premi "Salva" prima di cambiare opportunità.
+      </div>
 
-     <form id="oppForm">
+      <form id="oppForm">
 
-<div class="formActions top">
-  <button id="saveBtn" type="submit">Salva</button>
-  <button id="deleteBtn" type="button" class="danger">Elimina</button>
-</div>
+        <div class="formActions top">
+          <button id="saveBtn" type="submit">Salva</button>
+          <button id="deleteBtn" type="button" class="danger">Elimina</button>
+        </div>
 
-  <div class="two">
-    <label class="row">
-      <span>Lead</span>
-      <input id="lead" list="leadList" placeholder="Scrivi o seleziona un lead…" />
-      <datalist id="leadList"></datalist>
-    </label>
+        <div class="two">
+          <label class="row">
+            <span>Lead</span>
+            <input id="lead" list="leadList" placeholder="Scrivi o seleziona un lead…" />
+            <datalist id="leadList"></datalist>
+          </label>
 
-    <label class="row">
-      <span>Referente</span>
-      <input id="leadContactName" placeholder="Nome persona di riferimento" />
-    </label>
-  </div>
+          <label class="row">
+            <span>Referente</span>
+            <input id="leadContactName" placeholder="Nome persona di riferimento" />
+          </label>
+        </div>
 
-  <div class="two">
-    <label class="row">
-      <span>Telefono</span>
-      <input id="leadPhone" placeholder="+39…" />
-    </label>
+        <div class="two">
+          <label class="row">
+            <span>Telefono</span>
+            <input id="leadPhone" placeholder="+39…" />
+          </label>
 
-    <label class="row">
-      <span>Email</span>
-      <input id="leadEmail" placeholder="nome@azienda.it" />
-    </label>
-  </div>
+          <label class="row">
+            <span>Email</span>
+            <input id="leadEmail" placeholder="nome@azienda.it" />
+          </label>
+        </div>
 
-  <label>
-    Data creazione
-    <input id="createdAt" type="date" required />
-  </label>
+        <label>
+          Data creazione
+          <input id="createdAt" type="date" required />
+        </label>
 
-  <label>
-    Commerciale
-    <select id="owner" required></select>
-  </label>
-    
+        <label>
+          Commerciale
+          <select id="owner" required></select>
+        </label>
+
         <label>
           Nome opportunità
           <input id="oppName" required placeholder="es. Corso blended per team commerciale" />
@@ -194,7 +193,7 @@
         <div class="two">
           <label>
             Prossima azione commerciale
-            <input id="nextAction" placeholder="es. chiamare per follow-up, inviare CTR..." />
+            <input id="nextAction" placeholder="es. chiamare per follow-up, inviare CTR…" />
           </label>
           <label>
             Data prossima azione
@@ -204,7 +203,7 @@
 
         <label>
           Note
-          <textarea id="notes" rows="5" placeholder="contesto, obiezioni, dettagli, decision maker..."></textarea>
+          <textarea id="notes" rows="5" placeholder="contesto, obiezioni, dettagli, decision maker…"></textarea>
         </label>
 
         <div class="card inner">
@@ -231,7 +230,7 @@
               </select>
             </label>
             <div class="muted" style="margin-top:22px;">
-              Usa “pianificata” quando sai che dovrai fatturare più avanti.
+              Usa "pianificata" quando sai che dovrai fatturare più avanti.
             </div>
           </div>
 
@@ -272,17 +271,17 @@
           <hr/>
           <div class="muted" id="calcBox"></div>
         </div>
-     
+
         <div id="fileInfo" class="muted"></div>
       </form>
     </section>
   </main>
 
-  <!-- Modal promemoria -->
+  <!-- Modal -->
   <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-content">
       <div class="modal-header">
-        <strong>Promemoria</strong>
+        <strong id="modalTitle">Promemoria</strong>
         <button id="modalCloseBtn" type="button">Chiudi</button>
       </div>
       <div id="modalBody" class="modal-body"></div>
