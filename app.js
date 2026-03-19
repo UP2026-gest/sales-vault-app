@@ -297,10 +297,11 @@ function normalizeOpp(o){
   const inv = Array.isArray(o.invoices) ? o.invoices : [];
   const owners = normalizeSalespeopleList(db?.salespeople);
   const rawOwner = String(o.owner??"").trim();
-  // Fallback: se il proprietario salvato non è più nell'elenco, usa Renato (se presente)
-  // oppure il primo della lista — MAI sovrascrivere un valore valido già presente
   const defaultOwner = owners.includes("Renato") ? "Renato" : (owners[0]||"");
-  const safeOwner = rawOwner && owners.includes(rawOwner) ? rawOwner : defaultOwner;
+  // Regola: NON sovrascrivere mai un owner non vuoto, anche se non è più nell'elenco attuale.
+  // Il fallback scatta SOLO se il campo è vuoto. Un owner rimosso dall'elenco resta valido
+  // sull'opportunità finché non viene modificato manualmente dall'utente.
+  const safeOwner = rawOwner || defaultOwner;
   return {
     id:             o.id || uid(),
     oppSeq:         o.oppSeq || 0,
@@ -458,7 +459,7 @@ async function syncPull(silent = false){
   saveDbLocal();
   refreshOwnerSelects();
   refreshLeadDatalist();
-  renderAll();
+  renderAllSafe();
 
   if(!silent) setGhStatus(`Sincronizzato — ${fmtItDateTime(db.updatedAt)}`, "ok");
   return true;
@@ -493,7 +494,7 @@ async function syncSave(){
       saveDbLocal();
       refreshOwnerSelects();
       refreshLeadDatalist();
-      renderAll();
+      renderAllSafe();
     }
 
     // 3. Push del db unito
@@ -513,6 +514,7 @@ async function syncSave(){
           const rem = migrateDb(fresh.content);
           db = mergeDb(db, rem);
           saveDbLocal();
+          renderAllSafe();
         }
         const retry = await GH.push(db, fresh.sha);
         if(retry){
@@ -545,7 +547,7 @@ function startPolling(){
     saveDbLocal();
     refreshOwnerSelects();
     refreshLeadDatalist();
-    renderAll();
+    renderAllSafe();
     setGhStatus(`Aggiornato da remoto — ${new Date().toLocaleTimeString("it-IT")}`, "ok");
   }, 30_000);
 }
@@ -1284,14 +1286,20 @@ function deleteInvoice(invId){
 function markPlannedAsIssued(invId){
   const idx = db.opportunities.findIndex(x => x.id === currentOppId);
   if(idx === -1) return;
-  const opp = normalizeOpp(db.opportunities[idx]);
+  // Lavora direttamente sul raw db per non perdere owner e altri campi
+  const raw = db.opportunities[idx];
+  const opp = normalizeOpp(raw);
   const inv = (opp.invoices||[]).find(x => x.id === invId);
   if(!inv) return;
   const num    = prompt("Numero fattura (es. 12/2026):", ""); if(num === null) return;
   const dt     = prompt("Data fattura (YYYY-MM-DD):", todayStr()); if(dt === null) return;
   const amtStr = prompt("Importo fatturato (€):", toNum(inv.plannedAmount).toFixed(2)); if(amtStr === null) return;
-  const newInvoices = opp.invoices.map(x => x.id !== invId ? x : normalizeInvoice({ ...x, status:"emessa", number:num.trim(), date:(dt||"").trim(), amount:toNum(amtStr), updatedAt:nowIso() }));
-  db.opportunities[idx] = normalizeOpp({ ...opp, invoices:newInvoices, updatedAt:nowIso() });
+  const newInvoices = opp.invoices.map(x => x.id !== invId ? x : normalizeInvoice({
+    ...x, status:"emessa", number:num.trim(), date:(dt||"").trim(), amount:toNum(amtStr), updatedAt:nowIso()
+  }));
+  // Aggiorna solo le fatture e updatedAt — non toccare owner né altri campi
+  raw.invoices  = newInvoices;
+  raw.updatedAt = nowIso();
   clearNextActionDateForOpp(idx);
   applyInvoiceAutoStatus(idx);
   saveDb();
@@ -1562,6 +1570,28 @@ function renderAll(){
   if(currentOppId){
     const fresh = db.opportunities.find(x=>x.id===currentOppId);
     if(fresh){ const n=normalizeOpp(fresh); renderCalcBox(n); renderInvoices(n.invoices); }
+  }
+}
+
+/**
+ * Versione "safe" di renderAll usata dopo sync/pull/merge in background.
+ * Aggiorna KPI e lista, ma NON sovrascrive i campi del form aperto
+ * (per non perdere modifiche in corso o cambiare il commerciale).
+ * Aggiorna fatture e calcBox dell'opp aperta (read-only) senza toccare i campi editabili.
+ */
+function renderAllSafe(){
+  refreshYearFilter();
+  renderKpi();
+  renderOppList();
+  if(currentOppId){
+    const fresh = db.opportunities.find(x=>x.id===currentOppId);
+    if(fresh){
+      const n = normalizeOpp(fresh);
+      // Aggiorna solo le sezioni read-only (fatture e calcoli), MAI i campi del form
+      renderCalcBox(n);
+      renderInvoices(n.invoices);
+      renderBillLines(n.billLines || []);
+    }
   }
 }
 
