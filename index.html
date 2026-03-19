@@ -58,6 +58,13 @@
       </div>
 
       <label class="row">
+        <span>Anno creazione</span>
+        <select id="yearFilter">
+          <option value="all">(tutti gli anni)</option>
+        </select>
+      </label>
+
+      <label class="row">
         <span>Azioni</span>
         <select id="dueFilter">
           <option value="all">(tutte)</option>
@@ -270,6 +277,87 @@
 
           <hr/>
           <div class="muted" id="calcBox"></div>
+        </div>
+
+        <!-- ════ DATI FATTURAZIONE CLIENTE ════ -->
+        <div class="card inner">
+          <h3>Dati fatturazione cliente</h3>
+          <p class="muted" style="margin:0 0 8px;">Compila una volta: verranno stampati nella scheda per l'amministrazione.</p>
+
+          <div class="two">
+            <label>
+              Ragione sociale (destinatario fattura)
+              <input id="billName" placeholder="es. SOCIETA' DI PROGETTO BREBEMI SPA" />
+            </label>
+            <label>
+              Indirizzo
+              <input id="billAddress" placeholder="es. Via Flero 28, 25125 Brescia (BS)" />
+            </label>
+          </div>
+
+          <div class="two">
+            <label>
+              P.IVA destinatario
+              <input id="billVat" placeholder="es. 02508160989" />
+            </label>
+            <label>
+              Codice Fiscale destinatario
+              <input id="billCf" placeholder="es. 02508160989" />
+            </label>
+          </div>
+
+          <div class="two">
+            <label>
+              Email SDI / PEC destinatario
+              <input id="billSdi" placeholder="es. nadia.esposito@brebemi.it" />
+            </label>
+            <label>
+              Riferimento ordine cliente
+              <input id="billOrderRef" placeholder="es. Ordine 2026 - AC 000023 del 29/01/2026" />
+            </label>
+          </div>
+        </div>
+
+        <!-- ════ RIGHE DI DETTAGLIO FATTURA ════ -->
+        <div class="card inner">
+          <h3>Righe di dettaglio fattura</h3>
+          <p class="muted" style="margin:0 0 8px;">Descrivi i servizi da fatturare. IVA 22% calcolata in automatico nella scheda stampa.</p>
+
+          <div id="billLinesList" class="list muted">Nessuna riga inserita.</div>
+
+          <hr/>
+
+          <div class="billLineInput">
+            <label style="margin:0;">
+              Descrizione
+              <input id="blDesc" placeholder="es. Corso online di inglese — 30 ore docente" />
+            </label>
+            <label style="margin:0;">
+              Quantità
+              <input id="blQty" type="number" min="0" step="0.01" placeholder="30" />
+            </label>
+            <label style="margin:0;">
+              Unità
+              <input id="blUnit" placeholder="ore" />
+            </label>
+            <label style="margin:0;">
+              Prezzo unitario €
+              <input id="blPrice" type="number" min="0" step="0.01" placeholder="35.00" />
+            </label>
+            <div style="padding-top:20px;">
+              <button id="addBillLineBtn" type="button">Aggiungi</button>
+            </div>
+          </div>
+
+          <hr/>
+          <div class="muted" id="billTotalsBox"></div>
+        </div>
+
+        <!-- Pulsante stampa -->
+        <div style="margin-top:10px;">
+          <button id="printBillBtn" type="button" style="background:#1a4a9a; color:white; border-color:#1a4a9a; width:auto; padding:10px 20px; font-size:15px;">
+            🖨️ Stampa scheda fatturazione
+          </button>
         </div>
 
         <div id="fileInfo" class="muted"></div>

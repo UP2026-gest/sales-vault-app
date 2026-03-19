@@ -297,7 +297,10 @@ function normalizeOpp(o){
   const inv = Array.isArray(o.invoices) ? o.invoices : [];
   const owners = normalizeSalespeopleList(db?.salespeople);
   const rawOwner = String(o.owner??"").trim();
-  const safeOwner = rawOwner && owners.includes(rawOwner) ? rawOwner : (owners[0]||"");
+  // Fallback: se il proprietario salvato non è più nell'elenco, usa Renato (se presente)
+  // oppure il primo della lista — MAI sovrascrivere un valore valido già presente
+  const defaultOwner = owners.includes("Renato") ? "Renato" : (owners[0]||"");
+  const safeOwner = rawOwner && owners.includes(rawOwner) ? rawOwner : defaultOwner;
   return {
     id:             o.id || uid(),
     oppSeq:         o.oppSeq || 0,
@@ -322,6 +325,15 @@ function normalizeOpp(o){
     leadContactName: o.leadContactName || "",
     leadPhone:       o.leadPhone || "",
     leadEmail:       o.leadEmail || "",
+    // dati fatturazione cliente
+    billName:     o.billName     || "",
+    billAddress:  o.billAddress  || "",
+    billVat:      o.billVat      || "",
+    billCf:       o.billCf       || "",
+    billSdi:      o.billSdi      || "",
+    billOrderRef: o.billOrderRef || "",
+    // righe di dettaglio fattura
+    billLines: Array.isArray(o.billLines) ? o.billLines.map(normalizeBillLine) : [],
   };
 }
 
@@ -568,6 +580,7 @@ const ui = {
   ownerFilter:      document.getElementById("ownerFilter"),
   manageOwnersBtn:  document.getElementById("manageOwnersBtn"),
   dueFilter:        document.getElementById("dueFilter"),
+  yearFilter:       document.getElementById("yearFilter"),
   invPlannedFilter: document.getElementById("invPlannedFilter"),
   invIssuedFilter:  document.getElementById("invIssuedFilter"),
 
@@ -607,6 +620,23 @@ const ui = {
   saveBtn:          document.getElementById("saveBtn"),
   deleteBtn:        document.getElementById("deleteBtn"),
   fileInfo:         document.getElementById("fileInfo"),
+
+  // dati fatturazione cliente
+  billName:         document.getElementById("billName"),
+  billAddress:      document.getElementById("billAddress"),
+  billVat:          document.getElementById("billVat"),
+  billCf:           document.getElementById("billCf"),
+  billSdi:          document.getElementById("billSdi"),
+  billOrderRef:     document.getElementById("billOrderRef"),
+  // righe dettaglio
+  billLinesList:    document.getElementById("billLinesList"),
+  blDesc:           document.getElementById("blDesc"),
+  blQty:            document.getElementById("blQty"),
+  blUnit:           document.getElementById("blUnit"),
+  blPrice:          document.getElementById("blPrice"),
+  addBillLineBtn:   document.getElementById("addBillLineBtn"),
+  billTotalsBox:    document.getElementById("billTotalsBox"),
+  printBillBtn:     document.getElementById("printBillBtn"),
 
   modal:            document.getElementById("modal"),
   modalTitle:       document.getElementById("modalTitle"),
@@ -737,6 +767,20 @@ function allocateOppSeq(createdAt){
 function d_nextSeqByYear(){ return db.nextOppSeqByYear && typeof db.nextOppSeqByYear === "object" && !Array.isArray(db.nextOppSeqByYear); }
 
 // ═══════════════════════════════════════════════════════════════
+// RIGHE DI DETTAGLIO FATTURA
+// ═══════════════════════════════════════════════════════════════
+
+function normalizeBillLine(x){
+  return {
+    id:    x?.id    || uid(),
+    desc:  x?.desc  || "",
+    qty:   toNum(x?.qty),
+    unit:  x?.unit  || "",
+    price: toNum(x?.price),
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════
 // LEADS (rubrica)
 // ═══════════════════════════════════════════════════════════════
 
@@ -761,16 +805,35 @@ function fillLeadContactFields(name){
   ui.leadEmail.value       = lead?.email||"";
 }
 
-// ═══════════════════════════════════════════════════════════════
-// FORM ↔ DB
+/** Aggiorna il menu a tendina "Anno creazione" con gli anni presenti nel db */
+function refreshYearFilter(){
+  if(!ui.yearFilter) return;
+  const current = ui.yearFilter.value;
+  const years = [...new Set(
+    db.opportunities
+      .map(o => (o.createdAt||"").slice(0,4))
+      .filter(y => /^\d{4}$/.test(y))
+  )].sort((a,b) => b.localeCompare(a)); // più recente prima
+
+  ui.yearFilter.innerHTML = `<option value="all">(tutti gli anni)</option>`;
+  for(const y of years){
+    const opt = document.createElement("option");
+    opt.value = y; opt.textContent = y;
+    ui.yearFilter.appendChild(opt);
+  }
+  // ripristina selezione precedente se ancora valida
+  if(years.includes(current)) ui.yearFilter.value = current;
+}
 // ═══════════════════════════════════════════════════════════════
 
 function oppToForm(o){
   currentOppId = o.id;
+  const owners = normalizeSalespeopleList(db.salespeople);
   ui.lead.value           = o.lead;
   fillLeadContactFields(o.lead);
   ui.createdAt.value      = o.createdAt;
-  if(ui.owner) ui.owner.value = o.owner || (db.salespeople?.[0]||"");
+  // Usa il commerciale salvato nell'opportunità — non sovrascriverlo mai con il default
+  if(ui.owner) ui.owner.value = (o.owner && owners.includes(o.owner)) ? o.owner : (owners.includes("Renato") ? "Renato" : (owners[0]||""));
   ui.oppName.value        = o.name;
   ui.oppStatus.value      = o.status;
   ui.oppPhase.value       = o.phase;
@@ -781,6 +844,15 @@ function oppToForm(o){
   ui.nextActionDate.value = o.nextActionDate || "";
   ui.notes.value          = o.notes;
   ui.serviceCost.value    = o.serviceCost || "";
+
+  // dati fatturazione cliente
+  if(ui.billName)     ui.billName.value     = o.billName     || "";
+  if(ui.billAddress)  ui.billAddress.value  = o.billAddress  || "";
+  if(ui.billVat)      ui.billVat.value      = o.billVat      || "";
+  if(ui.billCf)       ui.billCf.value       = o.billCf       || "";
+  if(ui.billSdi)      ui.billSdi.value      = o.billSdi      || "";
+  if(ui.billOrderRef) ui.billOrderRef.value = o.billOrderRef || "";
+  renderBillLines(o.billLines || []);
 
   renderInvoices(o.invoices);
   renderCalcBox(o);
@@ -801,7 +873,7 @@ function formToOpp(){
     ...seqData,
     lead:           ui.lead.value.trim(),
     createdAt:      ui.createdAt.value,
-    owner:          ui.owner?.value || (db.salespeople?.[0]||""),
+    owner:          ui.owner?.value || (normalizeSalespeopleList(db.salespeople).includes("Renato") ? "Renato" : (db.salespeople?.[0]||"")),
     name:           ui.oppName.value.trim(),
     status:         ui.oppStatus.value,
     phase:          ui.oppPhase.value,
@@ -813,6 +885,13 @@ function formToOpp(){
     notes:          ui.notes.value.trim(),
     serviceCost:    ui.serviceCost.value,
     invoices:       inv,
+    billLines:      existing?.billLines || [],
+    billName:       ui.billName?.value.trim()     || "",
+    billAddress:    ui.billAddress?.value.trim()  || "",
+    billVat:        ui.billVat?.value.trim()       || "",
+    billCf:         ui.billCf?.value.trim()        || "",
+    billSdi:        ui.billSdi?.value.trim()       || "",
+    billOrderRef:   ui.billOrderRef?.value.trim()  || "",
     createdAtTs:    existing?.createdAtTs || nowIso(),
     updatedAt:      nowIso(),
   });
@@ -842,12 +921,218 @@ function newOpp(){
   ui.deleteBtn.disabled = true;
   if(ui.invStatus) ui.invStatus.value = "pianificata";
   resetInvoiceInputs();
+  // reset billing fields
+  if(ui.billName)     ui.billName.value     = "";
+  if(ui.billAddress)  ui.billAddress.value  = "";
+  if(ui.billVat)      ui.billVat.value      = "";
+  if(ui.billCf)       ui.billCf.value       = "";
+  if(ui.billSdi)      ui.billSdi.value      = "";
+  if(ui.billOrderRef) ui.billOrderRef.value = "";
+  renderBillLines([]);
   ui.invList.textContent = "Nessuna riga fattura.";
   ui.invList.classList.add("muted");
   ui.calcBox.textContent = "";
   ui.fileInfo.textContent = "";
   setFormSnapshot();
   updateDirtyHint();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RIGHE DETTAGLIO — rendering e gestione
+// ═══════════════════════════════════════════════════════════════
+
+function renderBillTotals(lines){
+  if(!ui.billTotalsBox) return;
+  if(!lines || lines.length === 0){ ui.billTotalsBox.textContent = ""; return; }
+  const imponibile = lines.reduce((s,l) => s + toNum(l.qty) * toNum(l.price), 0);
+  const iva = imponibile * 0.22;
+  const totale = imponibile + iva;
+  ui.billTotalsBox.innerHTML =
+    `<div><b>Imponibile</b>: € ${imponibile.toFixed(2)}</div>` +
+    `<div><b>IVA 22%</b>: € ${iva.toFixed(2)}</div>` +
+    `<div><b>Totale fattura</b>: € ${totale.toFixed(2)}</div>`;
+}
+
+function renderBillLines(lines){
+  if(!ui.billLinesList) return;
+  ui.billLinesList.innerHTML = "";
+  if(!lines || lines.length === 0){
+    ui.billLinesList.textContent = "Nessuna riga inserita.";
+    ui.billLinesList.classList.add("muted");
+    renderBillTotals([]);
+    return;
+  }
+  ui.billLinesList.classList.remove("muted");
+  lines.forEach((l, idx) => {
+    const importo = toNum(l.qty) * toNum(l.price);
+    const div = document.createElement("div"); div.className = "item";
+    const left = document.createElement("div");
+    const s = document.createElement("strong");
+    s.textContent = l.desc || "(senza descrizione)";
+    const meta = document.createElement("div"); meta.className = "meta";
+    meta.textContent = `${l.qty} ${l.unit} × € ${toNum(l.price).toFixed(2)} = € ${importo.toFixed(2)}`;
+    left.appendChild(s); left.appendChild(meta);
+    const del = document.createElement("button"); del.type = "button"; del.textContent = "🗑";
+    del.addEventListener("click", () => deleteBillLine(idx));
+    div.appendChild(left); div.appendChild(del);
+    ui.billLinesList.appendChild(div);
+  });
+  renderBillTotals(lines);
+}
+
+function addBillLine(){
+  if(!currentOppId){ alert("Salva prima l'opportunità, poi aggiungi le righe di dettaglio."); return; }
+  const desc  = ui.blDesc?.value.trim()  || "";
+  const qty   = toNum(ui.blQty?.value);
+  const unit  = ui.blUnit?.value.trim()  || "";
+  const price = toNum(ui.blPrice?.value);
+  if(!desc && qty === 0 && price === 0){ alert("Compila almeno la descrizione o quantità e prezzo."); return; }
+
+  const idx = db.opportunities.findIndex(x => x.id === currentOppId);
+  if(idx === -1) return;
+  if(!Array.isArray(db.opportunities[idx].billLines)) db.opportunities[idx].billLines = [];
+  db.opportunities[idx].billLines.push(normalizeBillLine({ id:uid(), desc, qty, unit, price }));
+  db.opportunities[idx].updatedAt = nowIso();
+
+  if(ui.blDesc)  ui.blDesc.value  = "";
+  if(ui.blQty)   ui.blQty.value   = "";
+  if(ui.blUnit)  ui.blUnit.value  = "";
+  if(ui.blPrice) ui.blPrice.value = "";
+
+  renderBillLines(db.opportunities[idx].billLines);
+  saveDb();
+}
+
+function deleteBillLine(lineIdx){
+  const idx = db.opportunities.findIndex(x => x.id === currentOppId);
+  if(idx === -1) return;
+  db.opportunities[idx].billLines = (db.opportunities[idx].billLines || []).filter((_, i) => i !== lineIdx);
+  db.opportunities[idx].updatedAt = nowIso();
+  renderBillLines(db.opportunities[idx].billLines);
+  saveDb();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STAMPA SCHEDA FATTURAZIONE
+// ═══════════════════════════════════════════════════════════════
+
+function printBillingSheet(){
+  if(!currentOppId){ alert("Apri un'opportunità prima di stampare la scheda."); return; }
+  const raw = db.opportunities.find(x => x.id === currentOppId);
+  if(!raw){ alert("Opportunità non trovata."); return; }
+  const o = normalizeOpp(raw);
+
+  const lines = (o.billLines || []).map(normalizeBillLine);
+  const imponibile = lines.reduce((s,l) => s + toNum(l.qty)*toNum(l.price), 0);
+  const iva        = imponibile * 0.22;
+  const totale     = imponibile + iva;
+
+  const linesHtml = lines.length > 0
+    ? `<table>
+        <thead><tr>
+          <th>Descrizione</th>
+          <th style="text-align:right;">Qtà</th>
+          <th>Unità</th>
+          <th style="text-align:right;">Prezzo unit. €</th>
+          <th style="text-align:right;">Importo €</th>
+        </tr></thead>
+        <tbody>
+          ${lines.map(l => {
+            const imp = toNum(l.qty)*toNum(l.price);
+            return `<tr>
+              <td>${escapeHtml(l.desc)}</td>
+              <td class="num">${toNum(l.qty)}</td>
+              <td>${escapeHtml(l.unit)}</td>
+              <td class="num">${toNum(l.price).toFixed(2)}</td>
+              <td class="num">${imp.toFixed(2)}</td>
+            </tr>`;
+          }).join("")}
+        </tbody>
+      </table>
+      <div class="ps-totals">
+        <div>Imponibile: <b>€ ${imponibile.toFixed(2)}</b></div>
+        <div>IVA 22%: <b>€ ${iva.toFixed(2)}</b></div>
+        <div class="tot-final">TOTALE: € ${totale.toFixed(2)}</div>
+      </div>`
+    : `<p style="color:#888; font-style:italic;">Nessuna riga di dettaglio inserita — compilare in fase di emissione.</p>`;
+
+  const html = `<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8"/>
+  <title>Scheda Fatturazione — ${escapeHtml(o.oppId)} ${escapeHtml(o.name)}</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    body { background: white; margin: 0; }
+    @media print { .no-print { display:none!important; } }
+  </style>
+</head>
+<body>
+<div class="print-sheet">
+
+  <div class="no-print" style="background:#e8f0fe; padding:12px 16px; border-radius:8px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between;">
+    <span style="font-weight:600; color:#1a4a9a;">📋 Scheda pronta — usa Ctrl+P (o ⌘+P su Mac) per stampare o salvare come PDF</span>
+    <button onclick="window.print()" style="background:#1a4a9a; color:white; border:none; border-radius:8px; padding:8px 16px; cursor:pointer; font-size:14px;">🖨️ Stampa / Salva PDF</button>
+  </div>
+
+  <h1>Scheda Fatturazione</h1>
+  <div class="ps-meta">
+    Generata il ${new Date().toLocaleDateString("it-IT", {day:"2-digit",month:"long",year:"numeric"})} •
+    ${escapeHtml(o.oppId)} — ${escapeHtml(o.name)}
+  </div>
+
+  <!-- DATI OPPORTUNITÀ -->
+  <div class="ps-section">
+    <h2>Riferimento opportunità</h2>
+    <div class="ps-row"><span class="ps-label">ID Opportunità</span><span class="ps-value">${escapeHtml(o.oppId)}</span></div>
+    <div class="ps-row"><span class="ps-label">Nome opportunità</span><span class="ps-value">${escapeHtml(o.name)}</span></div>
+    <div class="ps-row"><span class="ps-label">Cliente (Lead)</span><span class="ps-value">${escapeHtml(o.lead)}</span></div>
+    <div class="ps-row"><span class="ps-label">Commerciale</span><span class="ps-value">${escapeHtml(o.owner)}</span></div>
+    <div class="ps-row"><span class="ps-label">Prodotto</span><span class="ps-value">${escapeHtml(o.product)}</span></div>
+    ${o.notes ? `<div class="ps-row"><span class="ps-label">Note opportunità</span><span class="ps-value">${escapeHtml(o.notes)}</span></div>` : ""}
+  </div>
+
+  <!-- DESTINATARIO -->
+  <div class="ps-section">
+    <h2>Destinatario fattura</h2>
+    ${o.billName    ? `<div class="ps-row"><span class="ps-label">Ragione sociale</span><span class="ps-value"><b>${escapeHtml(o.billName)}</b></span></div>` : ""}
+    ${o.billAddress ? `<div class="ps-row"><span class="ps-label">Indirizzo</span><span class="ps-value">${escapeHtml(o.billAddress)}</span></div>` : ""}
+    ${o.billVat     ? `<div class="ps-row"><span class="ps-label">P.IVA</span><span class="ps-value">${escapeHtml(o.billVat)}</span></div>` : ""}
+    ${o.billCf      ? `<div class="ps-row"><span class="ps-label">Codice Fiscale</span><span class="ps-value">${escapeHtml(o.billCf)}</span></div>` : ""}
+    ${o.billSdi     ? `<div class="ps-row"><span class="ps-label">Email SDI / PEC</span><span class="ps-value">${escapeHtml(o.billSdi)}</span></div>` : ""}
+    ${o.billOrderRef? `<div class="ps-row"><span class="ps-label">Riferimento ordine</span><span class="ps-value"><b>${escapeHtml(o.billOrderRef)}</b></span></div>` : ""}
+    ${(!o.billName && !o.billAddress && !o.billVat && !o.billSdi)
+      ? `<p style="color:#a00; font-style:italic;">⚠️ Dati destinatario non compilati nel gestionale — inserirli prima di emettere la fattura.</p>` : ""}
+  </div>
+
+  <!-- RIGHE DI DETTAGLIO -->
+  <div class="ps-section">
+    <h2>Dettaglio servizi da fatturare</h2>
+    ${linesHtml}
+  </div>
+
+  <!-- RIQUADRO DA COMPILARE -->
+  <div class="ps-compile">
+    <h2>✏️ Da compilare al momento dell'emissione</h2>
+    <div class="field"><label>Numero fattura</label><div class="line"></div></div>
+    <div class="field"><label>Data fattura</label><div class="line"></div></div>
+    <div class="field"><label>Scadenze pagamento</label><div class="line"></div></div>
+    <div class="field"><label>Modalità pagamento</label><div class="line" style="flex:2;"></div></div>
+    <div class="field"><label>Note aggiuntive</label><div class="line" style="flex:2;"></div></div>
+  </div>
+
+  <div class="ps-note">
+    Documento interno generato da Sales Vault • ${escapeHtml(o.oppId)} • Non ha valenza fiscale
+  </div>
+
+</div>
+</body>
+</html>`;
+
+  const win = window.open("", "_blank");
+  if(!win){ alert("Il browser ha bloccato la finestra popup. Consenti i popup per questo sito."); return; }
+  win.document.write(html);
+  win.document.close();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1027,7 +1312,8 @@ function saveOpp(e){
   if(idx === -1){
     db.opportunities.push(o);
   } else {
-    o.invoices = db.opportunities[idx].invoices || [];
+    o.invoices   = db.opportunities[idx].invoices   || [];
+    o.billLines  = db.opportunities[idx].billLines  || [];
     db.opportunities[idx] = o;
   }
 
@@ -1120,10 +1406,12 @@ function matchesFilters(o){
   const pf  = ui.phaseFilter.value;
   const prf = ui.productFilter.value;
   const of  = ui.ownerFilter?.value||"";
+  const yf  = ui.yearFilter?.value||"all";
   if(sf && o.status !== sf)   return false;
   if(pf && o.phase !== pf)    return false;
   if(prf && o.product !== prf) return false;
   if(of && o.owner !== of)    return false;
+  if(yf !== "all" && (o.createdAt||"").slice(0,4) !== yf) return false;
   if(!matchesDueFilter(o))             return false;
   if(!matchesPlannedInvoiceFilter(o))  return false;
   if(!matchesIssuedInvoiceFilter(o))   return false;
@@ -1162,7 +1450,30 @@ function renderOwnerStats(all){
 }
 
 function renderKpi(){
-  const all = db.opportunities.map(normalizeOpp);
+  const allNorm  = db.opportunities.map(normalizeOpp);
+  // Il cruscotto rispecchia esattamente i filtri attivi nella lista
+  const all = allNorm.filter(matchesFilters);
+
+  // Etichetta filtri attivi
+  const filterLabels = [];
+  const yf  = ui.yearFilter?.value||"all";
+  const sf  = ui.statusFilter?.value||"";
+  const of  = ui.ownerFilter?.value||"";
+  const pf  = ui.phaseFilter?.value||"";
+  const prf = ui.productFilter?.value||"";
+  const iif = ui.invIssuedFilter?.value||"all";
+  const ipf = ui.invPlannedFilter?.value||"all";
+  if(yf !== "all") filterLabels.push(`Anno: ${yf}`);
+  if(sf)  filterLabels.push(`Stato: ${sf}`);
+  if(of)  filterLabels.push(`Commerciale: ${of}`);
+  if(pf)  filterLabels.push(`Fase: ${pf}`);
+  if(prf) filterLabels.push(`Prodotto: ${prf}`);
+  if(iif !== "all") filterLabels.push(`Fatture emesse: ${iif}`);
+  if(ipf !== "all") filterLabels.push(`Fatture prog.: ${ipf}`);
+  const filterNote = filterLabels.length > 0
+    ? `<div style="background:#e8f0fe; border-radius:6px; padding:4px 8px; margin-bottom:8px; font-size:12px; color:#1a4a9a;">🔍 Filtri attivi: ${filterLabels.join(" • ")} <span style="color:#555;">(${all.length} su ${allNorm.length} opp.)</span></div>`
+    : `<div style="font-size:12px; color:#999; margin-bottom:6px;">Tutte le opportunità (${allNorm.length})</div>`;
+
   const today = todayStr();
   const open  = all.filter(o=>o.status==="aperta").length;
   const susp  = all.filter(o=>o.status==="sospesa").length;
@@ -1180,6 +1491,7 @@ function renderKpi(){
   const molPct   = eurTotal > 0 ? (molWon/eurTotal)*100 : 0;
 
   ui.kpiBox.innerHTML =
+    filterNote +
     `<div><b>Opportunità aperte</b>: ${open} • <b>Sospese</b>: ${susp}</div>` +
     `<div><b>Azioni commerciali scadute</b>: ${overdue}</div>` +
     `<div><b>Pipeline (valore previsto)</b>: € ${totalPipe.toFixed(2)}</div>` +
@@ -1244,6 +1556,7 @@ function renderOppList(){
 }
 
 function renderAll(){
+  refreshYearFilter();
   renderKpi();
   renderOppList();
   if(currentOppId){
@@ -1478,6 +1791,8 @@ ui.newOppBtn.addEventListener("click", () => { if(!confirmIfDirty()) return; new
 ui.oppForm.addEventListener("submit", saveOpp);
 ui.deleteBtn.addEventListener("click", deleteOpp);
 ui.addInvBtn.addEventListener("click", addInvoice);
+ui.addBillLineBtn?.addEventListener("click", addBillLine);
+ui.printBillBtn?.addEventListener("click", printBillingSheet);
 ui.lead.addEventListener("input", () => fillLeadContactFields(ui.lead.value));
 
 ui.q.addEventListener("input", renderAll);
@@ -1485,6 +1800,7 @@ ui.statusFilter.addEventListener("change", renderAll);
 ui.phaseFilter.addEventListener("change", renderAll);
 ui.productFilter.addEventListener("change", renderAll);
 ui.ownerFilter?.addEventListener("change", renderAll);
+ui.yearFilter?.addEventListener("change", renderAll);
 ui.dueFilter.addEventListener("change", renderAll);
 ui.invPlannedFilter.addEventListener("change", renderAll);
 ui.invIssuedFilter?.addEventListener("change", renderAll);
