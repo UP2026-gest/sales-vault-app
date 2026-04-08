@@ -326,15 +326,8 @@ function normalizeOpp(o){
     leadContactName: o.leadContactName || "",
     leadPhone:       o.leadPhone || "",
     leadEmail:       o.leadEmail || "",
-    // dati fatturazione cliente
-    billName:     o.billName     || "",
-    billAddress:  o.billAddress  || "",
-    billVat:      o.billVat      || "",
-    billCf:       o.billCf       || "",
-    billSdi:      o.billSdi      || "",
-    billOrderRef: o.billOrderRef || "",
-    // righe di dettaglio fattura
-    billLines: Array.isArray(o.billLines) ? o.billLines.map(normalizeBillLine) : [],
+    // archivio
+    archived: o.archived === true,
   };
 }
 
@@ -385,7 +378,15 @@ function mergeDb(local, remote){
       // Vince l'ultima modifica
       const rTs = ro.updatedAt || "";
       const lTs = lo.updatedAt || "";
-      resultMap.set(ro.id, lTs > rTs ? lo : ro);
+      let winner = lTs >= rTs ? lo : ro;
+      // Protezione owner: se la versione vincente ha owner vuoto ma l'altra ce l'ha,
+      // usa quello non vuoto. Previene che un dato corrotto remoto sovrascriva un owner valido.
+      const winnerOwner = String(winner.owner || "").trim();
+      const otherOwner  = String((winner === lo ? ro : lo).owner || "").trim();
+      if(!winnerOwner && otherOwner){
+        winner = { ...winner, owner: otherOwner };
+      }
+      resultMap.set(ro.id, winner);
     }
   }
 
@@ -619,26 +620,14 @@ const ui = {
   invList:          document.getElementById("invList"),
   calcBox:          document.getElementById("calcBox"),
 
-  saveBtn:          document.getElementById("saveBtn"),
-  deleteBtn:        document.getElementById("deleteBtn"),
-  fileInfo:         document.getElementById("fileInfo"),
+  archiveFilter:    document.getElementById("archiveFilter"),
 
-  // dati fatturazione cliente
-  billName:         document.getElementById("billName"),
-  billAddress:      document.getElementById("billAddress"),
-  billVat:          document.getElementById("billVat"),
-  billCf:           document.getElementById("billCf"),
-  billSdi:          document.getElementById("billSdi"),
-  billOrderRef:     document.getElementById("billOrderRef"),
-  // righe dettaglio
-  billLinesList:    document.getElementById("billLinesList"),
-  blDesc:           document.getElementById("blDesc"),
-  blQty:            document.getElementById("blQty"),
-  blUnit:           document.getElementById("blUnit"),
-  blPrice:          document.getElementById("blPrice"),
-  addBillLineBtn:   document.getElementById("addBillLineBtn"),
-  billTotalsBox:    document.getElementById("billTotalsBox"),
-  printBillBtn:     document.getElementById("printBillBtn"),
+  saveBtn:          document.getElementById("saveBtn"),
+  archiveBtn:       document.getElementById("archiveBtn"),
+  deleteBtn:        document.getElementById("deleteBtn"),
+  restoreBtn:       document.getElementById("restoreBtn"),
+  archivedBanner:   document.getElementById("archivedBanner"),
+  fileInfo:         document.getElementById("fileInfo"),
 
   modal:            document.getElementById("modal"),
   modalTitle:       document.getElementById("modalTitle"),
@@ -684,8 +673,47 @@ function isFormDirty(){ return !dirtyBypass && JSON.stringify(getFormState()) !=
 function updateDirtyHint(){
   if(ui.dirtyHint) ui.dirtyHint.style.display = isFormDirty() ? "block" : "none";
 }
-function confirmIfDirty(msg = "Hai modifiche non salvate. Vuoi uscire senza salvare?"){
-  return !isFormDirty() || confirm(msg);
+/**
+ * Se il form non è dirty: risolve subito true (procedi).
+ * Se è dirty: mostra una modal con tre bottoni e ritorna una Promise<boolean>.
+ *   true  = l'utente ha scelto "Esci senza salvare" oppure ha salvato
+ *   false = l'utente ha scelto "Annulla"
+ */
+function confirmIfDirty(){
+  if(!isFormDirty()) return Promise.resolve(true);
+  return new Promise(resolve => {
+    // Usa la modal esistente
+    if(ui.modalTitle) ui.modalTitle.textContent = "Modifiche non salvate";
+    ui.modalBody.innerHTML = `
+      <div style="font-size:15px; margin-bottom:16px;">
+        Hai modifiche non salvate su questa opportunità.<br>
+        <b>Vuoi salvarla prima di uscire?</b>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button id="_dirtySave"   style="background:#1a7a3a; color:white; border-color:#1a7a3a; width:auto; padding:8px 18px;">💾 Salva</button>
+        <button id="_dirtyLeave"  style="width:auto; padding:8px 18px;">Esci senza salvare</button>
+        <button id="_dirtyCancel" style="width:auto; padding:8px 18px;" class="danger">Annulla</button>
+      </div>`;
+    ui.modal.classList.remove("hidden");
+
+    document.getElementById("_dirtySave").onclick = () => {
+      closeModal();
+      // Salva l'opportunità corrente (simula submit del form)
+      if(currentOppId || ui.oppName.value.trim()){
+        const evt = new Event("submit", { bubbles:true, cancelable:true });
+        ui.oppForm.dispatchEvent(evt);
+      }
+      resolve(true);
+    };
+    document.getElementById("_dirtyLeave").onclick = () => {
+      closeModal();
+      resolve(true);
+    };
+    document.getElementById("_dirtyCancel").onclick = () => {
+      closeModal();
+      resolve(false);
+    };
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -772,15 +800,6 @@ function d_nextSeqByYear(){ return db.nextOppSeqByYear && typeof db.nextOppSeqBy
 // RIGHE DI DETTAGLIO FATTURA
 // ═══════════════════════════════════════════════════════════════
 
-function normalizeBillLine(x){
-  return {
-    id:    x?.id    || uid(),
-    desc:  x?.desc  || "",
-    qty:   toNum(x?.qty),
-    unit:  x?.unit  || "",
-    price: toNum(x?.price),
-  };
-}
 
 // ═══════════════════════════════════════════════════════════════
 // LEADS (rubrica)
@@ -847,21 +866,22 @@ function oppToForm(o){
   ui.notes.value          = o.notes;
   ui.serviceCost.value    = o.serviceCost || "";
 
-  // dati fatturazione cliente
-  if(ui.billName)     ui.billName.value     = o.billName     || "";
-  if(ui.billAddress)  ui.billAddress.value  = o.billAddress  || "";
-  if(ui.billVat)      ui.billVat.value      = o.billVat      || "";
-  if(ui.billCf)       ui.billCf.value       = o.billCf       || "";
-  if(ui.billSdi)      ui.billSdi.value      = o.billSdi      || "";
-  if(ui.billOrderRef) ui.billOrderRef.value = o.billOrderRef || "";
-  renderBillLines(o.billLines || []);
-
   renderInvoices(o.invoices);
   renderCalcBox(o);
 
   ui.deleteBtn.disabled = false;
   const badge = o.oppId ? `<span class="oppid-badge">${escapeHtml(o.oppId)}</span>` : "";
   ui.fileInfo.innerHTML = `${badge}ID interno: ${o.id}`;
+
+  // Mostra/nasconde banner archiviato e pulsanti
+  const isArch = o.archived === true;
+  if(ui.archivedBanner) ui.archivedBanner.style.display = isArch ? "block" : "none";
+  if(ui.archiveBtn){
+    ui.archiveBtn.style.display = isArch ? "none" : "";
+    ui.archiveBtn.textContent   = "📦 Archivia";
+  }
+  if(ui.deleteBtn) ui.deleteBtn.style.display = isArch ? "" : "none";
+
   setFormSnapshot();
   updateDirtyHint();
 }
@@ -887,13 +907,6 @@ function formToOpp(){
     notes:          ui.notes.value.trim(),
     serviceCost:    ui.serviceCost.value,
     invoices:       inv,
-    billLines:      existing?.billLines || [],
-    billName:       ui.billName?.value.trim()     || "",
-    billAddress:    ui.billAddress?.value.trim()  || "",
-    billVat:        ui.billVat?.value.trim()       || "",
-    billCf:         ui.billCf?.value.trim()        || "",
-    billSdi:        ui.billSdi?.value.trim()       || "",
-    billOrderRef:   ui.billOrderRef?.value.trim()  || "",
     createdAtTs:    existing?.createdAtTs || nowIso(),
     updatedAt:      nowIso(),
   });
@@ -921,220 +934,17 @@ function newOpp(){
   ui.product.value      = "da definire";
   ui.probability.value  = "50%";
   ui.deleteBtn.disabled = true;
+  if(ui.archivedBanner) ui.archivedBanner.style.display = "none";
+  if(ui.archiveBtn)     ui.archiveBtn.style.display = "";
+  if(ui.deleteBtn)      ui.deleteBtn.style.display  = "none";
   if(ui.invStatus) ui.invStatus.value = "pianificata";
   resetInvoiceInputs();
-  // reset billing fields
-  if(ui.billName)     ui.billName.value     = "";
-  if(ui.billAddress)  ui.billAddress.value  = "";
-  if(ui.billVat)      ui.billVat.value      = "";
-  if(ui.billCf)       ui.billCf.value       = "";
-  if(ui.billSdi)      ui.billSdi.value      = "";
-  if(ui.billOrderRef) ui.billOrderRef.value = "";
-  renderBillLines([]);
   ui.invList.textContent = "Nessuna riga fattura.";
   ui.invList.classList.add("muted");
   ui.calcBox.textContent = "";
   ui.fileInfo.textContent = "";
   setFormSnapshot();
   updateDirtyHint();
-}
-
-// ═══════════════════════════════════════════════════════════════
-// RIGHE DETTAGLIO — rendering e gestione
-// ═══════════════════════════════════════════════════════════════
-
-function renderBillTotals(lines){
-  if(!ui.billTotalsBox) return;
-  if(!lines || lines.length === 0){ ui.billTotalsBox.textContent = ""; return; }
-  const imponibile = lines.reduce((s,l) => s + toNum(l.qty) * toNum(l.price), 0);
-  const iva = imponibile * 0.22;
-  const totale = imponibile + iva;
-  ui.billTotalsBox.innerHTML =
-    `<div><b>Imponibile</b>: € ${imponibile.toFixed(2)}</div>` +
-    `<div><b>IVA 22%</b>: € ${iva.toFixed(2)}</div>` +
-    `<div><b>Totale fattura</b>: € ${totale.toFixed(2)}</div>`;
-}
-
-function renderBillLines(lines){
-  if(!ui.billLinesList) return;
-  ui.billLinesList.innerHTML = "";
-  if(!lines || lines.length === 0){
-    ui.billLinesList.textContent = "Nessuna riga inserita.";
-    ui.billLinesList.classList.add("muted");
-    renderBillTotals([]);
-    return;
-  }
-  ui.billLinesList.classList.remove("muted");
-  lines.forEach((l, idx) => {
-    const importo = toNum(l.qty) * toNum(l.price);
-    const div = document.createElement("div"); div.className = "item";
-    const left = document.createElement("div");
-    const s = document.createElement("strong");
-    s.textContent = l.desc || "(senza descrizione)";
-    const meta = document.createElement("div"); meta.className = "meta";
-    meta.textContent = `${l.qty} ${l.unit} × € ${toNum(l.price).toFixed(2)} = € ${importo.toFixed(2)}`;
-    left.appendChild(s); left.appendChild(meta);
-    const del = document.createElement("button"); del.type = "button"; del.textContent = "🗑";
-    del.addEventListener("click", () => deleteBillLine(idx));
-    div.appendChild(left); div.appendChild(del);
-    ui.billLinesList.appendChild(div);
-  });
-  renderBillTotals(lines);
-}
-
-function addBillLine(){
-  if(!currentOppId){ alert("Salva prima l'opportunità, poi aggiungi le righe di dettaglio."); return; }
-  const desc  = ui.blDesc?.value.trim()  || "";
-  const qty   = toNum(ui.blQty?.value);
-  const unit  = ui.blUnit?.value.trim()  || "";
-  const price = toNum(ui.blPrice?.value);
-  if(!desc && qty === 0 && price === 0){ alert("Compila almeno la descrizione o quantità e prezzo."); return; }
-
-  const idx = db.opportunities.findIndex(x => x.id === currentOppId);
-  if(idx === -1) return;
-  if(!Array.isArray(db.opportunities[idx].billLines)) db.opportunities[idx].billLines = [];
-  db.opportunities[idx].billLines.push(normalizeBillLine({ id:uid(), desc, qty, unit, price }));
-  db.opportunities[idx].updatedAt = nowIso();
-
-  if(ui.blDesc)  ui.blDesc.value  = "";
-  if(ui.blQty)   ui.blQty.value   = "";
-  if(ui.blUnit)  ui.blUnit.value  = "";
-  if(ui.blPrice) ui.blPrice.value = "";
-
-  renderBillLines(db.opportunities[idx].billLines);
-  saveDb();
-}
-
-function deleteBillLine(lineIdx){
-  const idx = db.opportunities.findIndex(x => x.id === currentOppId);
-  if(idx === -1) return;
-  db.opportunities[idx].billLines = (db.opportunities[idx].billLines || []).filter((_, i) => i !== lineIdx);
-  db.opportunities[idx].updatedAt = nowIso();
-  renderBillLines(db.opportunities[idx].billLines);
-  saveDb();
-}
-
-// ═══════════════════════════════════════════════════════════════
-// STAMPA SCHEDA FATTURAZIONE
-// ═══════════════════════════════════════════════════════════════
-
-function printBillingSheet(){
-  if(!currentOppId){ alert("Apri un'opportunità prima di stampare la scheda."); return; }
-  const raw = db.opportunities.find(x => x.id === currentOppId);
-  if(!raw){ alert("Opportunità non trovata."); return; }
-  const o = normalizeOpp(raw);
-
-  const lines = (o.billLines || []).map(normalizeBillLine);
-  const imponibile = lines.reduce((s,l) => s + toNum(l.qty)*toNum(l.price), 0);
-  const iva        = imponibile * 0.22;
-  const totale     = imponibile + iva;
-
-  const linesHtml = lines.length > 0
-    ? `<table>
-        <thead><tr>
-          <th>Descrizione</th>
-          <th style="text-align:right;">Qtà</th>
-          <th>Unità</th>
-          <th style="text-align:right;">Prezzo unit. €</th>
-          <th style="text-align:right;">Importo €</th>
-        </tr></thead>
-        <tbody>
-          ${lines.map(l => {
-            const imp = toNum(l.qty)*toNum(l.price);
-            return `<tr>
-              <td>${escapeHtml(l.desc)}</td>
-              <td class="num">${toNum(l.qty)}</td>
-              <td>${escapeHtml(l.unit)}</td>
-              <td class="num">${toNum(l.price).toFixed(2)}</td>
-              <td class="num">${imp.toFixed(2)}</td>
-            </tr>`;
-          }).join("")}
-        </tbody>
-      </table>
-      <div class="ps-totals">
-        <div>Imponibile: <b>€ ${imponibile.toFixed(2)}</b></div>
-        <div>IVA 22%: <b>€ ${iva.toFixed(2)}</b></div>
-        <div class="tot-final">TOTALE: € ${totale.toFixed(2)}</div>
-      </div>`
-    : `<p style="color:#888; font-style:italic;">Nessuna riga di dettaglio inserita — compilare in fase di emissione.</p>`;
-
-  const html = `<!DOCTYPE html>
-<html lang="it">
-<head>
-  <meta charset="utf-8"/>
-  <title>Scheda Fatturazione — ${escapeHtml(o.oppId)} ${escapeHtml(o.name)}</title>
-  <link rel="stylesheet" href="style.css"/>
-  <style>
-    body { background: white; margin: 0; }
-    @media print { .no-print { display:none!important; } }
-  </style>
-</head>
-<body>
-<div class="print-sheet">
-
-  <div class="no-print" style="background:#e8f0fe; padding:12px 16px; border-radius:8px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between;">
-    <span style="font-weight:600; color:#1a4a9a;">📋 Scheda pronta — usa Ctrl+P (o ⌘+P su Mac) per stampare o salvare come PDF</span>
-    <button onclick="window.print()" style="background:#1a4a9a; color:white; border:none; border-radius:8px; padding:8px 16px; cursor:pointer; font-size:14px;">🖨️ Stampa / Salva PDF</button>
-  </div>
-
-  <h1>Scheda Fatturazione</h1>
-  <div class="ps-meta">
-    Generata il ${new Date().toLocaleDateString("it-IT", {day:"2-digit",month:"long",year:"numeric"})} •
-    ${escapeHtml(o.oppId)} — ${escapeHtml(o.name)}
-  </div>
-
-  <!-- DATI OPPORTUNITÀ -->
-  <div class="ps-section">
-    <h2>Riferimento opportunità</h2>
-    <div class="ps-row"><span class="ps-label">ID Opportunità</span><span class="ps-value">${escapeHtml(o.oppId)}</span></div>
-    <div class="ps-row"><span class="ps-label">Nome opportunità</span><span class="ps-value">${escapeHtml(o.name)}</span></div>
-    <div class="ps-row"><span class="ps-label">Cliente (Lead)</span><span class="ps-value">${escapeHtml(o.lead)}</span></div>
-    <div class="ps-row"><span class="ps-label">Commerciale</span><span class="ps-value">${escapeHtml(o.owner)}</span></div>
-    <div class="ps-row"><span class="ps-label">Prodotto</span><span class="ps-value">${escapeHtml(o.product)}</span></div>
-    ${o.notes ? `<div class="ps-row"><span class="ps-label">Note opportunità</span><span class="ps-value">${escapeHtml(o.notes)}</span></div>` : ""}
-  </div>
-
-  <!-- DESTINATARIO -->
-  <div class="ps-section">
-    <h2>Destinatario fattura</h2>
-    ${o.billName    ? `<div class="ps-row"><span class="ps-label">Ragione sociale</span><span class="ps-value"><b>${escapeHtml(o.billName)}</b></span></div>` : ""}
-    ${o.billAddress ? `<div class="ps-row"><span class="ps-label">Indirizzo</span><span class="ps-value">${escapeHtml(o.billAddress)}</span></div>` : ""}
-    ${o.billVat     ? `<div class="ps-row"><span class="ps-label">P.IVA</span><span class="ps-value">${escapeHtml(o.billVat)}</span></div>` : ""}
-    ${o.billCf      ? `<div class="ps-row"><span class="ps-label">Codice Fiscale</span><span class="ps-value">${escapeHtml(o.billCf)}</span></div>` : ""}
-    ${o.billSdi     ? `<div class="ps-row"><span class="ps-label">Email SDI / PEC</span><span class="ps-value">${escapeHtml(o.billSdi)}</span></div>` : ""}
-    ${o.billOrderRef? `<div class="ps-row"><span class="ps-label">Riferimento ordine</span><span class="ps-value"><b>${escapeHtml(o.billOrderRef)}</b></span></div>` : ""}
-    ${(!o.billName && !o.billAddress && !o.billVat && !o.billSdi)
-      ? `<p style="color:#a00; font-style:italic;">⚠️ Dati destinatario non compilati nel gestionale — inserirli prima di emettere la fattura.</p>` : ""}
-  </div>
-
-  <!-- RIGHE DI DETTAGLIO -->
-  <div class="ps-section">
-    <h2>Dettaglio servizi da fatturare</h2>
-    ${linesHtml}
-  </div>
-
-  <!-- RIQUADRO DA COMPILARE -->
-  <div class="ps-compile">
-    <h2>✏️ Da compilare al momento dell'emissione</h2>
-    <div class="field"><label>Numero fattura</label><div class="line"></div></div>
-    <div class="field"><label>Data fattura</label><div class="line"></div></div>
-    <div class="field"><label>Scadenze pagamento</label><div class="line"></div></div>
-    <div class="field"><label>Modalità pagamento</label><div class="line" style="flex:2;"></div></div>
-    <div class="field"><label>Note aggiuntive</label><div class="line" style="flex:2;"></div></div>
-  </div>
-
-  <div class="ps-note">
-    Documento interno generato da Sales Vault • ${escapeHtml(o.oppId)} • Non ha valenza fiscale
-  </div>
-
-</div>
-</body>
-</html>`;
-
-  const win = window.open("", "_blank");
-  if(!win){ alert("Il browser ha bloccato la finestra popup. Consenti i popup per questo sito."); return; }
-  win.document.write(html);
-  win.document.close();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1321,7 +1131,6 @@ function saveOpp(e){
     db.opportunities.push(o);
   } else {
     o.invoices   = db.opportunities[idx].invoices   || [];
-    o.billLines  = db.opportunities[idx].billLines  || [];
     db.opportunities[idx] = o;
   }
 
@@ -1341,9 +1150,41 @@ function saveOpp(e){
   updateDirtyHint();
 }
 
+function archiveOpp(){
+  if(!currentOppId) return;
+  if(!confirm("Archiviare questa opportunità? Non apparirà più nei conteggi né nella lista normale. Potrai recuperarla con il filtro Archivio.")) return;
+  const idx = db.opportunities.findIndex(x => x.id === currentOppId);
+  if(idx === -1) return;
+  db.opportunities[idx].archived  = true;
+  db.opportunities[idx].updatedAt = nowIso();
+  saveDb();
+  renderAll();
+  // Aggiorna banner e pulsanti senza uscire dall'opportunità
+  const fresh = db.opportunities.find(x => x.id === currentOppId);
+  if(fresh) oppToForm(normalizeOpp(fresh));
+}
+
+function restoreOpp(){
+  if(!currentOppId) return;
+  const idx = db.opportunities.findIndex(x => x.id === currentOppId);
+  if(idx === -1) return;
+  db.opportunities[idx].archived  = false;
+  db.opportunities[idx].updatedAt = nowIso();
+  saveDb();
+  renderAll();
+  const fresh = db.opportunities.find(x => x.id === currentOppId);
+  if(fresh) oppToForm(normalizeOpp(fresh));
+}
+
 function deleteOpp(){
   if(!currentOppId) return;
-  if(!confirm("Vuoi eliminare definitivamente questa opportunità?")) return;
+  const o = db.opportunities.find(x => x.id === currentOppId);
+  if(!o?.archived){
+    alert("Puoi eliminare definitivamente solo le opportunità già archiviate.");
+    return;
+  }
+  if(!confirm("ATTENZIONE: eliminazione definitiva e irreversibile. Continuare?")) return;
+  if(!confirm("Sei sicuro? I dati non potranno essere recuperati.")) return;
   db.opportunities = db.opportunities.filter(x => x.id !== currentOppId);
   saveDb();
   renderAll();
@@ -1415,14 +1256,21 @@ function matchesFilters(o){
   const prf = ui.productFilter.value;
   const of  = ui.ownerFilter?.value||"";
   const yf  = ui.yearFilter?.value||"all";
-  if(sf && o.status !== sf)   return false;
-  if(pf && o.phase !== pf)    return false;
+  const af  = ui.archiveFilter?.value||"active";
+
+  // Filtro archivio — default: mostra solo attive
+  if(af === "active"   &&  o.archived) return false;
+  if(af === "archived" && !o.archived) return false;
+  // af === "all": mostra tutto
+
+  if(sf && o.status !== sf)    return false;
+  if(pf && o.phase !== pf)     return false;
   if(prf && o.product !== prf) return false;
-  if(of && o.owner !== of)    return false;
+  if(of && o.owner !== of)     return false;
   if(yf !== "all" && (o.createdAt||"").slice(0,4) !== yf) return false;
-  if(!matchesDueFilter(o))             return false;
-  if(!matchesPlannedInvoiceFilter(o))  return false;
-  if(!matchesIssuedInvoiceFilter(o))   return false;
+  if(!matchesDueFilter(o))            return false;
+  if(!matchesPlannedInvoiceFilter(o)) return false;
+  if(!matchesIssuedInvoiceFilter(o))  return false;
   if(!q) return true;
   const invText = (o.invoices||[]).map(x=>{const i=normalizeInvoice(x); return [i.status,i.plannedDate,i.plannedAmount,i.number,i.date,i.amount].join(" ");}).join(" ");
   return [o.lead,o.oppId,o.name,o.owner,o.status,o.phase,o.product,o.probability,o.nextAction,o.nextActionDate,o.notes,invText].join(" ").toLowerCase().includes(q);
@@ -1471,6 +1319,7 @@ function renderKpi(){
   const prf = ui.productFilter?.value||"";
   const iif = ui.invIssuedFilter?.value||"all";
   const ipf = ui.invPlannedFilter?.value||"all";
+  const af  = ui.archiveFilter?.value||"active";
   if(yf !== "all") filterLabels.push(`Anno: ${yf}`);
   if(sf)  filterLabels.push(`Stato: ${sf}`);
   if(of)  filterLabels.push(`Commerciale: ${of}`);
@@ -1478,6 +1327,8 @@ function renderKpi(){
   if(prf) filterLabels.push(`Prodotto: ${prf}`);
   if(iif !== "all") filterLabels.push(`Fatture emesse: ${iif}`);
   if(ipf !== "all") filterLabels.push(`Fatture prog.: ${ipf}`);
+  if(af === "archived") filterLabels.push("📦 Archiviate");
+  if(af === "all")      filterLabels.push("Archiviate incluse");
   const filterNote = filterLabels.length > 0
     ? `<div style="background:#e8f0fe; border-radius:6px; padding:4px 8px; margin-bottom:8px; font-size:12px; color:#1a4a9a;">🔍 Filtri attivi: ${filterLabels.join(" • ")} <span style="color:#555;">(${all.length} su ${allNorm.length} opp.)</span></div>`
     : `<div style="font-size:12px; color:#999; margin-bottom:6px;">Tutte le opportunità (${allNorm.length})</div>`;
@@ -1532,7 +1383,7 @@ function renderOppList(){
 
     // Titolo con badge OPP-NNN
     if(o.oppId){
-      title.innerHTML = `<span class="oppid-badge">${escapeHtml(o.oppId)}</span>${escapeHtml(o.name||"(senza nome)")} — ${escapeHtml(o.lead||"(lead)")}`;
+      title.innerHTML = `${o.archived ? '<span class="archived-badge">📦 ARCHIVIATA</span>' : ''}<span class="oppid-badge">${escapeHtml(o.oppId)}</span>${escapeHtml(o.name||"(senza nome)")} — ${escapeHtml(o.lead||"(lead)")}`;
     } else {
       title.textContent = `${o.name||"(senza nome)"} — ${o.lead||"(lead)"}`;
     }
@@ -1550,8 +1401,9 @@ function renderOppList(){
     left.appendChild(title); left.appendChild(meta);
 
     const btnOpen = document.createElement("button"); btnOpen.type="button"; btnOpen.textContent="Apri";
-    btnOpen.addEventListener("click", () => {
-      if(!confirmIfDirty()) return;
+    btnOpen.addEventListener("click", async () => {
+      const ok = await confirmIfDirty();
+      if(!ok) return;
       const fresh = db.opportunities.find(x=>x.id===o.id);
       if(fresh) oppToForm(normalizeOpp(fresh));
     });
@@ -1590,7 +1442,6 @@ function renderAllSafe(){
       // Aggiorna solo le sezioni read-only (fatture e calcoli), MAI i campi del form
       renderCalcBox(n);
       renderInvoices(n.invoices);
-      renderBillLines(n.billLines || []);
     }
   }
 }
@@ -1817,12 +1668,12 @@ function handleManageOwners(){
 // EVENT LISTENERS
 // ═══════════════════════════════════════════════════════════════
 
-ui.newOppBtn.addEventListener("click", () => { if(!confirmIfDirty()) return; newOpp(); });
+ui.newOppBtn.addEventListener("click", async () => { if(!await confirmIfDirty()) return; newOpp(); });
 ui.oppForm.addEventListener("submit", saveOpp);
+ui.archiveBtn?.addEventListener("click", archiveOpp);
+ui.restoreBtn?.addEventListener("click", restoreOpp);
 ui.deleteBtn.addEventListener("click", deleteOpp);
 ui.addInvBtn.addEventListener("click", addInvoice);
-ui.addBillLineBtn?.addEventListener("click", addBillLine);
-ui.printBillBtn?.addEventListener("click", printBillingSheet);
 ui.lead.addEventListener("input", () => fillLeadContactFields(ui.lead.value));
 
 ui.q.addEventListener("input", renderAll);
@@ -1830,6 +1681,7 @@ ui.statusFilter.addEventListener("change", renderAll);
 ui.phaseFilter.addEventListener("change", renderAll);
 ui.productFilter.addEventListener("change", renderAll);
 ui.ownerFilter?.addEventListener("change", renderAll);
+ui.archiveFilter?.addEventListener("change", renderAll);
 ui.yearFilter?.addEventListener("change", renderAll);
 ui.dueFilter.addEventListener("change", renderAll);
 ui.invPlannedFilter.addEventListener("change", renderAll);
@@ -1841,9 +1693,9 @@ ui.manageOwnersBtn?.addEventListener("click", handleManageOwners);
 
 ui.exportBtn.addEventListener("click", exportBackup);
 ui.importBtn.addEventListener("click", () => ui.importFile.click());
-ui.importFile.addEventListener("change", (e) => {
+ui.importFile.addEventListener("change", async (e) => {
   const f = e.target.files?.[0];
-  if(!confirmIfDirty("Hai modifiche non salvate. Importando un backup le perderai. Continuare?")) return;
+  if(!await confirmIfDirty()) return;
   if(f) importBackup(f);
   ui.importFile.value = "";
 });

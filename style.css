@@ -96,3 +96,4 @@ hr { border: 0; border-top: 1px solid #eee; margin: 12px 0; }
 .ghStatus.syncing { color: #7a5a00; }
 .ghStatus.info    { color: #555; }
 .ghStatus.warn    { color: #a12a2a; }
+
