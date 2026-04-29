@@ -123,7 +123,61 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 }
 #newOppBtn:hover { background: rgba(255,255,255,.22); }
 
-/* Bottoni secondari header (backup, csv) */
+/* ── Campanello scaduti ── */
+.bell-btn {
+  position: relative;
+  background: rgba(255,255,255,.12);
+  color: rgba(255,255,255,.75);
+  border-color: rgba(255,255,255,.2);
+  padding: 6px 10px;
+  font-size: 16px;
+  line-height: 1;
+  min-width: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bell-btn:hover {
+  background: rgba(255,255,255,.22);
+  color: #fff;
+}
+.bell-btn.bell-has-items {
+  background: var(--amber);
+  color: var(--navy);
+  border-color: var(--amber);
+  animation: bell-shake .5s ease;
+}
+.bell-btn.bell-has-items:hover {
+  background: #d48f18;
+}
+.bell-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: var(--red);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: 'DM Mono', monospace;
+  border-radius: 10px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--navy);
+  pointer-events: none;
+}
+@keyframes bell-shake {
+  0%,100% { transform: rotate(0deg); }
+  20%      { transform: rotate(-12deg); }
+  40%      { transform: rotate(12deg); }
+  60%      { transform: rotate(-8deg); }
+  80%      { transform: rotate(8deg); }
+}
+
+/* ── Bottone secondario header (backup, csv) ── */
 #exportBtn, #importBtn, #exportCsvBtn {
   background: transparent;
   color: rgba(255,255,255,.65);

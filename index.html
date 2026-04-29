@@ -19,6 +19,10 @@
       <button id="exportBtn" title="Esporta backup JSON">⬇ Backup</button>
       <button id="importBtn" title="Importa backup JSON">⬆ Importa</button>
       <button id="exportCsvBtn" title="Esporta CSV per Excel">📊 CSV</button>
+      <button id="overdueBtn" title="Mostra azioni scadute" class="bell-btn" aria-label="Promemoria scaduti">
+        <span class="bell-icon">🔔</span>
+        <span id="overdueBadge" class="bell-badge" style="display:none;">0</span>
+      </button>
       <input id="importFile" type="file" accept="application/json" hidden />
     </div>
   </header>
@@ -311,27 +315,63 @@
 
   <script src="app.js"></script>
   <script>
-    // Patch: aggiunge data-status agli item della lista per i badge colorati
-    // Si aggancia dopo il rendering senza modificare app.js
+    // Patch 1: data-status badge colorati sulla lista
     (function(){
-      const origRender = window.renderOppList;
-      if(typeof origRender !== "function") {
-        // Fallback: MutationObserver sulla lista
-        const list = document.getElementById("oppList");
-        if(!list) return;
-        const obs = new MutationObserver(() => {
-          list.querySelectorAll(".item").forEach(item => {
-            const badge = item.querySelector(".oppid-badge");
-            if(!badge || item.dataset.status) return;
-            const meta = item.querySelector(".meta");
-            if(!meta) return;
-            const text = meta.textContent || "";
-            const m = text.match(/• (aperta|sospesa|chiusa vinta|chiusa persa|abbandonata)/);
-            if(m) item.dataset.status = m[1];
-          });
+      const list = document.getElementById("oppList");
+      if(!list) return;
+      const obs = new MutationObserver(() => {
+        list.querySelectorAll(".item").forEach(item => {
+          const badge = item.querySelector(".oppid-badge");
+          if(!badge || item.dataset.status) return;
+          const meta = item.querySelector(".meta");
+          if(!meta) return;
+          const text = meta.textContent || "";
+          const m = text.match(/• (aperta|sospesa|chiusa vinta|chiusa persa|abbandonata)/);
+          if(m) item.dataset.status = m[1];
         });
-        obs.observe(list, { childList: true, subtree: true });
+      });
+      obs.observe(list, { childList: true, subtree: true });
+    })();
+
+    // Patch 2: campanello scaduti
+    (function(){
+      const btn   = document.getElementById("overdueBtn");
+      const badge = document.getElementById("overdueBadge");
+      if(!btn || !badge) return;
+
+      // Aggiorna il contatore sul badge
+      function updateBell(){
+        if(typeof db === "undefined" || typeof todayStr === "undefined") return;
+        const today = todayStr();
+        const count = db.opportunities.map(normalizeOpp)
+          .filter(o => o.nextActionDate && o.nextActionDate < today && ["aperta","sospesa"].includes(o.status))
+          .length;
+        if(count > 0){
+          badge.textContent = count;
+          badge.style.display = "flex";
+          btn.classList.add("bell-has-items");
+        } else {
+          badge.style.display = "none";
+          btn.classList.remove("bell-has-items");
+        }
       }
+
+      // Aggiorna ogni volta che renderAll viene chiamato
+      const origRenderAll = window.renderAll;
+      if(typeof origRenderAll === "function"){
+        window.renderAll = function(){
+          origRenderAll.apply(this, arguments);
+          updateBell();
+        };
+      }
+      // Aggiornamento iniziale dopo avvio
+      setTimeout(updateBell, 1200);
+      setInterval(updateBell, 60_000);
+
+      // Click: apri il modal delle scadute
+      btn.addEventListener("click", () => {
+        if(typeof showModalOverdue === "function") showModalOverdue();
+      });
     })();
   </script>
 </body>
