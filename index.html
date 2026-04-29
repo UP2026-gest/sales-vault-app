@@ -14,16 +14,18 @@
       <div id="ghStatus" class="ghStatus syncing">🔄 Connessione a GitHub…</div>
     </div>
     <div class="actions">
-      <button id="ghSyncBtn" style="background:#1a7a3a; color:white; border-color:#1a7a3a;">☁️ GitHub Sync</button>
+      <button id="ghSyncBtn">☁️ GitHub Sync</button>
       <button id="newOppBtn">+ Nuova opportunità</button>
-      <button id="exportBtn">Esporta backup</button>
-      <button id="importBtn">Importa backup</button>
-      <button id="exportCsvBtn">Esporta Excel (CSV)</button>
+      <button id="exportBtn" title="Esporta backup JSON">⬇ Backup</button>
+      <button id="importBtn" title="Importa backup JSON">⬆ Importa</button>
+      <button id="exportCsvBtn" title="Esporta CSV per Excel">📊 CSV</button>
       <input id="importFile" type="file" accept="application/json" hidden />
     </div>
   </header>
 
   <main class="grid">
+
+    <!-- ── COLONNA 1: FILTRI ── -->
     <section class="card">
       <h2>Filtri</h2>
 
@@ -31,39 +33,32 @@
         <span>Ricerca</span>
         <input id="q" placeholder="cliente, opportunità, note…" />
       </label>
-
       <label class="row">
         <span>Stato</span>
         <select id="statusFilter"></select>
       </label>
-
       <label class="row">
         <span>Fase</span>
         <select id="phaseFilter"></select>
       </label>
-
       <label class="row">
         <span>Prodotto</span>
         <select id="productFilter"></select>
       </label>
-
       <label class="row">
         <span>Commerciale</span>
         <select id="ownerFilter"></select>
       </label>
-
-      <div class="row" style="margin-top:6px;">
+      <div class="row" style="margin-top:4px;">
         <span></span>
         <button id="manageOwnersBtn" type="button">Gestisci commerciali</button>
       </div>
-
       <label class="row">
-        <span>Anno creazione</span>
+        <span>Anno</span>
         <select id="yearFilter">
           <option value="all">(tutti gli anni)</option>
         </select>
       </label>
-
       <label class="row">
         <span>Archivio</span>
         <select id="archiveFilter">
@@ -72,7 +67,6 @@
           <option value="all">tutte (attive + archiviate)</option>
         </select>
       </label>
-
       <label class="row">
         <span>Azioni</span>
         <select id="dueFilter">
@@ -82,9 +76,8 @@
           <option value="next7">prossimi 7 giorni</option>
         </select>
       </label>
-
       <label class="row">
-        <span>Fatture prog.</span>
+        <span>Fatt. prog.</span>
         <select id="invPlannedFilter">
           <option value="all">(tutte)</option>
           <option value="lastMonth">mese scorso</option>
@@ -93,9 +86,8 @@
           <option value="year">questo anno solare</option>
         </select>
       </label>
-
       <label class="row">
-        <span>Fatture emesse</span>
+        <span>Fatt. emesse</span>
         <select id="invIssuedFilter">
           <option value="all">(tutte)</option>
           <option value="thisMonth">mese corrente</option>
@@ -110,71 +102,78 @@
       <div class="muted" id="kpiBox"></div>
 
       <hr/>
-
-      <div class="muted">
-        Dati sincronizzati automaticamente via GitHub. Configura il sync con il pulsante <b>☁️ GitHub Sync</b>.
+      <div class="muted" style="font-size:11.5px; line-height:1.6;">
+        Dati sincronizzati via GitHub.<br>
+        Configura con il pulsante <b>☁️ GitHub Sync</b>.
       </div>
     </section>
 
+    <!-- ── COLONNA 2: LISTA OPPORTUNITÀ ── -->
     <section class="card">
       <h2>Opportunità</h2>
-      <div id="oppCounter" class="muted" style="margin:-6px 0 10px 0;"></div>
+      <div id="oppCounter" class="muted"></div>
       <div id="oppList" class="list muted">Nessuna opportunità.</div>
     </section>
 
+    <!-- ── COLONNA 3: DETTAGLIO ── -->
     <section class="card">
       <h2>Dettaglio opportunità</h2>
 
-      <div id="dirtyHint" class="warn" style="display:none; margin:-6px 0 10px 0;">
+      <div id="dirtyHint" class="warn" style="display:none; margin-bottom:12px;">
         ⚠️ Hai modifiche non salvate: premi "Salva" prima di cambiare opportunità.
       </div>
 
       <form id="oppForm">
 
         <div class="formActions top">
-          <button id="saveBtn" type="submit">Salva</button>
-          <button id="archiveBtn" type="button" class="btn-archive">📦 Archivia</button>
-          <button id="deleteBtn" type="button" class="danger" style="display:none;">🗑 Elimina definitivamente</button>
+          <button id="saveBtn" type="submit">💾 Salva</button>
+          <button id="archiveBtn" type="button">📦 Archivia</button>
+          <button id="deleteBtn" type="button" class="danger" style="display:none;">🗑 Elimina</button>
         </div>
-        <div id="archivedBanner" style="display:none; background:#fff3cd; border:1px solid #e6c200; border-radius:8px; padding:8px 12px; margin:-4px 0 10px; font-size:13px; color:#7a5a00;">
-          📦 Opportunità archiviata — non appare nei conteggi. <b>Ripristina</b> per renderla di nuovo attiva.
-          <button id="restoreBtn" type="button" style="width:auto; padding:4px 10px; margin-left:8px;">↩ Ripristina</button>
+
+        <div id="archivedBanner">
+          📦 Opportunità archiviata — non appare nei conteggi.
+          <button id="restoreBtn" type="button">↩ Ripristina</button>
         </div>
+
+        <!-- Sezione: Anagrafica lead -->
+        <div class="form-section-label">Cliente / Lead</div>
 
         <div class="two">
-          <label class="row">
-            <span>Lead</span>
-            <input id="lead" list="leadList" placeholder="Scrivi o seleziona un lead…" />
+          <label>
+            Lead
+            <input id="lead" list="leadList" placeholder="Scrivi o seleziona…" />
             <datalist id="leadList"></datalist>
           </label>
-
-          <label class="row">
-            <span>Referente</span>
+          <label>
+            Referente
             <input id="leadContactName" placeholder="Nome persona di riferimento" />
           </label>
         </div>
-
         <div class="two">
-          <label class="row">
-            <span>Telefono</span>
+          <label>
+            Telefono
             <input id="leadPhone" placeholder="+39…" />
           </label>
-
-          <label class="row">
-            <span>Email</span>
+          <label>
+            Email
             <input id="leadEmail" placeholder="nome@azienda.it" />
           </label>
         </div>
 
-        <label>
-          Data creazione
-          <input id="createdAt" type="date" required />
-        </label>
+        <!-- Sezione: Dati opportunità -->
+        <div class="form-section-label" style="margin-top:6px;">Opportunità</div>
 
-        <label>
-          Commerciale
-          <select id="owner" required></select>
-        </label>
+        <div class="two">
+          <label>
+            Data creazione
+            <input id="createdAt" type="date" required />
+          </label>
+          <label>
+            Commerciale
+            <select id="owner" required></select>
+          </label>
+        </div>
 
         <label>
           Nome opportunità
@@ -205,7 +204,7 @@
 
         <div class="two">
           <label>
-            Valore (previsto) €
+            Valore previsto €
             <input id="valueExpected" type="number" min="0" step="0.01" placeholder="es. 2500" />
           </label>
           <div></div>
@@ -224,18 +223,19 @@
 
         <label>
           Note
-          <textarea id="notes" rows="5" placeholder="contesto, obiezioni, dettagli, decision maker…"></textarea>
+          <textarea id="notes" rows="4" placeholder="contesto, obiezioni, dettagli, decision maker…"></textarea>
         </label>
 
+        <!-- Sezione: Fatture -->
         <div class="card inner">
-          <h3>Fatture (pianificate + emesse)</h3>
+          <h3>Fatture — pianificate e emesse</h3>
 
           <div class="two">
             <label>
-              Costo erogazione servizio € (totale opportunità)
+              Costo erogazione servizio € (totale opp.)
               <input id="serviceCost" type="number" min="0" step="0.01" placeholder="es. 800" />
             </label>
-            <div class="muted" style="margin-top:22px;">
+            <div class="muted" style="margin-top:22px; font-size:12px;">
               MOL = Fatturato emesso − costo erogazione
             </div>
           </div>
@@ -250,47 +250,47 @@
                 <option value="emessa">Fattura emessa</option>
               </select>
             </label>
-            <div class="muted" style="margin-top:22px;">
-              Usa "pianificata" quando sai che dovrai fatturare più avanti.
+            <div class="muted" style="margin-top:22px; font-size:12px;">
+              "Pianificata" = sai che emetterai dopo.
             </div>
           </div>
 
           <div class="two">
             <label>
-              Data prevista (solo per pianificata)
+              Data prevista <span class="muted">(solo pianificata)</span>
               <input id="invPlannedDate" type="date" />
             </label>
             <label>
-              Importo previsto € (solo per pianificata)
+              Importo previsto € <span class="muted">(solo pianificata)</span>
               <input id="invPlannedAmount" type="number" min="0" step="0.01" placeholder="es. 1200" />
             </label>
           </div>
 
           <div class="two">
             <label>
-              Numero fattura (solo per emessa)
+              N° fattura <span class="muted">(solo emessa)</span>
               <input id="invNumber" placeholder="es. 12/2026" />
             </label>
             <label>
-              Data fattura (solo per emessa)
+              Data fattura <span class="muted">(solo emessa)</span>
               <input id="invDate" type="date" />
             </label>
           </div>
 
           <div class="two">
             <label>
-              Importo fatturato € (solo per emessa)
+              Importo fatturato € <span class="muted">(solo emessa)</span>
               <input id="invAmount" type="number" min="0" step="0.01" placeholder="es. 1200" />
             </label>
-            <div class="row" style="margin-top:22px;">
-              <button id="addInvBtn" type="button">Aggiungi riga</button>
+            <div style="display:flex; align-items:flex-end; padding-bottom:2px;">
+              <button id="addInvBtn" type="button">+ Aggiungi riga</button>
             </div>
           </div>
 
           <div id="invList" class="list muted">Nessuna riga fattura.</div>
 
           <hr/>
-          <div class="muted" id="calcBox"></div>
+          <div id="calcBox"></div>
         </div>
 
         <div id="fileInfo" class="muted"></div>
@@ -310,5 +310,29 @@
   </div>
 
   <script src="app.js"></script>
+  <script>
+    // Patch: aggiunge data-status agli item della lista per i badge colorati
+    // Si aggancia dopo il rendering senza modificare app.js
+    (function(){
+      const origRender = window.renderOppList;
+      if(typeof origRender !== "function") {
+        // Fallback: MutationObserver sulla lista
+        const list = document.getElementById("oppList");
+        if(!list) return;
+        const obs = new MutationObserver(() => {
+          list.querySelectorAll(".item").forEach(item => {
+            const badge = item.querySelector(".oppid-badge");
+            if(!badge || item.dataset.status) return;
+            const meta = item.querySelector(".meta");
+            if(!meta) return;
+            const text = meta.textContent || "";
+            const m = text.match(/• (aperta|sospesa|chiusa vinta|chiusa persa|abbandonata)/);
+            if(m) item.dataset.status = m[1];
+          });
+        });
+        obs.observe(list, { childList: true, subtree: true });
+      }
+    })();
+  </script>
 </body>
 </html>
