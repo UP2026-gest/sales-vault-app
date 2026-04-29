@@ -333,6 +333,33 @@
       obs.observe(list, { childList: true, subtree: true });
     })();
 
+    // Patch 3: svuota azione commerciale quando si salva come "chiusa persa" o "abbandonata"
+    (function(){
+      const CLOSED_LOST = ["chiusa persa", "abbandonata"];
+      const form = document.getElementById("oppForm");
+      if(!form) return;
+      form.addEventListener("submit", function(){
+        const statusEl = document.getElementById("oppStatus");
+        if(!statusEl || !CLOSED_LOST.includes(statusEl.value)) return;
+        // Svuota nel form
+        const nextAction     = document.getElementById("nextAction");
+        const nextActionDate = document.getElementById("nextActionDate");
+        if(nextAction)     nextAction.value     = "";
+        if(nextActionDate) nextActionDate.value = "";
+        // Svuota nel db (il salvataggio avviene subito dopo in app.js)
+        setTimeout(() => {
+          if(typeof db === "undefined" || typeof currentOppId === "undefined") return;
+          const opp = db.opportunities.find(x => x.id === currentOppId);
+          if(!opp) return;
+          if(!CLOSED_LOST.includes(opp.status)) return;
+          opp.nextAction     = "";
+          opp.nextActionDate = "";
+          if(typeof saveDb === "function") saveDb();
+          if(typeof renderAll === "function") renderAll();
+        }, 50);
+      }, true); // capture: prima che app.js processi il submit
+    })();
+
     // Patch 2: campanello scaduti
     (function(){
       const btn   = document.getElementById("overdueBtn");
