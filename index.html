@@ -183,7 +183,7 @@
           <label>
             N° Contratto UP
             <div class="contract-row">
-              <input id="contractNumber" placeholder="es. 26-001" />
+              <input id="contractNumber" placeholder="es. 26001" />
               <button type="button" id="assignContractBtn" title="Assegna prossimo numero disponibile">+ Assegna</button>
             </div>
           </label>
@@ -449,37 +449,56 @@
       const assignBtn  = document.getElementById("assignContractBtn");
       if(!contractEl || !assignBtn) return;
 
-      // Genera il prossimo numero contratto disponibile (formato YY-NNN)
+      const CONTRACT_SEQ_KEY = "sales_vault_contract_seq";
+
+      function getStoredSeq(yy){
+        try { const m = JSON.parse(localStorage.getItem(CONTRACT_SEQ_KEY)||"{}"); return m[yy]||0; }
+        catch { return 0; }
+      }
+      function storeSeq(yy, n){
+        try { const m = JSON.parse(localStorage.getItem(CONTRACT_SEQ_KEY)||"{}"); m[yy]=n; localStorage.setItem(CONTRACT_SEQ_KEY, JSON.stringify(m)); }
+        catch {}
+      }
+
       function nextContractNumber(){
         const yy = String(new Date().getFullYear()).slice(2);
-        const prefix = yy + "-";
-        let max = 0;
+        // Massimo tra progressivo memorizzato e quello trovato nel db
+        let maxDb = 0;
         for(const o of (db.opportunities || [])){
           const cn = String(o.contractNumber || "");
-          if(cn.startsWith(prefix)){
-            const n = parseInt(cn.slice(prefix.length), 10);
-            if(!isNaN(n) && n > max) max = n;
+          if(cn.startsWith(yy) && cn.length === 5){
+            const n = parseInt(cn.slice(2), 10);
+            if(!isNaN(n) && n > maxDb) maxDb = n;
           }
         }
-        return prefix + String(max + 1).padStart(3, "0");
+        const maxStored = getStoredSeq(yy);
+        const next = Math.max(maxDb, maxStored) + 1;
+        return yy + String(next).padStart(3, "0");
       }
 
       assignBtn.addEventListener("click", () => {
         if(contractEl.value.trim()){
           if(!confirm("Questo campo ha già un valore. Sovrascrivere con il prossimo numero disponibile?")) return;
         }
-        contractEl.value = nextContractNumber();
+        const num = nextContractNumber();
+        contractEl.value = num;
       });
 
-      // Salva contractNumber nel db al momento del submit (patch capture)
       document.getElementById("oppForm").addEventListener("submit", function(){
         setTimeout(() => {
           if(typeof db === "undefined" || typeof currentOppId === "undefined") return;
           const opp = db.opportunities.find(x => x.id === currentOppId);
           if(!opp) return;
-          opp.contractNumber = contractEl.value.trim();
+          const cn = contractEl.value.trim();
+          opp.contractNumber = cn;
+          // Aggiorna il progressivo memorizzato se il numero è valido
+          if(/^\d{5}$/.test(cn)){
+            const yy = cn.slice(0,2);
+            const n  = parseInt(cn.slice(2), 10);
+            if(n > getStoredSeq(yy)) storeSeq(yy, n);
+          }
           if(typeof saveDb === "function") saveDb();
-        }, 80); // dopo il salvataggio principale di app.js
+        }, 80);
       }, false);
     })();
     (function(){
