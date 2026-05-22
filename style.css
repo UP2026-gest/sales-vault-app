@@ -134,12 +134,12 @@ button:disabled { opacity: .45; cursor: not-allowed; }
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  align-items: center;
 }
 .owner-radio-item {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 5px 12px;
+  padding: 5px 14px;
   border: 1px solid var(--border);
   border-radius: 20px;
   background: var(--bg);
@@ -151,6 +151,7 @@ button:disabled { opacity: .45; cursor: not-allowed; }
   user-select: none;
   width: auto !important;
   margin: 0 !important;
+  white-space: nowrap;
 }
 .owner-radio-item input[type="radio"] {
   display: none;
