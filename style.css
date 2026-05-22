@@ -159,7 +159,10 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 .owner-radio-item:has(input:checked) {
   background: var(--navy);
   border-color: var(--navy);
-  color: #fff;
+  color: #ffffff;
+  font-weight: 700;
+  letter-spacing: .2px;
+  box-shadow: 0 2px 6px rgba(26,39,68,.25);
 }
 .owner-radio-item:hover {
   border-color: var(--navy-light);
