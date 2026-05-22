@@ -157,12 +157,16 @@ button:disabled { opacity: .45; cursor: not-allowed; }
   display: none;
 }
 .owner-radio-item:has(input:checked) {
-  background: var(--navy);
-  border-color: var(--navy);
-  color: #ffffff;
+  background: var(--amber);
+  border-color: var(--amber);
+  color: var(--navy);
   font-weight: 700;
-  letter-spacing: .2px;
-  box-shadow: 0 2px 6px rgba(26,39,68,.25);
+  box-shadow: 0 2px 6px rgba(232,160,32,.35);
+}
+.owner-radio-item:has(input:checked):hover {
+  background: #d48f18;
+  border-color: #d48f18;
+  color: var(--navy);
 }
 .owner-radio-item:hover {
   border-color: var(--navy-light);
