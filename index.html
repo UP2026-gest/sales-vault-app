@@ -171,7 +171,6 @@
         <div style="margin-bottom:10px;">
           <div class="owner-radio-label">Commerciale</div>
           <div id="ownerRadioGroup" class="owner-radio-group"></div>
-          <select id="owner" required style="display:none;"></select>
         </div>
 
         <label>
@@ -373,101 +372,28 @@
       }, true); // capture: prima che app.js processi il submit
     })();
 
-    // Patch 4: Radio button commerciali — sostituisce il select #owner
-    (function(){
-      const group  = document.getElementById("ownerRadioGroup");
-      const select = document.getElementById("owner");
-      if(!group || !select) return;
-
-      // Fonte di verità: quale pill è selezionato
-      function getSelectedOwner(){
-        const checked = group.querySelector("input[type=radio]:checked");
-        return checked ? checked.value : "";
-      }
-
-      // Allinea il <select> al pill attivo (chiamato prima di ogni salvataggio)
-      function syncSelectFromRadio(){
-        const val = getSelectedOwner();
-        if(val) select.value = val;
-      }
-
-      function buildRadios(forceOwner){
-        if(typeof db === "undefined") return;
-        const owners = (db.salespeople || []).map(x => String(x).trim()).filter(Boolean);
-        // Determina il valore da selezionare: forceOwner > select.value > Renato > primo
-        const target = forceOwner || select.value ||
-          (owners.includes("Renato") ? "Renato" : owners[0] || "");
-        group.innerHTML = "";
-        // Ricrea anche le option del select (app.js le svuota)
-        select.innerHTML = "";
-        for(const name of owners){
-          // option nel select nascosto
-          const opt = document.createElement("option");
-          opt.value = name; opt.textContent = name;
-          select.appendChild(opt);
-          // pill visibile
-          const lbl = document.createElement("label");
-          lbl.className = "owner-radio-item";
-          const inp = document.createElement("input");
-          inp.type = "radio"; inp.name = "ownerRadio"; inp.value = name;
-          inp.checked = (name === target);
-          inp.addEventListener("change", () => {
-            select.value = name; // sincronizza subito
-          });
-          lbl.appendChild(inp);
-          lbl.appendChild(document.createTextNode(name));
-          group.appendChild(lbl);
-        }
-        select.value = target;
-      }
-
-      // Prima del submit: garantisce che il select abbia il valore del pill
-      document.getElementById("oppForm").addEventListener("submit", syncSelectFromRadio, true);
-
-      // Intercetta refreshOwnerSelects: app.js svuota il select, noi lo ripristiniamo
-      const origRefresh = window.refreshOwnerSelects;
-      if(typeof origRefresh === "function"){
-        window.refreshOwnerSelects = function(){
-          const currentOwner = getSelectedOwner() || select.value;
-          origRefresh.apply(this, arguments);
-          buildRadios(currentOwner); // ripristina con il commerciale attivo
-        };
-      }
-
-      // Intercetta oppToForm: carica il commerciale dell'opportunità
-      const origOppToForm = window.oppToForm;
-      if(typeof origOppToForm === "function"){
-        window.oppToForm = function(o){
-          origOppToForm.apply(this, arguments);
-          // select.value è già impostato da oppToForm, allineamo i pill
-          const ownerVal = select.value || o.owner || "";
-          buildRadios(ownerVal);
-          // Popola campo contratto
-          const contractEl = document.getElementById("contractNumber");
-          if(contractEl) contractEl.value = o.contractNumber || "";
-        };
-      }
-
-      // Intercetta newOpp: default Renato
-      const origNewOpp = window.newOpp;
-      if(typeof origNewOpp === "function"){
-        window.newOpp = function(){
-          origNewOpp.apply(this, arguments);
-          buildRadios("Renato");
-          const contractEl = document.getElementById("contractNumber");
-          if(contractEl) contractEl.value = "";
-        };
-      }
-
-      // Costruzione iniziale
-      setTimeout(() => buildRadios(), 800);
-    })();
-
-    // Patch 5: Numero contratto — salvataggio e generazione progressivo
+    // Patch 5: Numero contratto — salvataggio, generazione progressivo, caricamento in form
     (function(){
       const contractEl = document.getElementById("contractNumber");
       const assignBtn  = document.getElementById("assignContractBtn");
       if(!contractEl || !assignBtn) return;
+
+      // Popola il campo contratto quando si apre un'opportunità
+      const origOppToForm = window.oppToForm;
+      if(typeof origOppToForm === "function"){
+        window.oppToForm = function(o){
+          origOppToForm.apply(this, arguments);
+          contractEl.value = o.contractNumber || "";
+        };
+      }
+      // Svuota il campo contratto su nuova opportunità
+      const origNewOpp = window.newOpp;
+      if(typeof origNewOpp === "function"){
+        window.newOpp = function(){
+          origNewOpp.apply(this, arguments);
+          contractEl.value = "";
+        };
+      }
 
       const CONTRACT_SEQ_KEY = "sales_vault_contract_seq";
 

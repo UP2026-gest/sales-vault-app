@@ -598,7 +598,7 @@ const ui = {
   leadPhone:        document.getElementById("leadPhone"),
   leadEmail:        document.getElementById("leadEmail"),
   createdAt:        document.getElementById("createdAt"),
-  owner:            document.getElementById("owner"),
+  // owner: rimosso — gestito dai pill #ownerRadioGroup
   oppName:          document.getElementById("oppName"),
   oppStatus:        document.getElementById("oppStatus"),
   oppPhase:         document.getElementById("oppPhase"),
@@ -734,14 +734,39 @@ function refreshOwnerSelects(){
   const owners = normalizeSalespeopleList(db.salespeople);
   db.salespeople = owners;
   if(ui.ownerFilter) setSelectOptions(ui.ownerFilter, ["(tutti)", ...owners]);
-  if(ui.owner){
-    ui.owner.innerHTML = "";
-    for(const v of owners){
-      const opt = document.createElement("option");
-      opt.value = v; opt.textContent = v;
-      ui.owner.appendChild(opt);
-    }
+  buildOwnerPills(owners);
+}
+
+function buildOwnerPills(owners, selectValue){
+  const group = document.getElementById("ownerRadioGroup");
+  if(!group) return;
+  const target = selectValue ||
+    group.querySelector("input[type=radio]:checked")?.value ||
+    (owners.includes("Renato") ? "Renato" : (owners[0] || ""));
+  group.innerHTML = "";
+  for(const name of owners){
+    const lbl = document.createElement("label");
+    lbl.className = "owner-radio-item";
+    const inp = document.createElement("input");
+    inp.type = "radio"; inp.name = "ownerRadio"; inp.value = name;
+    inp.checked = (name === target);
+    lbl.appendChild(inp);
+    lbl.appendChild(document.createTextNode(name));
+    group.appendChild(lbl);
   }
+}
+
+function getOwnerFromPills(){
+  const group = document.getElementById("ownerRadioGroup");
+  if(!group) return "";
+  return group.querySelector("input[type=radio]:checked")?.value || "";
+}
+
+function setOwnerPill(name){
+  const group = document.getElementById("ownerRadioGroup");
+  if(!group) return;
+  const owners = normalizeSalespeopleList(db.salespeople);
+  buildOwnerPills(owners, name);
 }
 
 function refreshLeadDatalist(){
@@ -853,8 +878,8 @@ function oppToForm(o){
   ui.lead.value           = o.lead;
   fillLeadContactFields(o.lead);
   ui.createdAt.value      = o.createdAt;
-  // Usa il commerciale salvato nell'opportunità — non sovrascriverlo mai con il default
-  if(ui.owner) ui.owner.value = (o.owner && owners.includes(o.owner)) ? o.owner : (owners.includes("Renato") ? "Renato" : (owners[0]||""));
+  // Usa il commerciale salvato nell'opportunità — pill selezionabile
+  { const ownerVal = (o.owner && owners.includes(o.owner)) ? o.owner : (owners.includes("Renato") ? "Renato" : (owners[0]||"")); setOwnerPill(ownerVal); }
   ui.oppName.value        = o.name;
   ui.oppStatus.value      = o.status;
   ui.oppPhase.value       = o.phase;
@@ -895,7 +920,7 @@ function formToOpp(){
     ...seqData,
     lead:           ui.lead.value.trim(),
     createdAt:      ui.createdAt.value,
-    owner:          ui.owner?.value || (normalizeSalespeopleList(db.salespeople).includes("Renato") ? "Renato" : (db.salespeople?.[0]||"")),
+    owner:          getOwnerFromPills() || (normalizeSalespeopleList(db.salespeople).includes("Renato") ? "Renato" : (db.salespeople?.[0]||"")),
     name:           ui.oppName.value.trim(),
     status:         ui.oppStatus.value,
     phase:          ui.oppPhase.value,
@@ -925,10 +950,7 @@ function newOpp(){
   ui.oppForm.reset();
   ui.createdAt.value    = todayStr();
   // Commerciale di default: Renato (se presente nell'elenco), altrimenti il primo disponibile
-  if(ui.owner){
-    const owners = normalizeSalespeopleList(db.salespeople);
-    ui.owner.value = owners.includes("Renato") ? "Renato" : (owners[0]||"");
-  }
+  { const owners = normalizeSalespeopleList(db.salespeople); setOwnerPill(owners.includes("Renato") ? "Renato" : (owners[0]||"")); }
   ui.oppStatus.value    = "aperta";
   ui.oppPhase.value     = "contatto iniziale";
   ui.product.value      = "da definire";
@@ -1656,9 +1678,9 @@ function handleManageOwners(){
   refreshOwnerSelects();
   if(currentOppId){
     const o = db.opportunities.find(x=>x.id===currentOppId);
-    if(o && ui.owner) ui.owner.value = normalizeOpp(o).owner;
+    if(o) setOwnerPill(normalizeOpp(o).owner);
   } else {
-    if(ui.owner) ui.owner.value = db.salespeople[0];
+    setOwnerPill(db.salespeople[0] || "");
   }
   saveDb();
   renderAll();
