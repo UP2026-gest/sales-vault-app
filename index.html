@@ -173,10 +173,24 @@
             Data creazione
             <input id="createdAt" type="date" required />
           </label>
+          <div>
+            <div class="owner-radio-label">Commerciale</div>
+            <div id="ownerRadioGroup" class="owner-radio-group"></div>
+            <select id="owner" required style="display:none;"></select>
+          </div>
+        </div>
+
+        <div class="two">
           <label>
-            Commerciale
-            <select id="owner" required></select>
+            N° Contratto UP
+            <div class="contract-row">
+              <input id="contractNumber" placeholder="es. 26-001" />
+              <button type="button" id="assignContractBtn" title="Assegna prossimo numero disponibile">+ Assegna</button>
+            </div>
           </label>
+          <div class="muted" style="font-size:11.5px; padding-top:20px; line-height:1.6;">
+            Lascia vuoto se l'opportunità non prevede un contratto UP.
+          </div>
         </div>
 
         <label>
@@ -360,7 +374,115 @@
       }, true); // capture: prima che app.js processi il submit
     })();
 
-    // Patch 2: campanello scaduti
+    // Patch 4: Radio button commerciali — sostituisce il select #owner
+    (function(){
+      const group  = document.getElementById("ownerRadioGroup");
+      const select = document.getElementById("owner");
+      if(!group || !select) return;
+
+      function buildRadios(){
+        if(typeof db === "undefined") return;
+        const owners = (db.salespeople || []).map(x => String(x).trim()).filter(Boolean);
+        const current = select.value;
+        group.innerHTML = "";
+        for(const name of owners){
+          const lbl = document.createElement("label");
+          lbl.className = "owner-radio-item";
+          const inp = document.createElement("input");
+          inp.type = "radio"; inp.name = "ownerRadio"; inp.value = name;
+          if(name === current || (!current && name === "Renato")) inp.checked = true;
+          inp.addEventListener("change", () => { select.value = name; });
+          lbl.appendChild(inp);
+          lbl.appendChild(document.createTextNode(name));
+          group.appendChild(lbl);
+          // Sincronizza select (per compatibilità app.js)
+          if(inp.checked) select.value = name;
+        }
+      }
+
+      // Intercetta refreshOwnerSelects di app.js per ricostruire anche i radio
+      const origRefresh = window.refreshOwnerSelects;
+      if(typeof origRefresh === "function"){
+        window.refreshOwnerSelects = function(){
+          origRefresh.apply(this, arguments);
+          buildRadios();
+        };
+      }
+
+      // Intercetta oppToForm per sincronizzare il radio al caricamento dell'opportunità
+      const origOppToForm = window.oppToForm;
+      if(typeof origOppToForm === "function"){
+        window.oppToForm = function(o){
+          origOppToForm.apply(this, arguments);
+          // Dopo oppToForm il select è già valorizzato: allinea il radio
+          setTimeout(() => {
+            const val = select.value;
+            group.querySelectorAll("input[type=radio]").forEach(r => {
+              r.checked = (r.value === val);
+            });
+            // Popola anche il campo contratto
+            const contractEl = document.getElementById("contractNumber");
+            if(contractEl) contractEl.value = o.contractNumber || "";
+          }, 0);
+        };
+      }
+
+      // Intercetta newOpp per resettare radio e contratto
+      const origNewOpp = window.newOpp;
+      if(typeof origNewOpp === "function"){
+        window.newOpp = function(){
+          origNewOpp.apply(this, arguments);
+          setTimeout(() => {
+            buildRadios(); // seleziona Renato di default
+            const contractEl = document.getElementById("contractNumber");
+            if(contractEl) contractEl.value = "";
+          }, 0);
+        };
+      }
+
+      // Costruzione iniziale dopo avvio
+      setTimeout(buildRadios, 800);
+    })();
+
+    // Patch 5: Numero contratto — salvataggio e generazione progressivo
+    (function(){
+      const contractEl = document.getElementById("contractNumber");
+      const assignBtn  = document.getElementById("assignContractBtn");
+      if(!contractEl || !assignBtn) return;
+
+      // Genera il prossimo numero contratto disponibile (formato YY-NNN)
+      function nextContractNumber(){
+        const yy = String(new Date().getFullYear()).slice(2);
+        const prefix = yy + "-";
+        let max = 0;
+        for(const o of (db.opportunities || [])){
+          const cn = String(o.contractNumber || "");
+          if(cn.startsWith(prefix)){
+            const n = parseInt(cn.slice(prefix.length), 10);
+            if(!isNaN(n) && n > max) max = n;
+          }
+        }
+        return prefix + String(max + 1).padStart(3, "0");
+      }
+
+      assignBtn.addEventListener("click", () => {
+        if(contractEl.value.trim()){
+          if(!confirm("Questo campo ha già un valore. Sovrascrivere con il prossimo numero disponibile?")) return;
+        }
+        contractEl.value = nextContractNumber();
+      });
+
+      // Salva contractNumber nel db al momento del submit (patch capture)
+      document.getElementById("oppForm").addEventListener("submit", function(){
+        setTimeout(() => {
+          if(typeof db === "undefined" || typeof currentOppId === "undefined") return;
+          const opp = db.opportunities.find(x => x.id === currentOppId);
+          if(!opp) return;
+          opp.contractNumber = contractEl.value.trim();
+          if(typeof saveDb === "function") saveDb();
+        }, 80); // dopo il salvataggio principale di app.js
+      }, false);
+    })();
     (function(){
       const btn   = document.getElementById("overdueBtn");
       const badge = document.getElementById("overdueBadge");

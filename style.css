@@ -123,6 +123,77 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 }
 #newOppBtn:hover { background: rgba(255,255,255,.22); }
 
+/* ── Radio button commerciali ── */
+.owner-radio-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-mid);
+  margin-bottom: 7px;
+}
+.owner-radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.owner-radio-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-mid);
+  cursor: pointer;
+  transition: background .12s, border-color .12s, color .12s;
+  user-select: none;
+  width: auto !important;
+  margin: 0 !important;
+}
+.owner-radio-item input[type="radio"] {
+  display: none;
+}
+.owner-radio-item:has(input:checked) {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: #fff;
+}
+.owner-radio-item:hover {
+  border-color: var(--navy-light);
+  color: var(--navy);
+}
+.owner-radio-item:has(input:checked):hover {
+  background: var(--navy-light);
+  color: #fff;
+}
+
+/* ── Campo contratto ── */
+.contract-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+.contract-row input {
+  flex: 1;
+  font-family: 'DM Mono', monospace;
+  font-weight: 500;
+  letter-spacing: .5px;
+}
+.contract-row button {
+  width: auto;
+  padding: 7px 11px;
+  background: var(--navy);
+  color: #fff;
+  border-color: var(--navy);
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.contract-row button:hover {
+  background: var(--navy-light);
+}
+
 /* ── Campanello scaduti ── */
 .bell-btn {
   position: relative;
