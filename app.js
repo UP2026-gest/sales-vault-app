@@ -328,6 +328,8 @@ function normalizeOpp(o){
     leadEmail:       o.leadEmail || "",
     // archivio
     archived: o.archived === true,
+    // contratto
+    contractNumber: String(o.contractNumber || "").trim(),
   };
 }
 
@@ -931,6 +933,7 @@ function formToOpp(){
     nextActionDate: ui.nextActionDate.value,
     notes:          ui.notes.value.trim(),
     serviceCost:    ui.serviceCost.value,
+    contractNumber: (document.getElementById("contractNumber")?.value || "").trim(),
     invoices:       inv,
     createdAtTs:    existing?.createdAtTs || nowIso(),
     updatedAt:      nowIso(),
@@ -1295,7 +1298,7 @@ function matchesFilters(o){
   if(!matchesIssuedInvoiceFilter(o))  return false;
   if(!q) return true;
   const invText = (o.invoices||[]).map(x=>{const i=normalizeInvoice(x); return [i.status,i.plannedDate,i.plannedAmount,i.number,i.date,i.amount].join(" ");}).join(" ");
-  return [o.lead,o.oppId,o.name,o.owner,o.status,o.phase,o.product,o.probability,o.nextAction,o.nextActionDate,o.notes,invText].join(" ").toLowerCase().includes(q);
+  return [o.lead,o.oppId,o.name,o.owner,o.status,o.phase,o.product,o.probability,o.nextAction,o.nextActionDate,o.notes,o.contractNumber||"" ,invText].join(" ").toLowerCase().includes(q);
 }
 
 // ═══════════════════════════════════════════════════════════════

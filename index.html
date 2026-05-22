@@ -426,25 +426,19 @@
         if(contractEl.value.trim()){
           if(!confirm("Questo campo ha già un valore. Sovrascrivere con il prossimo numero disponibile?")) return;
         }
-        const num = nextContractNumber();
-        contractEl.value = num;
+        contractEl.value = nextContractNumber();
       });
 
+      // Aggiorna il progressivo memorizzato dopo ogni salvataggio
       document.getElementById("oppForm").addEventListener("submit", function(){
         setTimeout(() => {
-          if(typeof db === "undefined" || typeof currentOppId === "undefined") return;
-          const opp = db.opportunities.find(x => x.id === currentOppId);
-          if(!opp) return;
           const cn = contractEl.value.trim();
-          opp.contractNumber = cn;
-          // Aggiorna il progressivo memorizzato se il numero è valido
           if(/^\d{5}$/.test(cn)){
             const yy = cn.slice(0,2);
             const n  = parseInt(cn.slice(2), 10);
             if(n > getStoredSeq(yy)) storeSeq(yy, n);
           }
-          if(typeof saveDb === "function") saveDb();
-        }, 80);
+        }, 120);
       }, false);
     })();
     (function(){
