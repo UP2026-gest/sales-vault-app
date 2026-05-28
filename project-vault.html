@@ -55,6 +55,14 @@ h1,h2,h3,h4 { font-weight: 600; }
 }
 .bar-left h1 { font-size: 18px; font-weight: 600; color: #fff; letter-spacing: .4px; }
 .bar-left h1::before { content: "◈ "; color: var(--amber); font-size: 14px; }
+.nav-link {
+  display: inline-flex; align-items: center;
+  padding: 6px 13px; border-radius: var(--radius-sm);
+  background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22);
+  color: rgba(255,255,255,.85); font-size: 13px; font-weight: 500;
+  text-decoration: none; transition: background .15s;
+}
+.nav-link:hover { background: rgba(255,255,255,.22); color: #fff; }
 #ghStatus { font-size: 12px; margin-top: 1px; }
 #ghStatus.ok      { color: #5edb8a; }
 #ghStatus.error   { color: #ff8080; font-weight: 600; }
@@ -326,6 +334,7 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 14px 0; }
     <div id="ghStatus" class="ghStatus info">Configurazione GitHub richiesta</div>
   </div>
   <div class="bar-actions">
+    <a href="index.html" class="nav-link">◆ Sales Vault</a>
     <button class="btn-primary" id="newProjectBtn">+ Nuovo progetto</button>
     <button class="btn-ghost" id="ghSyncBtn">☁️ Sync</button>
   </div>
