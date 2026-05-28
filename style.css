@@ -105,6 +105,15 @@ button {
 }
 button:disabled { opacity: .45; cursor: not-allowed; }
 
+#reportBtn {
+  background: var(--amber);
+  color: var(--navy);
+  border-color: var(--amber);
+  font-weight: 600;
+  padding: 7px 14px;
+}
+#reportBtn:hover { background: #d48f18; }
+
 /* Bottone primario (header) */
 #ghSyncBtn {
   background: var(--amber);

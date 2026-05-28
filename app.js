@@ -1754,3 +1754,362 @@ if(GH.isConfigured()){
 // Promemoria azioni scadute: all'avvio + ogni 15 minuti
 setTimeout(showModalOverdue, 1000);
 setInterval(showModalOverdue, 15 * 60 * 1000);
+
+// ═══════════════════════════════════════════════════════════════
+// REPORT MENSILE
+// ═══════════════════════════════════════════════════════════════
+
+function generateReport(fromDate, toDate) {
+  const opps = db.opportunities.map(normalizeOpp);
+  const owners = normalizeSalespeopleList(db.salespeople);
+
+  // Helper: data dentro il periodo
+  function inPeriod(dateStr) {
+    if (!dateStr) return false;
+    return dateStr >= fromDate && dateStr <= toDate;
+  }
+  function fmtEur(n) {
+    return n.toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
+  }
+  function fmtDate(d) {
+    if (!d) return "—";
+    const [y, m, dd] = d.split("-");
+    return `${dd}/${m}/${y}`;
+  }
+  function periodLabel() {
+    if (fromDate === toDate) return fmtDate(fromDate);
+    const sameYear = fromDate.slice(0, 4) === toDate.slice(0, 4);
+    const sameMonth = fromDate.slice(0, 7) === toDate.slice(0, 7);
+    if (sameMonth) {
+      const [y, m] = fromDate.split("-");
+      const months = ["","Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno",
+                      "Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
+      return `${months[parseInt(m)]} ${y}`;
+    }
+    return `${fmtDate(fromDate)} – ${fmtDate(toDate)}`;
+  }
+
+  // ── 1. Fatturato emesso nel periodo ─────────────────────────
+  let fatturato = 0;
+  const fattRows = [];
+  for (const o of opps) {
+    for (const inv of o.invoices) {
+      if (inv.status === "emessa" && inPeriod(inv.date)) {
+        fatturato += inv.amount;
+        fattRows.push({ opp: o, inv });
+      }
+    }
+  }
+
+  // ── 2. Fatture pianificate in arrivo (data prevista > oggi) ─
+  const today = todayStr();
+  let pianificato = 0;
+  const pianRows = [];
+  for (const o of opps.filter(o => !o.archived)) {
+    for (const inv of o.invoices) {
+      if (inv.status === "pianificata" && inv.plannedDate && inv.plannedDate >= today) {
+        pianificato += inv.plannedAmount;
+        pianRows.push({ opp: o, inv });
+      }
+    }
+  }
+  // ordina per data
+  pianRows.sort((a, b) => (a.inv.plannedDate || "").localeCompare(b.inv.plannedDate || ""));
+
+  // ── 3. Pipeline aperta ───────────────────────────────────────
+  const pipelineOpps = opps.filter(o => !o.archived && o.status === "aperta");
+  const pipelineVal  = pipelineOpps.reduce((s, o) => s + o.valueExpected, 0);
+  const pipelinePond = pipelineOpps.reduce((s, o) => s + o.valueExpected * (parseFloat(o.probability) / 100 || 0), 0);
+
+  // ── 4. Opportunità vinte/perse nel periodo ───────────────────
+  const vinteOpps = opps.filter(o => o.status === "chiusa vinta" && inPeriod(o.updatedAt?.slice(0,10)));
+  const perseOpps = opps.filter(o => (o.status === "chiusa persa" || o.status === "abbandonata") && inPeriod(o.updatedAt?.slice(0,10)));
+  const valoreVinte = vinteOpps.reduce((s, o) => s + o.valueExpected, 0);
+
+  // ── 5. Azioni scadute ────────────────────────────────────────
+  const scaduteOpps = opps.filter(o =>
+    !o.archived &&
+    o.nextActionDate && o.nextActionDate < today &&
+    ["aperta", "sospesa"].includes(o.status)
+  ).sort((a, b) => a.nextActionDate.localeCompare(b.nextActionDate));
+
+  // ── 6. Dettaglio per commerciale ────────────────────────────
+  const byOwner = {};
+  for (const name of owners) {
+    const mine = opps.filter(o => o.owner === name);
+    byOwner[name] = {
+      aperte:        mine.filter(o => !o.archived && o.status === "aperta").length,
+      pipeline:      mine.filter(o => !o.archived && o.status === "aperta").reduce((s,o) => s+o.valueExpected, 0),
+      vinte:         mine.filter(o => o.status === "chiusa vinta" && inPeriod(o.updatedAt?.slice(0,10))).length,
+      perse:         mine.filter(o => (o.status==="chiusa persa"||o.status==="abbandonata") && inPeriod(o.updatedAt?.slice(0,10))).length,
+      fatturato:     mine.flatMap(o=>o.invoices).filter(i=>i.status==="emessa"&&inPeriod(i.date)).reduce((s,i)=>s+i.amount, 0),
+      scadute:       mine.filter(o=>!o.archived&&o.nextActionDate&&o.nextActionDate<today&&["aperta","sospesa"].includes(o.status)).length,
+    };
+  }
+
+  // ── HTML ─────────────────────────────────────────────────────
+  const css = `
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; font-size: 13px; color: #1a2133; background: #fff; padding: 28px 32px; }
+    h1 { font-size: 22px; font-weight: 700; color: #1a2744; margin-bottom: 2px; }
+    .subtitle { color: #7a85a0; font-size: 13px; margin-bottom: 24px; }
+    .section { margin-bottom: 24px; break-inside: avoid; }
+    .section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px;
+      color: #7a85a0; border-bottom: 1px solid #dde2ec; padding-bottom: 6px; margin-bottom: 12px; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 8px; }
+    .kpi { background: #f2f4f8; border-radius: 10px; padding: 12px 14px; }
+    .kpi .val { font-size: 20px; font-weight: 700; color: #1a2744; }
+    .kpi .lbl { font-size: 11px; color: #7a85a0; margin-top: 2px; }
+    .kpi.green .val { color: #1a7a3a; }
+    .kpi.amber .val { color: #c75a00; }
+    .kpi.red   .val { color: #b52a2a; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th { background: #f2f4f8; font-size: 10.5px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .4px; color: #7a85a0; padding: 6px 8px; text-align: left; }
+    td { padding: 6px 8px; border-bottom: 1px solid #eef0f4; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    .mono { font-family: 'DM Mono', monospace; }
+    .badge { display: inline-block; font-size: 10px; font-weight: 700; font-family: 'DM Mono', monospace;
+      border-radius: 4px; padding: 1px 5px; margin-right: 4px; }
+    .badge.green { background: #edf7f1; color: #1a7a3a; }
+    .badge.red   { background: #fdf0f0; color: #b52a2a; }
+    .badge.blue  { background: #eef3fd; color: #2255c4; }
+    .badge.grey  { background: #f0f0f0; color: #888; }
+    .badge.amber { background: #fdf3e0; color: #c75a00; }
+    .warn { color: #b52a2a; font-weight: 600; }
+    .muted { color: #7a85a0; }
+    .right { text-align: right; }
+    .total-row td { font-weight: 700; background: #f8f9fb; }
+    @media print {
+      body { padding: 0; }
+      .no-print { display: none; }
+      .section { break-inside: avoid; }
+    }
+  `;
+
+  function statusBadge(s) {
+    const map = { "aperta":"green","sospesa":"amber","chiusa vinta":"blue","chiusa persa":"red","abbandonata":"grey" };
+    return `<span class="badge ${map[s]||'grey'}">${escapeHtml(s)}</span>`;
+  }
+
+  // Sezione fatturato
+  let fattHtml = `<table><thead><tr>
+    <th>Opportunità</th><th>Cliente</th><th>N° Fattura</th><th>Data</th><th class="right">Importo</th>
+  </tr></thead><tbody>`;
+  if (fattRows.length === 0) {
+    fattHtml += `<tr><td colspan="5" class="muted">Nessuna fattura emessa nel periodo.</td></tr>`;
+  } else {
+    for (const { opp, inv } of fattRows) {
+      fattHtml += `<tr>
+        <td><span class="badge blue mono">${escapeHtml(opp.oppId)}</span>${escapeHtml(opp.name)}</td>
+        <td>${escapeHtml(opp.lead)}</td>
+        <td class="mono">${escapeHtml(inv.number||"—")}</td>
+        <td>${fmtDate(inv.date)}</td>
+        <td class="right mono">${fmtEur(inv.amount)}</td>
+      </tr>`;
+    }
+    fattHtml += `<tr class="total-row"><td colspan="4">Totale fatturato</td><td class="right mono">${fmtEur(fatturato)}</td></tr>`;
+  }
+  fattHtml += `</tbody></table>`;
+
+  // Sezione pianificate
+  let pianHtml = `<table><thead><tr>
+    <th>Opportunità</th><th>Cliente</th><th>Data prevista</th><th class="right">Importo previsto</th>
+  </tr></thead><tbody>`;
+  if (pianRows.length === 0) {
+    pianHtml += `<tr><td colspan="4" class="muted">Nessuna fattura pianificata.</td></tr>`;
+  } else {
+    for (const { opp, inv } of pianRows) {
+      pianHtml += `<tr>
+        <td><span class="badge blue mono">${escapeHtml(opp.oppId)}</span>${escapeHtml(opp.name)}</td>
+        <td>${escapeHtml(opp.lead)}</td>
+        <td>${fmtDate(inv.plannedDate)}</td>
+        <td class="right mono">${fmtEur(inv.plannedAmount)}</td>
+      </tr>`;
+    }
+    pianHtml += `<tr class="total-row"><td colspan="3">Totale pianificato</td><td class="right mono">${fmtEur(pianificato)}</td></tr>`;
+  }
+  pianHtml += `</tbody></table>`;
+
+  // Sezione vinte/perse
+  function oppTableHtml(list, label) {
+    if (list.length === 0) return `<p class="muted">Nessuna opportunità ${label} nel periodo.</p>`;
+    let h = `<table><thead><tr><th>Opportunità</th><th>Cliente</th><th>Commerciale</th><th class="right">Valore previsto</th></tr></thead><tbody>`;
+    for (const o of list) {
+      h += `<tr>
+        <td><span class="badge blue mono">${escapeHtml(o.oppId)}</span>${escapeHtml(o.name)}</td>
+        <td>${escapeHtml(o.lead)}</td>
+        <td>${escapeHtml(o.owner)}</td>
+        <td class="right mono">${fmtEur(o.valueExpected)}</td>
+      </tr>`;
+    }
+    h += `</tbody></table>`;
+    return h;
+  }
+
+  // Sezione azioni scadute
+  let scaduteHtml = `<table><thead><tr>
+    <th>Opportunità</th><th>Cliente</th><th>Commerciale</th><th>Scaduta il</th><th>Azione</th>
+  </tr></thead><tbody>`;
+  if (scaduteOpps.length === 0) {
+    scaduteHtml += `<tr><td colspan="5" class="muted">Nessuna azione scaduta.</td></tr>`;
+  } else {
+    for (const o of scaduteOpps) {
+      scaduteHtml += `<tr>
+        <td><span class="badge blue mono">${escapeHtml(o.oppId)}</span>${escapeHtml(o.name)}</td>
+        <td>${escapeHtml(o.lead)}</td>
+        <td>${escapeHtml(o.owner)}</td>
+        <td class="warn">${fmtDate(o.nextActionDate)}</td>
+        <td>${escapeHtml(o.nextAction)}</td>
+      </tr>`;
+    }
+  }
+  scaduteHtml += `</tbody></table>`;
+
+  // Sezione per commerciale
+  let ownerHtml = `<table><thead><tr>
+    <th>Commerciale</th><th class="right">Opp. aperte</th><th class="right">Pipeline</th>
+    <th class="right">Vinte periodo</th><th class="right">Perse periodo</th>
+    <th class="right">Fatturato periodo</th><th class="right">Azioni scadute</th>
+  </tr></thead><tbody>`;
+  for (const [name, d] of Object.entries(byOwner)) {
+    ownerHtml += `<tr>
+      <td><strong>${escapeHtml(name)}</strong></td>
+      <td class="right">${d.aperte}</td>
+      <td class="right mono">${fmtEur(d.pipeline)}</td>
+      <td class="right">${d.vinte}</td>
+      <td class="right">${d.perse}</td>
+      <td class="right mono">${fmtEur(d.fatturato)}</td>
+      <td class="right ${d.scadute > 0 ? "warn" : ""}">${d.scadute}</td>
+    </tr>`;
+  }
+  ownerHtml += `</tbody></table>`;
+
+  return `<!doctype html><html lang="it"><head>
+    <meta charset="utf-8"/>
+    <title>Report UP Formazione – ${periodLabel()}</title>
+    <style>${css}</style>
+  </head><body>
+    <div class="no-print" style="background:#1a2744;color:#fff;padding:10px 16px;margin:-28px -32px 24px;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:13px;font-weight:600;">Report UP Formazione — ${escapeHtml(periodLabel())}</span>
+      <button onclick="window.print()" style="background:#e8a020;color:#1a2744;border:none;border-radius:8px;padding:7px 16px;font-weight:700;cursor:pointer;font-size:13px;">🖨 Stampa</button>
+    </div>
+    <h1>Report Commerciale</h1>
+    <div class="subtitle">Periodo: ${escapeHtml(periodLabel())} · Generato il ${fmtDate(todayStr())}</div>
+
+    <div class="section">
+      <div class="section-title">Riepilogo</div>
+      <div class="kpi-grid">
+        <div class="kpi green"><div class="val mono">${fmtEur(fatturato)}</div><div class="lbl">Fatturato emesso nel periodo</div></div>
+        <div class="kpi amber"><div class="val mono">${fmtEur(pianificato)}</div><div class="lbl">Fatture pianificate in arrivo</div></div>
+        <div class="kpi"><div class="val mono">${fmtEur(pipelineVal)}</div><div class="lbl">Pipeline aperta (${pipelineOpps.length} opp.)</div></div>
+        <div class="kpi"><div class="val mono">${fmtEur(pipelinePond)}</div><div class="lbl">Pipeline ponderata</div></div>
+      </div>
+      <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);">
+        <div class="kpi green"><div class="val">${vinteOpps.length}</div><div class="lbl">Opportunità vinte · ${fmtEur(valoreVinte)}</div></div>
+        <div class="kpi red"><div class="val">${perseOpps.length}</div><div class="lbl">Opportunità perse / abbandonate</div></div>
+        <div class="kpi red"><div class="val">${scaduteOpps.length}</div><div class="lbl">Azioni commerciali scadute</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Fatturato emesso nel periodo</div>
+      ${fattHtml}
+    </div>
+
+    <div class="section">
+      <div class="section-title">Fatture pianificate in arrivo</div>
+      ${pianHtml}
+    </div>
+
+    <div class="section">
+      <div class="section-title">Opportunità vinte nel periodo</div>
+      ${oppTableHtml(vinteOpps, "vinte")}
+    </div>
+
+    <div class="section">
+      <div class="section-title">Opportunità perse / abbandonate nel periodo</div>
+      ${oppTableHtml(perseOpps, "perse o abbandonate")}
+    </div>
+
+    <div class="section">
+      <div class="section-title">Azioni commerciali scadute</div>
+      ${scaduteHtml}
+    </div>
+
+    <div class="section">
+      <div class="section-title">Dettaglio per commerciale</div>
+      ${ownerHtml}
+    </div>
+  </body></html>`;
+}
+
+function showReportModal() {
+  // Calcola default: mese corrente
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = pad2(now.getMonth() + 1);
+  const firstDay = `${y}-${m}-01`;
+  const lastDay  = `${y}-${m}-${pad2(new Date(y, now.getMonth()+1, 0).getDate())}`;
+
+  ui.modalTitle.textContent = "📊 Genera report";
+  ui.modalBody.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+      <label style="font-size:12px;font-weight:500;color:#4a5570;">
+        Dal
+        <input type="date" id="reportFrom" value="${firstDay}" style="margin-top:4px;width:100%;padding:7px 10px;border-radius:8px;border:1px solid #dde2ec;font-size:13px;" />
+      </label>
+      <label style="font-size:12px;font-weight:500;color:#4a5570;">
+        Al
+        <input type="date" id="reportTo" value="${lastDay}" style="margin-top:4px;width:100%;padding:7px 10px;border-radius:8px;border:1px solid #dde2ec;font-size:13px;" />
+      </label>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+      <button type="button" onclick="setReportPeriod('month',0)" style="padding:5px 12px;border-radius:8px;border:1px solid #dde2ec;background:#f2f4f8;font-size:12px;cursor:pointer;">Mese corrente</button>
+      <button type="button" onclick="setReportPeriod('month',-1)" style="padding:5px 12px;border-radius:8px;border:1px solid #dde2ec;background:#f2f4f8;font-size:12px;cursor:pointer;">Mese scorso</button>
+      <button type="button" onclick="setReportPeriod('quarter',0)" style="padding:5px 12px;border-radius:8px;border:1px solid #dde2ec;background:#f2f4f8;font-size:12px;cursor:pointer;">Trimestre corrente</button>
+      <button type="button" onclick="setReportPeriod('year',0)" style="padding:5px 12px;border-radius:8px;border:1px solid #dde2ec;background:#f2f4f8;font-size:12px;cursor:pointer;">Anno corrente</button>
+    </div>
+    <button type="button" onclick="openReport()" style="width:100%;padding:9px;background:#1a2744;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">📄 Genera e apri report</button>
+  `;
+  ui.modal.classList.remove("hidden");
+}
+
+function setReportPeriod(type, offset) {
+  const now = new Date();
+  let from, to;
+  if (type === "month") {
+    const d = new Date(now.getFullYear(), now.getMonth() + offset, 1);
+    from = `${d.getFullYear()}-${pad2(d.getMonth()+1)}-01`;
+    const last = new Date(d.getFullYear(), d.getMonth()+1, 0);
+    to   = `${last.getFullYear()}-${pad2(last.getMonth()+1)}-${pad2(last.getDate())}`;
+  } else if (type === "quarter") {
+    const q = Math.floor(now.getMonth() / 3);
+    const qStart = new Date(now.getFullYear(), q * 3, 1);
+    const qEnd   = new Date(now.getFullYear(), q * 3 + 3, 0);
+    from = `${qStart.getFullYear()}-${pad2(qStart.getMonth()+1)}-01`;
+    to   = `${qEnd.getFullYear()}-${pad2(qEnd.getMonth()+1)}-${pad2(qEnd.getDate())}`;
+  } else if (type === "year") {
+    from = `${now.getFullYear()}-01-01`;
+    to   = `${now.getFullYear()}-12-31`;
+  }
+  document.getElementById("reportFrom").value = from;
+  document.getElementById("reportTo").value   = to;
+}
+
+function openReport() {
+  const from = document.getElementById("reportFrom")?.value;
+  const to   = document.getElementById("reportTo")?.value;
+  if (!from || !to || from > to) {
+    alert("Seleziona un periodo valido.");
+    return;
+  }
+  const html = generateReport(from, to);
+  const win  = window.open("", "_blank");
+  win.document.write(html);
+  win.document.close();
+  ui.modal.classList.add("hidden");
+}
+
+document.getElementById("reportBtn").addEventListener("click", showReportModal);
