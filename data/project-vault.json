@@ -1,1 +1,20 @@
-{"projects":[],"updatedAt":""}
+{
+  "projects": [
+    {
+      "id": "mpzia6io5f1tsbojjgt",
+      "name": "Network docenti UP",
+      "status": "attivo",
+      "owner": "",
+      "startDate": "2026-05-22",
+      "endDate": "",
+      "keyEvent": "Presentazione",
+      "keyEventDate": "2026-07-02",
+      "notes": "Creare un network con docenti perché loro ci diano segnalazioni commerciali, noi in cambio diamo gli strumenti, formazione e compenso economico",
+      "participants": [],
+      "phases": [],
+      "createdAt": "2026-06-04",
+      "updatedAt": "2026-06-04T13:03:12.768Z"
+    }
+  ],
+  "updatedAt": "2026-06-04T13:03:12.768Z"
+}
