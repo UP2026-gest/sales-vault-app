@@ -33,16 +33,26 @@
               "owner": "Renato",
               "date": "2026-06-03",
               "week": "",
+              "done": true,
+              "createdAt": "2026-06-04T13:04:19.399Z",
+              "updatedAt": "2026-06-04T13:04:20.552Z"
+            },
+            {
+              "id": "mpzic0lhbdlxyxy4dkb",
+              "text": "verifica legale contratti",
+              "owner": "Stefania",
+              "date": "2026-06-05",
+              "week": "",
               "done": false,
-              "createdAt": "2026-06-04T13:04:19.399Z"
+              "createdAt": "2026-06-04T13:04:38.405Z"
             }
           ],
           "collapsed": false
         }
       ],
       "createdAt": "2026-06-04",
-      "updatedAt": "2026-06-04T13:04:19.399Z"
+      "updatedAt": "2026-06-04T13:04:38.405Z"
     }
   ],
-  "updatedAt": "2026-06-04T13:04:19.399Z"
+  "updatedAt": "2026-06-04T13:04:38.405Z"
 }
