@@ -39,15 +39,17 @@ body{background:var(--bg);color:var(--text);min-height:100vh;}
 .lock-label{font-size:12px;font-weight:600;color:rgba(255,255,255,.6);
   text-align:left;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;}
 .lock-input{width:100%;padding:11px 14px;border-radius:var(--r8);border:1px solid rgba(255,255,255,.2);
-  background:rgba(255,255,255,.1);color:#fff;font-size:15px;font-family:inherit;
+  background:rgba(255,255,255,.1) !important;color:#ffffff !important;font-size:15px;font-family:inherit;
   letter-spacing:3px;text-align:center;margin-bottom:10px;}
 .lock-input::placeholder{letter-spacing:0;color:rgba(255,255,255,.35);}
-.lock-input:focus{outline:none;border-color:var(--amber);}
+.lock-input:focus{outline:none;border-color:var(--amber);box-shadow:none;background:rgba(255,255,255,.15) !important;}
 .lock-btn{width:100%;padding:11px;border-radius:var(--r8);border:none;
   background:var(--amber);color:var(--navy);font-size:14px;font-weight:700;
   cursor:pointer;transition:background .15s;margin-bottom:8px;}
 .lock-btn:hover{background:#d48f18;}
 .lock-err{font-size:12px;color:#ff8080;min-height:18px;margin-bottom:4px;}
+#lockUserSel{background:rgba(255,255,255,.1) !important;border:1px solid rgba(255,255,255,.2);color:#fff !important;padding:9px 12px;border-radius:var(--r8);font-size:14px;margin-bottom:12px;width:100%;}
+#lockUserSel option{background:var(--navy);color:#fff;}
 .lock-hint{font-size:11px;color:rgba(255,255,255,.3);margin-top:8px;}
 .lock-setup-link{font-size:12px;color:rgba(255,255,255,.4);cursor:pointer;
   text-decoration:underline;margin-top:12px;display:inline-block;}
@@ -250,10 +252,12 @@ hr{border:0;border-top:1px solid var(--border);margin:12px 0;}
 .setup-row{margin-bottom:14px;}
 .setup-row label{font-size:12px;font-weight:600;color:rgba(255,255,255,.6);
   display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;}
-.setup-row input{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);
-  color:#fff;padding:9px 12px;border-radius:var(--r8);font-family:inherit;font-size:13px;}
+.setup-row input{background:rgba(255,255,255,.1) !important;border:1px solid rgba(255,255,255,.2);
+  color:#fff !important;padding:9px 12px;border-radius:var(--r8);font-family:inherit;font-size:13px;}
 .setup-row input:focus{outline:none;border-color:var(--amber);}
 .setup-row input::placeholder{color:rgba(255,255,255,.3);}
+#setupAdminPin,#setupNewName,#setupNewPin{background:rgba(255,255,255,.1) !important;border:1px solid rgba(255,255,255,.2);color:#fff !important;}
+#adminPinInp{background:rgba(255,255,255,.08) !important;color:var(--text) !important;}
 .setup-add{background:transparent;border:1px dashed rgba(255,255,255,.25);color:rgba(255,255,255,.6);
   padding:7px 14px;border-radius:var(--r8);cursor:pointer;font-size:13px;margin-bottom:14px;}
 .setup-add:hover{border-color:rgba(255,255,255,.5);color:#fff;}
