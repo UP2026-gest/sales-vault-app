@@ -249,6 +249,10 @@ hr{border:0;border-top:1px solid var(--border);margin:12px 0;}
   <div class="setup-box">
     <h2>⚙️ Prima configurazione</h2>
     <p>Crea gli utenti del Meeting Vault. Ogni utente vedrà solo le proprie riunioni.</p>
+    <div class="setup-row">
+      <label>PIN Amministratore (per gestire gli utenti)</label>
+      <input id="setupAdminPin" type="password" maxlength="6" placeholder="Scegli un PIN admin (4-6 cifre)"/>
+    </div>
     <div id="setupUserList" class="setup-user-list"></div>
     <div style="display:flex;gap:8px;margin-bottom:16px;">
       <input id="setupNewName" placeholder="Nome utente (es. Renato)" style="flex:1;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:8px 11px;border-radius:var(--r8);font-family:inherit;font-size:13px;"/>
@@ -272,7 +276,7 @@ hr{border:0;border-top:1px solid var(--border);margin:12px 0;}
     <div class="lock-err" id="lockErr"></div>
     <button class="lock-btn" id="btnLogin">Entra</button>
     <div class="lock-hint">Ogni utente vede solo le proprie riunioni.</div>
-    <span class="lock-setup-link" id="linkSetup">Gestisci utenti / prima configurazione</span>
+    <span class="lock-setup-link" id="linkSetup">⚙️ Gestisci utenti (admin)</span>
   </div>
 </div>
 
@@ -287,6 +291,7 @@ hr{border:0;border-top:1px solid var(--border);margin:12px 0;}
       <a href="index.html" class="nav-link">◆ Sales Vault</a>
       <button class="btn-amber" id="btnNewMeet">+ Nuova riunione</button>
       <button class="btn-ghost" id="btnGhSync">☁️ Sync</button>
+      <button class="btn-ghost btn-sm" id="btnChangePin">🔑 Cambia PIN</button>
       <button class="btn-ghost btn-sm" id="btnLogout" title="Esci">🔒 Esci</button>
     </div>
     <div id="ghStatus" class="info" style="margin-top:3px;">GitHub Sync non configurato</div>
@@ -421,6 +426,41 @@ hr{border:0;border-top:1px solid var(--border);margin:12px 0;}
   </div>
 </div>
 
+<!-- ── MODAL PIN ADMIN (per accedere alla gestione utenti) ── -->
+<div class="modal h" id="mAdminPin">
+  <div class="modal-box" style="width:min(360px,100%);">
+    <div class="modal-hdr">
+      <strong>🔐 PIN Amministratore</strong>
+      <button class="btn-sec btn-sm" id="mAdminPinClose">✕ Chiudi</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--mid);margin-bottom:14px;">Inserisci il PIN amministratore per gestire gli utenti.</p>
+      <input id="adminPinInp" type="password" maxlength="6" placeholder="PIN admin"
+        style="text-align:center;letter-spacing:3px;font-size:16px;margin-bottom:10px;"/>
+      <div id="adminPinErr" style="font-size:12px;color:var(--red);min-height:18px;margin-bottom:8px;"></div>
+      <button class="btn-navy" id="btnAdminPinOk" style="width:100%;">Entra</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL CAMBIA PIN ── -->
+<div class="modal h" id="mChangePin">
+  <div class="modal-box" style="width:min(360px,100%);">
+    <div class="modal-hdr">
+      <strong>🔑 Cambia PIN</strong>
+      <button class="btn-sec btn-sm" id="mChangePinClose">✕ Chiudi</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--mid);margin-bottom:14px;">Cambia il PIN per <strong id="changePinUser"></strong>.</p>
+      <label>PIN attuale<input id="fOldPin" type="password" maxlength="6" placeholder="PIN attuale" style="letter-spacing:3px;text-align:center;"/></label>
+      <label>Nuovo PIN (4-6 cifre)<input id="fNewPin" type="password" maxlength="6" placeholder="Nuovo PIN" style="letter-spacing:3px;text-align:center;"/></label>
+      <label>Conferma nuovo PIN<input id="fNewPin2" type="password" maxlength="6" placeholder="Ripeti nuovo PIN" style="letter-spacing:3px;text-align:center;"/></label>
+      <div id="changePinErr" style="font-size:12px;color:var(--red);min-height:18px;margin-bottom:8px;"></div>
+      <button class="btn-navy" id="btnChangePinSave" style="width:100%;">Salva nuovo PIN</button>
+    </div>
+  </div>
+</div>
+
 <script>
 "use strict";
 // ══════════════════════════════════════════
@@ -535,9 +575,16 @@ async function ghPull(){
 // ══════════════════════════════════════════
 let _setupUsers = [];
 
-function showSetup(){
-  _setupUsers = getCfg()?.users ? [...getCfg().users] : [];
+function showSetup(fromAdmin){
+  const cfg = getCfg();
+  _setupUsers = cfg?.users ? [...cfg.users] : [];
   renderSetupList();
+  // Mostra PIN admin esistente come placeholder
+  const adminPinEl = $('setupAdminPin');
+  if(adminPinEl){
+    adminPinEl.placeholder = cfg?.adminPin ? 'PIN admin già impostato (lascia vuoto per non cambiarlo)' : 'Scegli un PIN admin (4-6 cifre)';
+    adminPinEl.value = '';
+  }
   $('setupScreen').classList.remove('h');
   $('lockScreen').classList.add('h');
 }
@@ -568,7 +615,13 @@ $('btnSetupAdd').onclick = () => {
 
 $('btnSetupSave').onclick = () => {
   if(_setupUsers.length===0){ $('setupErr').textContent='Aggiungi almeno un utente.'; return; }
-  saveCfg({users:_setupUsers});
+  const adminPin = $('setupAdminPin')?.value.trim();
+  const existing = getCfg();
+  // Se c'è già un adminPin salvato, mantienilo; altrimenti usa quello inserito
+  const finalAdminPin = adminPin || existing?.adminPin || '';
+  if(!finalAdminPin){ $('setupErr').textContent='Inserisci un PIN amministratore.'; return; }
+  if(adminPin && !/^\d{4,6}$/.test(adminPin)){ $('setupErr').textContent='Il PIN admin deve essere di 4-6 cifre.'; return; }
+  saveCfg({users:_setupUsers, adminPin: finalAdminPin});
   $('setupScreen').classList.add('h');
   showLock();
 };
@@ -599,7 +652,14 @@ function doLogin(){
   startApp();
 }
 
-$('linkSetup').onclick = showSetup;
+$('linkSetup').onclick = () => {
+  const cfg = getCfg();
+  // Se non c'è ancora configurazione, vai direttamente al setup
+  if(!cfg || !cfg.adminPin){ showSetup(); return; }
+  // Altrimenti chiedi il PIN admin
+  $('adminPinInp').value=''; $('adminPinErr').textContent='';
+  $('mAdminPin').classList.remove('h');
+};
 
 // ══════════════════════════════════════════
 // APP PRINCIPALE
@@ -999,6 +1059,51 @@ $('mGhClear').onclick=()=>{
   $('mGh').classList.add('h');
 };
 $('mGhClose').onclick=()=>$('mGh').classList.add('h');
+
+// ══════════════════════════════════════════
+// MODAL PIN ADMIN
+// ══════════════════════════════════════════
+$('mAdminPinClose').onclick = () => $('mAdminPin').classList.add('h');
+$('btnAdminPinOk').onclick = () => {
+  const cfg=getCfg();
+  const pin=$('adminPinInp').value.trim();
+  if(pin !== cfg?.adminPin){ $('adminPinErr').textContent='PIN errato.'; $('adminPinInp').value=''; return; }
+  $('mAdminPin').classList.add('h');
+  showSetup(true);
+};
+$('adminPinInp').onkeydown = e => { if(e.key==='Enter') $('btnAdminPinOk').click(); };
+$('mAdminPin').addEventListener('click', e => { if(e.target===e.currentTarget) $('mAdminPin').classList.add('h'); });
+
+// ══════════════════════════════════════════
+// MODAL CAMBIA PIN
+// ══════════════════════════════════════════
+$('mChangePinClose').onclick = () => $('mChangePin').classList.add('h');
+$('mChangePin').addEventListener('click', e => { if(e.target===e.currentTarget) $('mChangePin').classList.add('h'); });
+
+$('btnChangePin').onclick = () => {
+  if(!currentUser) return;
+  $('changePinUser').textContent = currentUser.name;
+  $('fOldPin').value=''; $('fNewPin').value=''; $('fNewPin2').value='';
+  $('changePinErr').textContent='';
+  $('mChangePin').classList.remove('h');
+  setTimeout(()=>$('fOldPin').focus(),50);
+};
+
+$('btnChangePinSave').onclick = () => {
+  const cfg=getCfg();
+  const oldPin=$('fOldPin').value.trim();
+  const newPin=$('fNewPin').value.trim();
+  const newPin2=$('fNewPin2').value.trim();
+  $('changePinErr').textContent='';
+  if(oldPin !== currentUser.pin){ $('changePinErr').textContent='PIN attuale errato.'; return; }
+  if(newPin.length<4||newPin.length>6||!/^\d+$/.test(newPin)){ $('changePinErr').textContent='Il nuovo PIN deve essere di 4-6 cifre.'; return; }
+  if(newPin !== newPin2){ $('changePinErr').textContent='I PIN non coincidono.'; return; }
+  currentUser.pin=newPin;
+  const u=cfg.users.find(x=>x.name===currentUser.name);
+  if(u){ u.pin=newPin; saveCfg(cfg); }
+  $('mChangePin').classList.add('h');
+  alert('PIN aggiornato con successo!');
+};
 
 // ══════════════════════════════════════════
 // FILTRI
