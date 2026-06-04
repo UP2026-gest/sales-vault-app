@@ -54,14 +54,23 @@
               "week": "",
               "done": false,
               "createdAt": "2026-06-04T13:04:58.202Z"
+            },
+            {
+              "id": "mpzicue4i924zdkej7",
+              "text": "Creazione canale whatsapp",
+              "owner": "Silvia",
+              "date": "2026-07-01",
+              "week": "",
+              "done": false,
+              "createdAt": "2026-06-04T13:05:17.020Z"
             }
           ],
           "collapsed": false
         }
       ],
       "createdAt": "2026-06-04",
-      "updatedAt": "2026-06-04T13:04:58.202Z"
+      "updatedAt": "2026-06-04T13:05:17.020Z"
     }
   ],
-  "updatedAt": "2026-06-04T13:04:58.202Z"
+  "updatedAt": "2026-06-04T13:05:17.020Z"
 }
