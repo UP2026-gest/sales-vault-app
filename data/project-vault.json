@@ -26,14 +26,23 @@
               "week": "",
               "done": false,
               "createdAt": "2026-06-04T13:03:58.562Z"
+            },
+            {
+              "id": "mpziblxjz4ih4g5q02c",
+              "text": "preparazione contratti",
+              "owner": "Renato",
+              "date": "2026-06-03",
+              "week": "",
+              "done": false,
+              "createdAt": "2026-06-04T13:04:19.399Z"
             }
           ],
           "collapsed": false
         }
       ],
       "createdAt": "2026-06-04",
-      "updatedAt": "2026-06-04T13:03:58.562Z"
+      "updatedAt": "2026-06-04T13:04:19.399Z"
     }
   ],
-  "updatedAt": "2026-06-04T13:03:58.562Z"
+  "updatedAt": "2026-06-04T13:04:19.399Z"
 }
