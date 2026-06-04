@@ -1,34 +1,4 @@
 {
-  "meetings": [
-    {
-      "id": "mpzm1mjodk2z53",
-      "code": "26-001",
-      "title": "meeting UP",
-      "date": "2026-06-05",
-      "timeStart": "11:00",
-      "timeEnd": "12:00",
-      "client": "UP",
-      "topics": [
-        "commerciale",
-        "amministrazione",
-        "mkt"
-      ],
-      "participants": [],
-      "agenda": [],
-      "notes": "",
-      "actions": [
-        {
-          "id": "mpzmf5nguhnteb",
-          "text": "prova azione",
-          "who": "Renato",
-          "date": "2026-06-05",
-          "done": false,
-          "createdAt": "2026-06-04T14:59:03.388Z"
-        }
-      ],
-      "createdAt": "2026-06-04T14:48:32.100Z",
-      "updatedAt": "2026-06-04T14:59:03.388Z"
-    }
-  ],
-  "updatedAt": "2026-06-04T14:59:03.388Z"
+  "meetings": [],
+  "updatedAt": "2026-06-04T15:06:39.335Z"
 }
