@@ -11,10 +11,19 @@
       "keyEventDate": "2026-07-02",
       "notes": "Creare un network con docenti perché loro ci diano segnalazioni commerciali, noi in cambio diamo gli strumenti, formazione e compenso economico",
       "participants": [],
-      "phases": [],
+      "phases": [
+        {
+          "id": "mpziatrotqjv01g6ln",
+          "name": "Fase 0 - preparazione",
+          "startDate": "",
+          "endDate": "2026-07-02",
+          "tasks": [],
+          "collapsed": false
+        }
+      ],
       "createdAt": "2026-06-04",
-      "updatedAt": "2026-06-04T13:03:12.768Z"
+      "updatedAt": "2026-06-04T13:03:42.901Z"
     }
   ],
-  "updatedAt": "2026-06-04T13:03:12.768Z"
+  "updatedAt": "2026-06-04T13:03:42.901Z"
 }
