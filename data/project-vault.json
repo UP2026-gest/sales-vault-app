@@ -45,14 +45,23 @@
               "week": "",
               "done": false,
               "createdAt": "2026-06-04T13:04:38.405Z"
+            },
+            {
+              "id": "mpzicfvel8nskrcobob",
+              "text": "preparazione attività",
+              "owner": "Renato + Silvia",
+              "date": "2026-07-01",
+              "week": "",
+              "done": false,
+              "createdAt": "2026-06-04T13:04:58.202Z"
             }
           ],
           "collapsed": false
         }
       ],
       "createdAt": "2026-06-04",
-      "updatedAt": "2026-06-04T13:04:38.405Z"
+      "updatedAt": "2026-06-04T13:04:58.202Z"
     }
   ],
-  "updatedAt": "2026-06-04T13:04:38.405Z"
+  "updatedAt": "2026-06-04T13:04:58.202Z"
 }
