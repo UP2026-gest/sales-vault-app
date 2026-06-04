@@ -17,13 +17,23 @@
           "name": "Fase 0 - preparazione",
           "startDate": "",
           "endDate": "2026-07-02",
-          "tasks": [],
+          "tasks": [
+            {
+              "id": "mpzib5uqjmbxoom4lld",
+              "text": "email per inviti",
+              "owner": "Silvia",
+              "date": "2026-06-05",
+              "week": "",
+              "done": false,
+              "createdAt": "2026-06-04T13:03:58.562Z"
+            }
+          ],
           "collapsed": false
         }
       ],
       "createdAt": "2026-06-04",
-      "updatedAt": "2026-06-04T13:03:42.901Z"
+      "updatedAt": "2026-06-04T13:03:58.562Z"
     }
   ],
-  "updatedAt": "2026-06-04T13:03:42.901Z"
+  "updatedAt": "2026-06-04T13:03:58.562Z"
 }
