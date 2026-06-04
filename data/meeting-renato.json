@@ -1,4 +1,44 @@
 {
-  "meetings": [],
-  "updatedAt": "2026-06-04T15:06:39.335Z"
+  "meetings": [
+    {
+      "id": "mpzmsqlbtib5rh",
+      "code": "26-001",
+      "title": "meeting UP",
+      "date": "2026-06-05",
+      "timeStart": "11:00",
+      "timeEnd": "12:00",
+      "client": "",
+      "topics": [
+        "commerciale",
+        "didattica",
+        "amministrazione",
+        "mkt"
+      ],
+      "participants": [
+        "Stefania",
+        "Silvia",
+        "Valentina",
+        "Lucia"
+      ],
+      "agenda": [
+        {
+          "text": "Landing page italiano su FB vietnamiti",
+          "notes": ""
+        },
+        {
+          "text": "Database, invio cluster A con proposta test, valutare estensione anche per B e C",
+          "notes": ""
+        },
+        {
+          "text": "Corso Silvia, abbiamo prenotato?",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-06-04T15:09:37.055Z",
+      "updatedAt": "2026-06-04T15:09:37.055Z"
+    }
+  ],
+  "updatedAt": "2026-06-04T15:09:37.055Z"
 }
