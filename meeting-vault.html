@@ -144,11 +144,16 @@ a.nav-link:hover{background:rgba(255,255,255,.2);color:#fff;}
 .meta-cell .val{font-size:13px;font-weight:500;}
 
 /* ── AGENDA / NOTE ── */
-.agenda-list{display:flex;flex-direction:column;gap:6px;}
-.agenda-item{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;
-  border:1px solid var(--border);border-radius:var(--r8);background:var(--bg);}
-.agenda-num{font-size:11px;font-weight:700;color:var(--muted);min-width:18px;margin-top:1px;}
-.agenda-txt{flex:1;font-size:13px;}
+.agenda-list{display:flex;flex-direction:column;gap:8px;}
+.agenda-item{border:1px solid var(--border);border-radius:var(--r8);background:var(--bg);overflow:hidden;}
+.agenda-item-hdr{display:flex;gap:8px;align-items:flex-start;padding:9px 11px;}
+.agenda-num{font-size:11px;font-weight:700;color:var(--muted);min-width:18px;margin-top:2px;}
+.agenda-txt{flex:1;font-size:13px;font-weight:500;}
+.agenda-notes{padding:0 11px 9px 37px;font-size:12.5px;color:var(--mid);white-space:pre-wrap;line-height:1.55;}
+.agenda-notes-area{width:100%;margin:0 0 8px 0;padding:6px 11px 8px 37px;
+  font-family:inherit;font-size:12.5px;color:var(--text);background:transparent;
+  border:none;border-top:1px dashed var(--border);resize:none;line-height:1.55;}
+.agenda-notes-area:focus{outline:none;background:rgba(255,255,255,.7);}
 .notes-area{width:100%;padding:10px 12px;border:1px solid var(--border);
   border-radius:var(--r8);font-family:inherit;font-size:13px;background:var(--bg);
   resize:vertical;line-height:1.6;color:var(--text);}
@@ -383,8 +388,8 @@ hr{border:0;border-top:1px solid var(--border);margin:12px 0;}
       <label>Titolo riunione *<input id="fMTitle" placeholder="es. Incontro commerciale Confapi"/></label>
       <div class="g3">
         <label>Data *<input id="fMDate" type="date"/></label>
-        <label>Ora inizio<input id="fMTimeStart" type="time" step="900"/></label>
-        <label>Ora fine<input id="fMTimeEnd" type="time" step="900"/></label>
+        <label>Ora inizio<select id="fMTimeStart"><option value="">—</option><option value="07:00">07:00</option><option value="07:15">07:15</option><option value="07:30">07:30</option><option value="07:45">07:45</option><option value="08:00">08:00</option><option value="08:15">08:15</option><option value="08:30">08:30</option><option value="08:45">08:45</option><option value="09:00">09:00</option><option value="09:15">09:15</option><option value="09:30">09:30</option><option value="09:45">09:45</option><option value="10:00">10:00</option><option value="10:15">10:15</option><option value="10:30">10:30</option><option value="10:45">10:45</option><option value="11:00">11:00</option><option value="11:15">11:15</option><option value="11:30">11:30</option><option value="11:45">11:45</option><option value="12:00">12:00</option><option value="12:15">12:15</option><option value="12:30">12:30</option><option value="12:45">12:45</option><option value="13:00">13:00</option><option value="13:15">13:15</option><option value="13:30">13:30</option><option value="13:45">13:45</option><option value="14:00">14:00</option><option value="14:15">14:15</option><option value="14:30">14:30</option><option value="14:45">14:45</option><option value="15:00">15:00</option><option value="15:15">15:15</option><option value="15:30">15:30</option><option value="15:45">15:45</option><option value="16:00">16:00</option><option value="16:15">16:15</option><option value="16:30">16:30</option><option value="16:45">16:45</option><option value="17:00">17:00</option><option value="17:15">17:15</option><option value="17:30">17:30</option><option value="17:45">17:45</option><option value="18:00">18:00</option><option value="18:15">18:15</option><option value="18:30">18:30</option><option value="18:45">18:45</option><option value="19:00">19:00</option><option value="19:15">19:15</option><option value="19:30">19:30</option><option value="19:45">19:45</option><option value="20:00">20:00</option><option value="20:15">20:15</option><option value="20:30">20:30</option><option value="20:45">20:45</option><option value="21:00">21:00</option><option value="21:15">21:15</option><option value="21:30">21:30</option><option value="21:45">21:45</option><option value="22:00">22:00</option><option value="22:15">22:15</option><option value="22:30">22:30</option><option value="22:45">22:45</option></select></label>
+        <label>Ora fine<select id="fMTimeEnd"><option value="">—</option><option value="07:00">07:00</option><option value="07:15">07:15</option><option value="07:30">07:30</option><option value="07:45">07:45</option><option value="08:00">08:00</option><option value="08:15">08:15</option><option value="08:30">08:30</option><option value="08:45">08:45</option><option value="09:00">09:00</option><option value="09:15">09:15</option><option value="09:30">09:30</option><option value="09:45">09:45</option><option value="10:00">10:00</option><option value="10:15">10:15</option><option value="10:30">10:30</option><option value="10:45">10:45</option><option value="11:00">11:00</option><option value="11:15">11:15</option><option value="11:30">11:30</option><option value="11:45">11:45</option><option value="12:00">12:00</option><option value="12:15">12:15</option><option value="12:30">12:30</option><option value="12:45">12:45</option><option value="13:00">13:00</option><option value="13:15">13:15</option><option value="13:30">13:30</option><option value="13:45">13:45</option><option value="14:00">14:00</option><option value="14:15">14:15</option><option value="14:30">14:30</option><option value="14:45">14:45</option><option value="15:00">15:00</option><option value="15:15">15:15</option><option value="15:30">15:30</option><option value="15:45">15:45</option><option value="16:00">16:00</option><option value="16:15">16:15</option><option value="16:30">16:30</option><option value="16:45">16:45</option><option value="17:00">17:00</option><option value="17:15">17:15</option><option value="17:30">17:30</option><option value="17:45">17:45</option><option value="18:00">18:00</option><option value="18:15">18:15</option><option value="18:30">18:30</option><option value="18:45">18:45</option><option value="19:00">19:00</option><option value="19:15">19:15</option><option value="19:30">19:30</option><option value="19:45">19:45</option><option value="20:00">20:00</option><option value="20:15">20:15</option><option value="20:30">20:30</option><option value="20:45">20:45</option><option value="21:00">21:00</option><option value="21:15">21:15</option><option value="21:30">21:30</option><option value="21:45">21:45</option><option value="22:00">22:00</option><option value="22:15">22:15</option><option value="22:30">22:30</option><option value="22:45">22:45</option></select></label>
       </div>
       <div class="g2">
         <label>Cliente / Organizzazione<input id="fMClient" placeholder="es. Confapi Brescia"/></label>
@@ -413,6 +418,7 @@ hr{border:0;border-top:1px solid var(--border);margin:12px 0;}
         <input id="fMAgendaInp" placeholder="Aggiungi punto all'ordine del giorno…" style="flex:1;"/>
         <button class="btn-navy btn-sm" id="btnAddAgenda">+ Aggiungi</button>
       </div>
+      <p style="font-size:11.5px;color:var(--muted);margin:-8px 0 14px;">Le note per ogni punto si inseriscono dopo aver salvato la riunione, direttamente nel dettaglio.</p>
       <div style="display:flex;gap:8px;margin-top:4px;">
         <button class="btn-navy" id="mMeetSave" style="flex:1;">💾 Salva</button>
         <button class="btn-danger btn-sm" id="mMeetDel" style="display:none;">🗑 Elimina</button>
@@ -812,8 +818,17 @@ function renderDetail(){
   const pending=actions.filter(a=>!a.done).length;
 
   // Ordine del giorno
-  const agendaHtml=(m.agenda||[]).length
-    ? (m.agenda||[]).map((a,i)=>`<div class="agenda-item"><span class="agenda-num">${i+1}.</span><span class="agenda-txt">${esc(a)}</span></div>`).join('')
+  const agendaItems=(m.agenda||[]).map(a=>typeof a==='string'?{text:a,notes:''}:a);
+  const agendaHtml=agendaItems.length
+    ? agendaItems.map((a,i)=>`
+      <div class="agenda-item">
+        <div class="agenda-item-hdr">
+          <span class="agenda-num">${i+1}.</span>
+          <span class="agenda-txt">${esc(a.text||'')}</span>
+        </div>
+        <textarea class="agenda-notes-area" data-ai="${i}" rows="2"
+          placeholder="Note per questo punto…">${esc(a.notes||'')}</textarea>
+      </div>`).join('')
     : '<p style="font-size:13px;color:var(--muted);">Nessun punto all\'ordine del giorno.</p>';
 
   // Azioni
@@ -850,7 +865,7 @@ function renderDetail(){
         <div class="meet-title-big">${esc(m.title)}</div>
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0;">
-        <button class="btn-amber btn-sm" id="btnPdf">📄 PDF</button>
+        <button class="btn-amber btn-sm" id="btnPdf">📄 Report / PDF</button>
         <button class="btn-sec btn-sm" id="btnEdit">✏️ Modifica</button>
       </div>
     </div>
@@ -862,8 +877,11 @@ function renderDetail(){
     </div>
   </div>
 
-  ${(m.agenda||[]).length?`<div class="card">
-    <div class="card-title">Ordine del giorno</div>
+  ${agendaItems.length?`<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div class="card-title" style="margin:0;">Ordine del giorno</div>
+      <span style="font-size:11.5px;color:var(--muted);">Le note si salvano con il pulsante "Salva note"</span>
+    </div>
     <div class="agenda-list">${agendaHtml}</div>
   </div>`:''}
 
@@ -895,7 +913,15 @@ function renderDetail(){
   $('btnEdit').onclick = ()=>openMeetModal(m.id);
   $('btnPdf').onclick  = ()=>openPdf(m.id);
   $('btnSaveNotes').onclick = ()=>{
-    m.notes=$('notesArea').value; m.updatedAt=nowIso(); dbSave();
+    m.notes=$('notesArea').value;
+    // Salva note agenda
+    const agItems=(m.agenda||[]).map(a=>typeof a==='string'?{text:a,notes:''}:a);
+    document.querySelectorAll('.agenda-notes-area').forEach(ta=>{
+      const i=Number(ta.dataset.ai);
+      if(agItems[i]) agItems[i].notes=ta.value;
+    });
+    m.agenda=agItems;
+    m.updatedAt=nowIso(); dbSave();
     $('btnSaveNotes').textContent='✓ Salvato';
     setTimeout(()=>{ $('btnSaveNotes').textContent='💾 Salva note'; },1500);
   };
@@ -936,8 +962,15 @@ function openMeetModal(id){
   $('mMeetDel').style.display=id?'':'none';
   $('fMTitle').value      =m?.title||'';
   $('fMDate').value       =m?.date||todayStr();
-  $('fMTimeStart').value  =m?.timeStart||'';
-  $('fMTimeEnd').value    =m?.timeEnd||'';
+  // Imposta select orari (value es. "09:00")
+  const setSelectVal = (id, val) => {
+    const sel = $(id); if(!sel) return;
+    // Cerca opzione corrispondente
+    const opt = [...sel.options].find(o => o.value === val);
+    sel.value = opt ? val : '';
+  };
+  setSelectVal('fMTimeStart', m?.timeStart||'');
+  setSelectVal('fMTimeEnd', m?.timeEnd||'');
   $('fMClient').value     =m?.client||'';
   // Topics multi-select
   const selTopics = Array.isArray(m?.topics)?m.topics:(m?.topic?[m.topic]:[]);
@@ -948,7 +981,7 @@ function openMeetModal(id){
     lbl.onclick=()=>{ cb.checked=!cb.checked; lbl.classList.toggle('on',cb.checked); };
   });
   _tempParts=[...(m?.participants||[])];
-  _tempAgenda=[...(m?.agenda||[])];
+  _tempAgenda=(m?.agenda||[]).map(a=>typeof a==='string'?{text:a,notes:''}:a);
   renderModalParts(); renderModalAgenda();
   $('mMeet').classList.remove('h');
   setTimeout(()=>$('fMTitle').focus(),50);
@@ -962,13 +995,14 @@ function renderModalParts(){
 }
 
 function renderModalAgenda(){
-  $('fMAgendaList').innerHTML=_tempAgenda.map((a,i)=>
-    `<div class="agenda-item">
-      <span class="agenda-num">${i+1}.</span>
-      <span class="agenda-txt" style="flex:1;">${esc(a)}</span>
+  $('fMAgendaList').innerHTML=_tempAgenda.map((a,i)=>{
+    const txt = typeof a==='string'?a:(a.text||'');
+    return `<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--border);border-radius:var(--r8);background:var(--bg);">
+      <span style="font-size:11px;font-weight:700;color:var(--muted);min-width:18px;">${i+1}.</span>
+      <span style="flex:1;font-size:13px;">${esc(txt)}</span>
       <button class="btn-icon" data-i="${i}" style="color:var(--red);font-size:12px;">✕</button>
-    </div>`
-  ).join('');
+    </div>`;
+  }).join('');
   $('fMAgendaList').querySelectorAll('.btn-icon').forEach(b=>b.onclick=()=>{_tempAgenda.splice(Number(b.dataset.i),1);renderModalAgenda();});
 }
 
@@ -980,7 +1014,7 @@ $('fMPartInp').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();$('btnAddPar
 
 $('btnAddAgenda').onclick=()=>{
   const v=$('fMAgendaInp').value.trim();
-  if(v){_tempAgenda.push(v);$('fMAgendaInp').value='';renderModalAgenda();}
+  if(v){_tempAgenda.push({text:v,notes:''});$('fMAgendaInp').value='';renderModalAgenda();}
 };
 $('fMAgendaInp').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();$('btnAddAgenda').click();}};
 
@@ -1108,8 +1142,18 @@ function buildPdf(m){
     <div class="mc"><div class="ml">Partecipanti</div><div class="mv">${e((m.participants||[]).join(', ')||'—')}</div></div>
   </div>
   ${(m.agenda||[]).length?`<div class="sec">Ordine del giorno</div>
-  ${(m.agenda).map((a,i)=>`<div class="ag-item"><span class="ag-n">${i+1}.</span><span>${e(a)}</span></div>`).join('')}`:''}
-  ${m.notes?`<div class="sec">Note</div><div class="notes">${e(m.notes)}</div>`:''}
+  ${(m.agenda).map((a,i)=>{
+    const txt=typeof a==='string'?a:(a.text||'');
+    const notes=typeof a==='object'?(a.notes||''):'';
+    return `<div class="ag-item">
+      <span class="ag-n">${i+1}.</span>
+      <div style="flex:1;">
+        <div style="font-weight:600;">${e(txt)}</div>
+        ${notes?`<div style="margin-top:4px;font-size:12px;color:#4a5570;white-space:pre-wrap;line-height:1.55;">${e(notes)}</div>`:''}
+      </div>
+    </div>`;
+  }).join('')}`:''}
+  ${m.notes?`<div class="sec">Note riunione</div><div class="notes">${e(m.notes)}</div>`:''}
   ${pending.length?`<div class="sec">Azioni da completare (${pending.length})</div>
   <table><thead><tr><th></th><th>Azione</th><th>Assegnato a</th><th>Scadenza</th></tr></thead>
   <tbody>${pending.map(a=>actRow(a)).join('')}</tbody></table>`:''}
