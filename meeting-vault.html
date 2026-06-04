@@ -213,6 +213,32 @@ label input,label select,label textarea{margin-top:4px;}
 
 hr{border:0;border-top:1px solid var(--border);margin:12px 0;}
 
+/* ── TOPIC MULTI-SELECT ── */
+.topic-checks{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
+.topic-check{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;
+  border-radius:20px;border:1px solid var(--border);background:var(--bg);
+  font-size:12.5px;font-weight:500;color:var(--mid);cursor:pointer;user-select:none;
+  transition:all .12s;}
+.topic-check input{display:none;}
+.topic-check.on{background:var(--navy);border-color:var(--navy);color:#fff;}
+
+/* ── CAMPANELLA ── */
+.bell-btn{position:relative;padding:6px 10px;font-size:16px;line-height:1;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
+  color:rgba(255,255,255,.75);border-radius:var(--r8);min-width:38px;
+  display:inline-flex;align-items:center;justify-content:center;}
+.bell-btn:hover{background:rgba(255,255,255,.22);color:#fff;}
+.bell-btn.has-overdue{background:var(--amber);color:var(--navy);border-color:var(--amber);}
+.bell-badge{position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;
+  font-size:10px;font-weight:700;font-family:'DM Mono',monospace;border-radius:10px;
+  min-width:18px;height:18px;padding:0 4px;display:flex;align-items:center;
+  justify-content:center;border:2px solid var(--navy);pointer-events:none;}
+
+/* ── CODICE RIUNIONE ── */
+.meet-code{font-family:'DM Mono',monospace;font-size:11px;font-weight:700;
+  background:var(--blue2);color:var(--blue);border-radius:4px;
+  padding:1px 6px;margin-right:5px;}
+
 /* ── SETUP ── */
 #setupScreen{position:fixed;inset:0;background:var(--navy);display:flex;
   align-items:center;justify-content:center;z-index:9998;flex-direction:column;}
@@ -291,6 +317,9 @@ hr{border:0;border-top:1px solid var(--border);margin:12px 0;}
       <a href="index.html" class="nav-link">◆ Sales Vault</a>
       <button class="btn-amber" id="btnNewMeet">+ Nuova riunione</button>
       <button class="btn-ghost" id="btnGhSync">☁️ Sync</button>
+      <button class="bell-btn" id="bellBtn" title="Azioni scadute">
+        🔔<span class="bell-badge" id="bellBadge" style="display:none;">0</span>
+      </button>
       <button class="btn-ghost btn-sm" id="btnChangePin">🔑 Cambia PIN</button>
       <button class="btn-ghost btn-sm" id="btnLogout" title="Esci">🔒 Esci</button>
     </div>
@@ -321,6 +350,14 @@ hr{border:0;border-top:1px solid var(--border);margin:12px 0;}
         <option value="all">Tutti gli anni</option>
       </select>
     </div>
+    <div>
+      <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:5px;">AZIONI</div>
+      <div class="filter-row">
+        <button class="f-btn on" data-a="all">Tutte</button>
+        <button class="f-btn" data-a="open">Con azioni aperte</button>
+        <button class="f-btn" data-a="overdue">Con azioni scadute</button>
+      </div>
+    </div>
     <div class="meet-list" id="meetList"></div>
   </aside>
   <main class="main" id="mainPanel">
@@ -347,15 +384,18 @@ hr{border:0;border-top:1px solid var(--border);margin:12px 0;}
       </div>
       <div class="g2">
         <label>Cliente / Organizzazione<input id="fMClient" placeholder="es. Confapi Brescia"/></label>
-        <label>Macro-argomento<select id="fMTopic">
-          <option value="commerciale">Commerciale</option>
-          <option value="didattica">Didattica</option>
-          <option value="hr">HR</option>
-          <option value="amministrazione">Amministrazione</option>
-          <option value="mkt">MKT</option>
-          <option value="gestionale">Gestionale</option>
-          <option value="altro">Altro</option>
-        </select></label>
+        <div>
+          <div style="font-size:12px;font-weight:500;color:var(--mid);margin-bottom:6px;">Macro-argomento (anche più di uno)</div>
+          <div class="topic-checks" id="fMTopics">
+            <label class="topic-check"><input type="checkbox" value="commerciale"/>Commerciale</label>
+            <label class="topic-check"><input type="checkbox" value="didattica"/>Didattica</label>
+            <label class="topic-check"><input type="checkbox" value="hr"/>HR</label>
+            <label class="topic-check"><input type="checkbox" value="amministrazione"/>Amministrazione</label>
+            <label class="topic-check"><input type="checkbox" value="mkt"/>MKT</label>
+            <label class="topic-check"><input type="checkbox" value="gestionale"/>Gestionale</label>
+            <label class="topic-check"><input type="checkbox" value="altro"/>Altro</label>
+          </div>
+        </div>
       </div>
       <div class="sec-lbl">Partecipanti</div>
       <div style="display:flex;gap:6px;margin-bottom:8px;">
@@ -396,6 +436,17 @@ hr{border:0;border-top:1px solid var(--border);margin:12px 0;}
       </div>
       <button class="btn-navy" id="mActionSave" style="width:100%;margin-top:8px;">💾 Salva</button>
     </div>
+  </div>
+</div>
+
+<!-- ── MODAL AZIONI SCADUTE ── -->
+<div class="modal h" id="mOverdue">
+  <div class="modal-box" style="width:min(620px,100%);">
+    <div class="modal-hdr">
+      <strong>🔔 Azioni scadute</strong>
+      <button class="btn-sec btn-sm" id="mOverdueClose">✕ Chiudi</button>
+    </div>
+    <div class="modal-body" id="mOverdueBody"></div>
   </div>
 </div>
 
@@ -500,6 +551,21 @@ let _editActionId = null;
 let _tempParts   = [];
 let _tempAgenda  = [];
 let _ghPushing   = false;
+let _filterAction = 'all'; // 'all' | 'open' | 'overdue'
+
+// Genera codice riunione YY-NNN
+function nextMeetCode(){
+  const yy = String(new Date().getFullYear()).slice(2);
+  let max = 0;
+  for(const m of db.meetings){
+    const c = String(m.code||'');
+    if(c.startsWith(yy+'-')){
+      const n = parseInt(c.slice(3),10);
+      if(!isNaN(n)&&n>max) max=n;
+    }
+  }
+  return yy+'-'+String(max+1).padStart(3,'0');
+}
 
 // ══════════════════════════════════════════
 // GITHUB — localStorage è fonte di verità
@@ -669,8 +735,8 @@ function startApp(){
   dbLoad();
   renderList();
   renderDetail();
-  if(ghOk()){ setStatus('🔄 Connessione…','sync'); ghPull(); }
-  else setStatus('GitHub Sync non configurato — clicca ☁️ Sync','info');
+  if(ghOk()){ setStatus('🔄 Connessione…','sync'); ghPull().then(()=>{ updateBell(); setTimeout(showOverduePopup,600); }); }
+  else { setStatus('GitHub Sync non configurato — clicca ☁️ Sync','info'); updateBell(); setTimeout(showOverduePopup,600); }
 }
 
 $('btnLogout').onclick = () => {
@@ -686,7 +752,12 @@ const TOPIC_LBL={commerciale:'Commerciale',didattica:'Didattica',hr:'HR',
 
 function renderList(){
   let list=db.meetings.filter(m=>m?.id&&m?.title);
-  if(_filterTopic!=='all') list=list.filter(m=>m.topic===_filterTopic);
+  if(_filterTopic!=='all') list=list.filter(m=>{
+    const topics=Array.isArray(m.topics)?m.topics:(m.topic?[m.topic]:[]);
+    return topics.includes(_filterTopic);
+  });
+  if(_filterAction==='open') list=list.filter(m=>(m.actions||[]).some(a=>!a.done));
+  if(_filterAction==='overdue') list=list.filter(m=>(m.actions||[]).some(a=>!a.done&&a.date&&a.date<todayStr()));
   if(_filterYear!=='all') list=list.filter(m=>(m.date||'').startsWith(_filterYear));
   if(_search) list=list.filter(m=>
     (m.title||'').toLowerCase().includes(_search)||
@@ -712,7 +783,8 @@ function renderList(){
       <div class="meet-card-title">${esc(m.title)}</div>
       <div class="meet-card-meta">${fdt(m.date)}${m.client?' · '+esc(m.client):''}</div>
       <div class="meet-card-foot">
-        <span class="topic-badge t-${m.topic||'altro'}">${TOPIC_LBL[m.topic]||'Altro'}</span>
+        ${m.code?`<span class="meet-code">${esc(m.code)}</span>`:''}
+        ${(Array.isArray(m.topics)?m.topics:(m.topic?[m.topic]:[])).map(t=>`<span class="topic-badge t-${t}">${TOPIC_LBL[t]||t}</span>`).join('')}
         ${pending>0?`<span style="font-size:11px;color:var(--muted);">${pending} azioni${overdue>0?` · <span style="color:var(--red);font-weight:600;">${overdue} scadute</span>`:''}</span>`:''}
       </div>
     </div>`;
@@ -768,7 +840,8 @@ function renderDetail(){
     <div class="meet-header">
       <div>
         <div style="display:flex;gap:7px;align-items:center;margin-bottom:8px;">
-          <span class="topic-badge t-${m.topic||'altro'}">${TOPIC_LBL[m.topic]||'Altro'}</span>
+          ${m.code?`<span class="meet-code">${esc(m.code)}</span>`:''}
+          ${(Array.isArray(m.topics)?m.topics:(m.topic?[m.topic]:[])).map(t=>`<span class="topic-badge t-${t}">${TOPIC_LBL[t]||t}</span>`).join('')}
         </div>
         <div class="meet-title-big">${esc(m.title)}</div>
       </div>
@@ -862,7 +935,14 @@ function openMeetModal(id){
   $('fMTimeStart').value  =m?.timeStart||'';
   $('fMTimeEnd').value    =m?.timeEnd||'';
   $('fMClient').value     =m?.client||'';
-  $('fMTopic').value      =m?.topic||'commerciale';
+  // Topics multi-select
+  const selTopics = Array.isArray(m?.topics)?m.topics:(m?.topic?[m.topic]:[]);
+  document.querySelectorAll('#fMTopics .topic-check').forEach(lbl=>{
+    const cb=lbl.querySelector('input');
+    const on=selTopics.includes(cb.value);
+    cb.checked=on; lbl.classList.toggle('on',on);
+    lbl.onclick=()=>{ cb.checked=!cb.checked; lbl.classList.toggle('on',cb.checked); };
+  });
   _tempParts=[...(m?.participants||[])];
   _tempAgenda=[...(m?.agenda||[])];
   renderModalParts(); renderModalAgenda();
@@ -907,12 +987,14 @@ $('mMeetSave').onclick=()=>{
   if(!date){alert('Inserisci la data.');return;}
   if(_editMeetId){
     const m=db.meetings.find(x=>x.id===_editMeetId);
+    const selT2=[...document.querySelectorAll('#fMTopics input:checked')].map(c=>c.value);
     if(m) Object.assign(m,{title,date,timeStart:$('fMTimeStart').value,timeEnd:$('fMTimeEnd').value,
-      client:$('fMClient').value.trim(),topic:$('fMTopic').value,
+      client:$('fMClient').value.trim(),topics:selT2,
       participants:[..._tempParts],agenda:[..._tempAgenda],updatedAt:nowIso()});
   } else {
-    const m={id:uid(),title,date,timeStart:$('fMTimeStart').value,timeEnd:$('fMTimeEnd').value,
-      client:$('fMClient').value.trim(),topic:$('fMTopic').value,
+    const selT=[...document.querySelectorAll('#fMTopics input:checked')].map(c=>c.value);
+    const m={id:uid(),code:nextMeetCode(),title,date,timeStart:$('fMTimeStart').value,timeEnd:$('fMTimeEnd').value,
+      client:$('fMClient').value.trim(),topics:selT,
       participants:[..._tempParts],agenda:[..._tempAgenda],
       notes:'',actions:[],createdAt:nowIso(),updatedAt:nowIso()};
     db.meetings.push(m); _selId=m.id;
@@ -1014,6 +1096,7 @@ function buildPdf(m){
   </div>
   <h1>${e(m.title)}</h1>
   <div class="sub">Verbale riunione · ${e(currentUser?.name||'')} · Generato il ${fd(td)}</div>
+  ${m.code?`<div style="margin-bottom:12px;"><span style="font-family:monospace;font-size:11px;font-weight:700;background:#eef3fd;color:#2255c4;border-radius:4px;padding:2px 6px;">${e(m.code)}</span></div>`:''}
   <div class="mg">
     <div class="mc"><div class="ml">Data</div><div class="mv">${fd(m.date)}</div></div>
     <div class="mc"><div class="ml">Orario</div><div class="mv">${m.timeStart||'—'}${m.timeEnd?' → '+m.timeEnd:''}</div></div>
@@ -1111,15 +1194,75 @@ $('btnChangePinSave').onclick = () => {
 $('btnNewMeet').onclick=()=>{ if(currentUser) openMeetModal(null); };
 $('searchQ').oninput=e=>{ _search=e.target.value.toLowerCase().trim(); renderList(); };
 $('yearFilter').onchange=e=>{ _filterYear=e.target.value; renderList(); };
-document.querySelectorAll('.f-btn').forEach(b=>{
+
+document.querySelectorAll('.f-btn[data-t]').forEach(b=>{
   b.onclick=()=>{
-    document.querySelectorAll('.f-btn').forEach(x=>x.classList.remove('on'));
+    document.querySelectorAll('.f-btn[data-t]').forEach(x=>x.classList.remove('on'));
     b.classList.add('on'); _filterTopic=b.dataset.t; renderList();
   };
 });
-['mMeet','mAction','mGh'].forEach(id=>{
+document.querySelectorAll('.f-btn[data-a]').forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll('.f-btn[data-a]').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on'); _filterAction=b.dataset.a; renderList();
+  };
+});
+
+['mMeet','mAction','mGh','mOverdue'].forEach(id=>{
   $(id).addEventListener('click',e=>{ if(e.target===e.currentTarget) $(id).classList.add('h'); });
 });
+
+// ── CAMPANELLA E POPUP SCADUTE ──
+function getOverdueActions(){
+  const td=todayStr();
+  const result=[];
+  for(const m of db.meetings){
+    for(const a of (m.actions||[])){
+      if(!a.done&&a.date&&a.date<td) result.push({...a,meetTitle:m.title,meetCode:m.code,meetId:m.id});
+    }
+  }
+  return result.sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+}
+
+function updateBell(){
+  const ov=getOverdueActions();
+  const badge=$('bellBadge'), btn=$('bellBtn');
+  if(ov.length>0){
+    badge.textContent=ov.length; badge.style.display='flex';
+    btn.classList.add('has-overdue');
+  } else {
+    badge.style.display='none'; btn.classList.remove('has-overdue');
+  }
+}
+
+function showOverduePopup(){
+  const ov=getOverdueActions();
+  if(!ov.length){ $('mOverdueBody').innerHTML='<p style="color:var(--muted);font-size:13px;">Nessuna azione scaduta. 🎉</p>'; $('mOverdue').classList.remove('h'); return; }
+  $('mOverdueBody').innerHTML=`
+    <p style="font-size:13px;color:var(--mid);margin-bottom:12px;">${ov.length} azione${ov.length>1?'i':''} scadut${ov.length>1?'e':'a'}:</p>
+    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <thead><tr style="background:var(--bg);">
+        <th style="padding:6px 8px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);">Riunione</th>
+        <th style="padding:6px 8px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);">Azione</th>
+        <th style="padding:6px 8px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);">Assegnato</th>
+        <th style="padding:6px 8px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);">Scadenza</th>
+      </tr></thead>
+      <tbody>${ov.map(a=>`<tr style="cursor:pointer;border-bottom:1px solid var(--border);" data-mid="${a.meetId}">
+        <td style="padding:6px 8px;"><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--blue);">${esc(a.meetCode||'')}</span> ${esc(a.meetTitle)}</td>
+        <td style="padding:6px 8px;">${esc(a.text)}</td>
+        <td style="padding:6px 8px;">${esc(a.who||'—')}</td>
+        <td style="padding:6px 8px;color:var(--red);font-weight:700;font-family:'DM Mono',monospace;">${fdt(a.date)}</td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+  // Click su riga → apri riunione
+  $('mOverdueBody').querySelectorAll('tr[data-mid]').forEach(r=>{
+    r.onclick=()=>{ _selId=r.dataset.mid; $('mOverdue').classList.add('h'); renderList(); renderDetail(); };
+  });
+  $('mOverdue').classList.remove('h');
+}
+
+$('bellBtn').onclick=showOverduePopup;
+$('mOverdueClose').onclick=()=>$('mOverdue').classList.add('h');
 
 // ══════════════════════════════════════════
 // AVVIO
