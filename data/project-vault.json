@@ -63,14 +63,23 @@
               "week": "",
               "done": false,
               "createdAt": "2026-06-04T13:05:17.020Z"
+            },
+            {
+              "id": "mpzidew70sjqhywe1tra",
+              "text": "Creazione casella email network@upformazione.com",
+              "owner": "Renato",
+              "date": "2026-07-01",
+              "week": "",
+              "done": false,
+              "createdAt": "2026-06-04T13:05:43.591Z"
             }
           ],
           "collapsed": false
         }
       ],
       "createdAt": "2026-06-04",
-      "updatedAt": "2026-06-04T13:05:17.020Z"
+      "updatedAt": "2026-06-04T13:05:43.591Z"
     }
   ],
-  "updatedAt": "2026-06-04T13:05:17.020Z"
+  "updatedAt": "2026-06-04T13:05:43.591Z"
 }
