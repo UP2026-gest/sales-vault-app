@@ -632,9 +632,11 @@ function setGhStatus(msg, cls){
 }
 
 async function syncPull(){
+  if(isSyncing) return;
+  isSyncing = true;
   setGhStatus("🔄 Sincronizzazione…","syncing");
   const res = await GH.pull();
-  if(!res){ setGhStatus("⚠️ Errore connessione GitHub","error"); return; }
+  if(!res){ isSyncing=false; setGhStatus("⚠️ Errore connessione GitHub","error"); return; }
   if(res.content){
     // Validazione struttura remota
     const remote = res.content;
@@ -655,8 +657,11 @@ async function syncPull(){
     db.projects = merged;
     saveLocal();
   }
+  isSyncing = false;
   setGhStatus(`✓ Sincronizzato — ${new Date().toLocaleString("it-IT")}`,"ok");
-  renderAll();
+  // Non resettare currentProjectId: aggiorna la UI preservando la selezione corrente
+  renderProjectList();
+  renderDetail();
 }
 
 async function syncPush(){
@@ -680,6 +685,7 @@ let searchQ = "";
 let editingPhaseId = null;
 let editingTaskId  = null;
 let editingTaskPhaseId = null;
+let isSyncing = false;
 
 // ═══════════════════════════════════════
 // RENDER LISTA PROGETTI
@@ -945,6 +951,13 @@ function addDays(dateStr, n){
 function renderAll(){
   renderProjectList();
   renderDetail();
+}
+
+// Versione che non interferisce con la selezione corrente (usata dal sync)
+function renderAllSafe(){
+  renderProjectList();
+  if(currentProjectId) renderDetail();
+  else renderDetail();
 }
 
 // ═══════════════════════════════════════
