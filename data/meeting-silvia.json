@@ -29,8 +29,9 @@
           "text": "Prepara lista finti test per Vale per infografica",
           "who": "Silvia",
           "date": "2026-06-05",
-          "done": false,
-          "createdAt": "2026-06-05T09:10:42.088Z"
+          "done": true,
+          "createdAt": "2026-06-05T09:10:42.088Z",
+          "updatedAt": "2026-06-05T10:20:37.020Z"
         },
         {
           "id": "mq0qag4h7ijk79",
@@ -42,8 +43,8 @@
         }
       ],
       "createdAt": "2026-06-05T09:00:13.791Z",
-      "updatedAt": "2026-06-05T09:35:08.321Z"
+      "updatedAt": "2026-06-05T10:20:37.020Z"
     }
   ],
-  "updatedAt": "2026-06-05T09:35:08.321Z"
+  "updatedAt": "2026-06-05T10:20:37.020Z"
 }
