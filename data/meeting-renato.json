@@ -80,10 +80,18 @@
           "date": "2026-06-12",
           "done": false,
           "createdAt": "2026-06-05T09:52:14.392Z"
+        },
+        {
+          "id": "mq0qx4q019jop5",
+          "text": "Rinfresco",
+          "who": "Stefania",
+          "date": "2026-06-30",
+          "done": false,
+          "createdAt": "2026-06-05T09:52:46.632Z"
         }
       ],
       "createdAt": "2026-06-04T15:09:37.055Z",
-      "updatedAt": "2026-06-05T09:52:14.392Z"
+      "updatedAt": "2026-06-05T09:52:46.632Z"
     },
     {
       "id": "mq0mmpdvmrgnyz",
@@ -120,5 +128,5 @@
       "updatedAt": "2026-06-05T08:09:09.955Z"
     }
   ],
-  "updatedAt": "2026-06-05T09:52:14.392Z"
+  "updatedAt": "2026-06-05T09:52:46.632Z"
 }
