@@ -1,1 +1,37 @@
-{"projects":[],"savedAt":""}
+{
+  "projects": [
+    {
+      "id": "mq0oq6svrzq4ym",
+      "name": "Network docenti UP",
+      "status": "attivo",
+      "owner": "",
+      "startDate": "",
+      "endDate": "",
+      "keyEvent": "Evento di lancio",
+      "keyEventDate": "2026-07-02",
+      "notes": "Obiettivi: UP fornisce ai docenti formazione continua, newsletter e canali social dedicati, strumenti per erogazione corsi che loro non potrebbero svolgere, compenso economico garantito per anni, priorità per erogazione dei corsi. I docenti forniscono segnalazioni commerciali, proposte per nuovi corsi, conoscenza nuovi docenti.",
+      "participants": [],
+      "phases": [],
+      "log": [],
+      "createdAt": "2026-06-05",
+      "updatedAt": "2026-06-05T08:51:23.503Z"
+    },
+    {
+      "id": "mq0p27d07qixh2",
+      "name": "Network docenti UP",
+      "status": "attivo",
+      "owner": "",
+      "startDate": "",
+      "endDate": "",
+      "keyEvent": "Lancio evento",
+      "keyEventDate": "2026-07-02",
+      "notes": "i docenti segnalano possibilità commerciali, fanno proposte didattiche e presentano docenti. UP offre formazione continua, newletter e canali social, strumenti per i corsi che i docenti non possono erogare, compenso economico",
+      "participants": [],
+      "phases": [],
+      "log": [],
+      "createdAt": "2026-06-05",
+      "updatedAt": "2026-06-05T09:00:44.100Z"
+    }
+  ],
+  "savedAt": "2026-06-05T09:00:44.101Z"
+}
