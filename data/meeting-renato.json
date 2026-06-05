@@ -40,12 +40,16 @@
         {
           "text": "Assistenti sociali, hanno risposto a mie richieste",
           "notes": ""
+        },
+        {
+          "text": "Evento 18/06",
+          "notes": ""
         }
       ],
       "notes": "",
       "actions": [],
       "createdAt": "2026-06-04T15:09:37.055Z",
-      "updatedAt": "2026-06-05T07:38:50.306Z"
+      "updatedAt": "2026-06-05T08:09:33.735Z"
     },
     {
       "id": "mq0mmpdvmrgnyz",
@@ -82,5 +86,5 @@
       "updatedAt": "2026-06-05T08:09:09.955Z"
     }
   ],
-  "updatedAt": "2026-06-05T08:09:09.955Z"
+  "updatedAt": "2026-06-05T08:09:33.735Z"
 }
