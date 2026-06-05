@@ -1,0 +1,32 @@
+{
+  "meetings": [
+    {
+      "id": "mq0p1jz3yij7cq",
+      "code": "26-001",
+      "title": "Riunione settimanale UP",
+      "date": "2026-06-05",
+      "timeStart": "11:00",
+      "timeEnd": "11:00",
+      "client": "",
+      "topics": [
+        "commerciale",
+        "didattica",
+        "amministrazione",
+        "mkt"
+      ],
+      "participants": [
+        "Valentina",
+        "Stefania",
+        "Lucia",
+        "Silvia",
+        "Renato"
+      ],
+      "agenda": [],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-06-05T09:00:13.791Z",
+      "updatedAt": "2026-06-05T09:00:13.791Z"
+    }
+  ],
+  "updatedAt": "2026-06-05T09:00:13.791Z"
+}
