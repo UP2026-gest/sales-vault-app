@@ -67,14 +67,15 @@
           "id": "mq0llmsmfig5mq",
           "text": "caterina deve farmi sapere se ha partorito",
           "who": "caterina",
-          "date": "2026-06-12",
+          "date": "2026-06-04",
           "done": false,
-          "createdAt": "2026-06-05T07:23:52.102Z"
+          "createdAt": "2026-06-05T07:23:52.102Z",
+          "updatedAt": "2026-06-05T07:24:14.799Z"
         }
       ],
       "createdAt": "2026-06-05T07:23:26.162Z",
-      "updatedAt": "2026-06-05T07:23:52.102Z"
+      "updatedAt": "2026-06-05T07:24:14.799Z"
     }
   ],
-  "updatedAt": "2026-06-05T07:23:52.102Z"
+  "updatedAt": "2026-06-05T07:24:14.799Z"
 }
