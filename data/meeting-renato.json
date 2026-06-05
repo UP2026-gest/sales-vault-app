@@ -52,9 +52,10 @@
           "id": "mq0pprsclqkys3",
           "text": "Stefania ci fa sapere da Sossi che piattaforma usare",
           "who": "Stefnia",
-          "date": "2026-01-12",
+          "date": "2026-06-12",
           "done": false,
-          "createdAt": "2026-06-05T09:19:03.660Z"
+          "createdAt": "2026-06-05T09:19:03.660Z",
+          "updatedAt": "2026-06-05T09:49:51.621Z"
         },
         {
           "id": "mq0qadc0n4pto9",
@@ -66,7 +67,7 @@
         }
       ],
       "createdAt": "2026-06-04T15:09:37.055Z",
-      "updatedAt": "2026-06-05T09:35:04.704Z"
+      "updatedAt": "2026-06-05T09:49:51.621Z"
     },
     {
       "id": "mq0mmpdvmrgnyz",
@@ -103,5 +104,5 @@
       "updatedAt": "2026-06-05T08:09:09.955Z"
     }
   ],
-  "updatedAt": "2026-06-05T09:35:04.704Z"
+  "updatedAt": "2026-06-05T09:49:51.621Z"
 }
