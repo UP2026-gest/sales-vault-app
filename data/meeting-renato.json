@@ -46,7 +46,41 @@
       "actions": [],
       "createdAt": "2026-06-04T15:09:37.055Z",
       "updatedAt": "2026-06-05T07:38:50.306Z"
+    },
+    {
+      "id": "mq0mmpdvmrgnyz",
+      "code": "26-002",
+      "title": "Meeteing UP MSF Piazza",
+      "date": "2026-06-05",
+      "timeStart": "12:00",
+      "timeEnd": "12:30",
+      "client": "",
+      "topics": [
+        "gestionale"
+      ],
+      "participants": [
+        "Stefania",
+        "Matteo"
+      ],
+      "agenda": [
+        {
+          "text": "Chinh, pagina su FB",
+          "notes": ""
+        },
+        {
+          "text": "Templus, richiesta per 18/06 ma rimandata",
+          "notes": ""
+        },
+        {
+          "text": "Assistenti sociali, ho avuto risposta, non fanno promozione, faremo un paio di eventi gratuiti e poi uno a pagamento",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-06-05T07:52:41.731Z",
+      "updatedAt": "2026-06-05T07:52:41.731Z"
     }
   ],
-  "updatedAt": "2026-06-05T07:38:50.306Z"
+  "updatedAt": "2026-06-05T07:52:41.731Z"
 }
