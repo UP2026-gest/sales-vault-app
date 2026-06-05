@@ -23,10 +23,19 @@
       ],
       "agenda": [],
       "notes": "DATABASE: inviato cluster C - cluster A partirà oggi e poi l'altra metà domani\n",
-      "actions": [],
+      "actions": [
+        {
+          "id": "mq0pf0rseb2yys",
+          "text": "Prepara lista finti test per Vale per infografica",
+          "who": "Silvia",
+          "date": "2026-06-05",
+          "done": false,
+          "createdAt": "2026-06-05T09:10:42.088Z"
+        }
+      ],
       "createdAt": "2026-06-05T09:00:13.791Z",
-      "updatedAt": "2026-06-05T09:08:54.503Z"
+      "updatedAt": "2026-06-05T09:10:42.088Z"
     }
   ],
-  "updatedAt": "2026-06-05T09:08:54.503Z"
+  "updatedAt": "2026-06-05T09:10:42.088Z"
 }
