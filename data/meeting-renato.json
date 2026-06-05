@@ -55,10 +55,18 @@
           "date": "2026-01-12",
           "done": false,
           "createdAt": "2026-06-05T09:19:03.660Z"
+        },
+        {
+          "id": "mq0qadc0n4pto9",
+          "text": "creare canale whatsapp",
+          "who": "Vale",
+          "date": "2026-06-12",
+          "done": false,
+          "createdAt": "2026-06-05T09:35:04.704Z"
         }
       ],
       "createdAt": "2026-06-04T15:09:37.055Z",
-      "updatedAt": "2026-06-05T09:19:03.660Z"
+      "updatedAt": "2026-06-05T09:35:04.704Z"
     },
     {
       "id": "mq0mmpdvmrgnyz",
@@ -95,5 +103,5 @@
       "updatedAt": "2026-06-05T08:09:09.955Z"
     }
   ],
-  "updatedAt": "2026-06-05T09:19:03.660Z"
+  "updatedAt": "2026-06-05T09:35:04.704Z"
 }
