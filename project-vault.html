@@ -1,0 +1,970 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Project Vault – UP Formazione</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --navy:#1a2744;--navy2:#243459;--navy3:#2e4070;
+  --amber:#e8a020;--amber2:#fdf3e0;
+  --green:#1a7a3a;--green2:#edf7f1;
+  --red:#b52a2a;--red2:#fdf0f0;
+  --orange:#c75a00;--orange2:#fff4ec;
+  --blue:#2255c4;--blue2:#eef3fd;
+  --purple:#5b3ec8;--purple2:#f3f0fd;
+  --bg:#f2f4f8;--surface:#fff;
+  --border:#dde2ec;--border2:#c8cfe0;
+  --text:#1a2133;--mid:#4a5570;--muted:#7a85a0;
+  --r8:8px;--r12:12px;--r16:16px;
+  --sh1:0 1px 3px rgba(26,39,68,.07);
+  --sh2:0 4px 12px rgba(26,39,68,.10);
+  --sh3:0 12px 32px rgba(26,39,68,.16);
+  font-family:'DM Sans',sans-serif;font-size:15px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* HEADER */
+.bar{display:flex;justify-content:space-between;align-items:center;
+  padding:0 20px;height:60px;background:var(--navy);
+  position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+.bar h1{font-size:17px;font-weight:700;color:#fff;letter-spacing:.3px;}
+.bar h1 span{color:var(--amber);}
+#ghStatus{font-size:11.5px;margin-top:1px;}
+#ghStatus.ok{color:#5edb8a;}#ghStatus.err{color:#ff8080;font-weight:600;}
+#ghStatus.sync{color:#ffc966;}#ghStatus.info{color:rgba(255,255,255,.4);}
+.bar-right{display:flex;gap:6px;align-items:center;}
+
+/* BUTTONS */
+button{cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;
+  border-radius:var(--r8);border:1px solid transparent;padding:7px 13px;
+  transition:background .15s;white-space:nowrap;}
+button:disabled{opacity:.4;cursor:not-allowed;}
+.btn-amber{background:var(--amber);color:var(--navy);border-color:var(--amber);font-weight:700;}
+.btn-amber:hover{background:#d48f18;}
+.btn-navy{background:var(--navy);color:#fff;border-color:var(--navy);}
+.btn-navy:hover{background:var(--navy3);}
+.btn-ghost{background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.2);}
+.btn-ghost:hover{background:rgba(255,255,255,.2);color:#fff;}
+.btn-sec{background:var(--bg);color:var(--mid);border-color:var(--border);}
+.btn-sec:hover{background:var(--border);color:var(--text);}
+.btn-danger{background:var(--red2);color:var(--red);border-color:#f0b0b0;}
+.btn-danger:hover{background:#fbe0e0;}
+.btn-sm{padding:5px 10px;font-size:12px;}
+.btn-xs{padding:3px 8px;font-size:11px;}
+.btn-icon{padding:4px 7px;font-size:14px;background:transparent;border:none;color:var(--muted);}
+.btn-icon:hover{color:var(--text);}
+a.nav-link{display:inline-flex;align-items:center;padding:6px 13px;border-radius:var(--r8);
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
+  color:rgba(255,255,255,.85);font-size:13px;font-weight:500;text-decoration:none;transition:background .15s;}
+a.nav-link:hover{background:rgba(255,255,255,.2);color:#fff;}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 60px);}
+.sidebar{border-right:1px solid var(--border);padding:14px;background:var(--surface);
+  display:flex;flex-direction:column;gap:10px;overflow-y:auto;}
+.main{padding:16px;overflow:auto;}
+
+/* SIDEBAR */
+.s-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);}
+.s-input{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--r8);
+  font-family:inherit;font-size:13px;background:var(--bg);color:var(--text);}
+.s-input:focus{outline:none;border-color:var(--blue);}
+.filter-row{display:flex;gap:4px;flex-wrap:wrap;}
+.f-btn{padding:3px 9px;font-size:11.5px;font-weight:500;border-radius:20px;
+  border:1px solid var(--border);background:var(--bg);color:var(--muted);cursor:pointer;transition:all .12s;}
+.f-btn.on{background:var(--navy);border-color:var(--navy);color:#fff;}
+.proj-list{display:flex;flex-direction:column;gap:6px;flex:1;}
+.proj-card{border:1px solid var(--border);border-radius:var(--r12);padding:10px 12px;
+  cursor:pointer;background:var(--surface);transition:border-color .12s,box-shadow .12s;}
+.proj-card:hover{border-color:var(--border2);box-shadow:var(--sh1);}
+.proj-card.sel{border-color:var(--navy);box-shadow:0 0 0 2px rgba(26,39,68,.1);}
+.proj-card-name{font-size:13px;font-weight:600;color:var(--text);}
+.proj-card-meta{font-size:11.5px;color:var(--muted);margin-top:3px;}
+.proj-card-foot{display:flex;gap:5px;align-items:center;margin-top:6px;flex-wrap:wrap;}
+
+/* BADGES */
+.badge{display:inline-block;font-size:10px;font-weight:700;border-radius:4px;padding:2px 6px;}
+.b-attivo{background:var(--green2);color:var(--green);}
+.b-idea{background:var(--purple2);color:var(--purple);}
+.b-pausa{background:var(--orange2);color:var(--orange);}
+.b-completato{background:var(--blue2);color:var(--blue);}
+.b-archiviato{background:#f0f0f0;color:#888;}
+
+/* DETAIL */
+.detail-empty{display:flex;flex-direction:column;align-items:center;
+  justify-content:center;height:calc(100vh - 120px);color:var(--muted);gap:10px;}
+.detail-empty .icon{font-size:40px;opacity:.4;}
+.card{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r16);padding:16px;box-shadow:var(--sh1);margin-bottom:12px;}
+.card-title{font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.7px;color:var(--muted);border-bottom:1px solid var(--border);
+  padding-bottom:8px;margin-bottom:12px;}
+.proj-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px;}
+.proj-title{font-size:20px;font-weight:700;color:var(--navy);}
+.proj-keyev{font-size:12px;color:var(--muted);margin-top:4px;}
+.meta-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.meta-cell{background:var(--bg);border-radius:var(--r8);padding:9px 11px;}
+.meta-cell .lbl{font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.5px;color:var(--muted);margin-bottom:3px;}
+.meta-cell .val{font-size:13px;font-weight:500;}
+.notes-box{background:var(--amber2);border:1px solid #f0d090;border-radius:var(--r8);
+  padding:11px 13px;font-size:13px;color:var(--mid);white-space:pre-wrap;line-height:1.65;margin-bottom:12px;}
+.pills{display:flex;flex-wrap:wrap;gap:5px;}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;
+  border-radius:20px;background:var(--blue2);color:var(--blue);font-size:12px;font-weight:500;}
+.pill .rm{cursor:pointer;opacity:.6;font-size:11px;}
+.pill .rm:hover{opacity:1;}
+
+/* LOG */
+.log-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+.log-item:last-child{border-bottom:none;}
+.log-date{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);flex-shrink:0;width:80px;margin-top:1px;}
+.log-text{font-size:13px;flex:1;line-height:1.45;}
+.log-author{font-size:11px;color:var(--muted);flex-shrink:0;}
+
+/* FASI */
+.phase-block{border:1px solid var(--border);border-radius:var(--r12);overflow:hidden;margin-bottom:10px;}
+.phase-hdr{display:flex;align-items:center;justify-content:space-between;
+  padding:9px 13px;background:var(--navy);cursor:pointer;user-select:none;}
+.phase-hdr-l{display:flex;align-items:center;gap:8px;}
+.phase-name{font-size:13px;font-weight:700;color:#fff;}
+.phase-dates{font-size:11px;color:rgba(255,255,255,.55);}
+.phase-prog{font-size:11px;color:rgba(255,255,255,.7);}
+.phase-hdr-r{display:flex;align-items:center;gap:4px;}
+.phase-tog{color:rgba(255,255,255,.6);font-size:11px;}
+.prog-bar{height:3px;background:rgba(255,255,255,.12);}
+.prog-fill{height:100%;background:var(--amber);transition:width .3s;}
+.task-list{display:flex;flex-direction:column;}
+.task-row{display:flex;align-items:flex-start;gap:8px;padding:8px 13px;
+  border-bottom:1px solid var(--border);transition:background .1s;}
+.task-row:last-child{border-bottom:none;}
+.task-row:hover{background:var(--bg);}
+.task-row.done .task-txt{text-decoration:line-through;color:var(--muted);}
+.chk{width:17px;height:17px;border-radius:4px;border:2px solid var(--border);background:#fff;
+  cursor:pointer;flex-shrink:0;margin-top:1px;display:flex;align-items:center;
+  justify-content:center;font-size:10px;transition:all .12s;}
+.chk.on{background:var(--green);border-color:var(--green);color:#fff;}
+.task-body{flex:1;min-width:0;}
+.task-txt{font-size:13px;line-height:1.4;}
+.task-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:3px;}
+.task-owner{font-size:11.5px;color:var(--muted);}
+.task-date{font-size:11.5px;color:var(--muted);font-family:'DM Mono',monospace;}
+.task-date.ov{color:var(--red);font-weight:600;}
+.task-date.soon{color:var(--orange);font-weight:600;}
+.task-acts{display:flex;gap:2px;flex-shrink:0;}
+.quick-add{display:flex;gap:6px;padding:7px 13px;border-top:1px dashed var(--border);flex-wrap:wrap;}
+.quick-add input{border:1px solid var(--border);border-radius:var(--r8);
+  padding:5px 9px;font-size:12.5px;font-family:inherit;background:var(--bg);}
+.quick-add input:focus{outline:none;border-color:var(--blue);background:#fff;}
+.qa-txt{flex:1;min-width:120px;}
+.qa-own{width:120px;}
+.qa-dt{width:130px;font-family:'DM Mono',monospace;}
+
+/* FORMS */
+input,select,textarea{width:100%;padding:7px 10px;border-radius:var(--r8);
+  border:1px solid var(--border);background:var(--bg);font-family:inherit;
+  font-size:13px;color:var(--text);transition:border-color .15s;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(34,85,196,.1);background:#fff;}
+label{display:block;font-size:12px;font-weight:500;color:var(--mid);margin-bottom:10px;}
+label input,label select,label textarea{margin-top:4px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.sec-lbl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;
+  color:var(--muted);border-bottom:1px solid var(--border);padding-bottom:5px;margin:14px 0 10px;}
+hr{border:0;border-top:1px solid var(--border);margin:12px 0;}
+
+/* MODAL */
+.modal{position:fixed;inset:0;background:rgba(10,15,30,.45);display:flex;
+  align-items:center;justify-content:center;padding:16px;z-index:500;backdrop-filter:blur(2px);}
+.modal.h{display:none;}
+.modal-box{background:var(--surface);border-radius:var(--r16);border:1px solid var(--border);
+  width:min(700px,100%);max-height:90vh;overflow-y:auto;box-shadow:var(--sh3);}
+.modal-hdr{display:flex;justify-content:space-between;align-items:center;
+  padding:13px 17px;border-bottom:1px solid var(--border);
+  position:sticky;top:0;background:var(--surface);z-index:1;
+  border-radius:var(--r16) var(--r16) 0 0;}
+.modal-hdr strong{font-size:14px;}
+.modal-body{padding:17px;}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div>
+    <h1>◈ <span>Project</span> Vault</h1>
+    <div id="ghStatus" class="info">GitHub Sync non configurato</div>
+  </div>
+  <div class="bar-right">
+    <a href="index.html" class="nav-link">◆ Sales Vault</a>
+    <a href="meeting-vault.html" class="nav-link">◆ Meeting Vault</a>
+    <button class="btn-amber" id="btnNewProj">+ Nuovo progetto</button>
+    <button class="btn-ghost" id="btnSync">☁️ Sync</button>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="s-title">Progetti</div>
+    <input class="s-input" id="searchQ" placeholder="Cerca progetto, responsabile…"/>
+    <div>
+      <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:5px;">STATO</div>
+      <div class="filter-row">
+        <button class="f-btn on" data-f="all">Tutti</button>
+        <button class="f-btn" data-f="idea">Idea</button>
+        <button class="f-btn" data-f="attivo">Attivi</button>
+        <button class="f-btn" data-f="pausa">In pausa</button>
+        <button class="f-btn" data-f="completato">Completati</button>
+        <button class="f-btn" data-f="archiviato">Archiviati</button>
+      </div>
+    </div>
+    <div class="proj-list" id="projList"></div>
+  </aside>
+  <main class="main" id="mainPanel">
+    <div class="detail-empty">
+      <div class="icon">◈</div>
+      <p>Seleziona un progetto o creane uno nuovo.</p>
+    </div>
+  </main>
+</div>
+
+<!-- Modal Progetto -->
+<div class="modal h" id="mProj">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <strong id="mProjTitle">Nuovo progetto</strong>
+      <button class="btn-sec btn-sm" id="mProjClose">✕ Chiudi</button>
+    </div>
+    <div class="modal-body">
+      <label>Nome progetto *<input id="fPName" placeholder="es. Network Docenti UP"/></label>
+      <div class="g2">
+        <label>Stato<select id="fPStatus">
+          <option value="idea">💡 Idea</option>
+          <option value="attivo" selected>🟢 Attivo</option>
+          <option value="pausa">⏸ In pausa</option>
+          <option value="completato">✅ Completato</option>
+          <option value="archiviato">📦 Archiviato</option>
+        </select></label>
+        <label>Responsabile<input id="fPOwner" placeholder="es. Renato"/></label>
+        <label>Data inizio<input id="fPStart" type="date"/></label>
+        <label>Data fine prevista<input id="fPEnd" type="date"/></label>
+        <label>Evento / milestone chiave<input id="fPKeyEv" placeholder="es. Lancio evento"/></label>
+        <label>Data evento chiave<input id="fPKeyDt" type="date"/></label>
+      </div>
+      <div class="sec-lbl">Obiettivo / Note</div>
+      <textarea id="fPNotes" rows="4" placeholder="Obiettivo, idee, vincoli…" style="margin-bottom:12px;"></textarea>
+      <div class="sec-lbl">Partecipanti</div>
+      <div style="display:flex;gap:6px;margin-bottom:8px;">
+        <input id="fPPartInp" placeholder="Nome partecipante" style="flex:1;"/>
+        <button class="btn-navy btn-sm" id="btnAddPart">+ Aggiungi</button>
+      </div>
+      <div id="fPParts" class="pills" style="margin-bottom:16px;min-height:28px;"></div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-navy" id="mProjSave" style="flex:1;">💾 Salva</button>
+        <button class="btn-danger btn-sm" id="mProjDel" style="display:none;">🗑 Elimina</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Fase -->
+<div class="modal h" id="mFase">
+  <div class="modal-box" style="width:min(440px,100%);">
+    <div class="modal-hdr">
+      <strong id="mFaseTitle">Nuova fase</strong>
+      <button class="btn-sec btn-sm" id="mFaseClose">✕ Chiudi</button>
+    </div>
+    <div class="modal-body">
+      <label>Nome fase *<input id="fFName" placeholder="es. Fase 0 — Preparazione"/></label>
+      <div class="g2">
+        <label>Data inizio<input id="fFStart" type="date"/></label>
+        <label>Data fine<input id="fFEnd" type="date"/></label>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button class="btn-navy" id="mFaseSave" style="flex:1;">💾 Salva</button>
+        <button class="btn-danger btn-sm" id="mFaseDel" style="display:none;">🗑 Elimina</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Task -->
+<div class="modal h" id="mTask">
+  <div class="modal-box" style="width:min(480px,100%);">
+    <div class="modal-hdr">
+      <strong id="mTaskTitle">Nuova attività</strong>
+      <button class="btn-sec btn-sm" id="mTaskClose">✕ Chiudi</button>
+    </div>
+    <div class="modal-body">
+      <label>Descrizione *<textarea id="fTTxt" rows="3" placeholder="Cosa deve essere fatto?"></textarea></label>
+      <div class="g2">
+        <label>Responsabile<input id="fTOwner" placeholder="es. Silvia / Renato"/></label>
+        <label>Data scadenza<input id="fTDate" type="date"/></label>
+        <label>Settimana / range (opzionale)<input id="fTWeek" placeholder="es. 16–20 giu"/></label>
+        <label>Stato<select id="fTDone">
+          <option value="0">☐ Da fare</option>
+          <option value="1">✓ Completata</option>
+        </select></label>
+      </div>
+      <button class="btn-navy" id="mTaskSave" style="width:100%;margin-top:8px;">💾 Salva</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Log -->
+<div class="modal h" id="mLog">
+  <div class="modal-box" style="width:min(460px,100%);">
+    <div class="modal-hdr">
+      <strong>📝 Aggiungi nota al log</strong>
+      <button class="btn-sec btn-sm" id="mLogClose">✕ Chiudi</button>
+    </div>
+    <div class="modal-body">
+      <label>Autore<input id="fLogAuthor" placeholder="es. Renato"/></label>
+      <label>Nota *<textarea id="fLogText" rows="4" placeholder="Aggiornamento, decisione, nota di avanzamento…"></textarea></label>
+      <button class="btn-navy" id="mLogSave" style="width:100%;margin-top:8px;">💾 Aggiungi</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal GitHub -->
+<div class="modal h" id="mGh">
+  <div class="modal-box" style="width:min(480px,100%);">
+    <div class="modal-hdr">
+      <strong>☁️ GitHub Sync</strong>
+      <button class="btn-sec btn-sm" id="mGhClose">✕ Chiudi</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--mid);margin-bottom:14px;">
+        Dati condivisi tra tutti gli utenti. Usa le stesse credenziali del Sales Vault.
+      </p>
+      <label>Token GitHub (PAT)<input id="fGhTok" type="password" placeholder="ghp_…"/></label>
+      <label>Owner<input id="fGhOwn" placeholder="es. UP2026-gest"/></label>
+      <label>Repository<input id="fGhRepo" placeholder="es. sales-vault-app"/></label>
+      <label>Percorso file<input id="fGhPath" value="data/project-vault.json"/></label>
+      <div style="display:flex;gap:8px;margin-top:14px;">
+        <button class="btn-navy" id="mGhSave" style="flex:1;">Salva e sincronizza</button>
+        <button class="btn-danger btn-sm" id="mGhClear">Rimuovi</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const nowIso = () => new Date().toISOString();
+const todayStr = () => { const d=new Date(); return `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`; };
+const p2 = n => String(n).padStart(2,'0');
+const esc = s => String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const fdt = s => { if(!s) return '—'; const[y,m,d]=s.split('-'); return `${d}/${m}/${y}`; };
+const addDays = (s,n) => { const d=new Date(s); d.setDate(d.getDate()+n); return `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`; };
+
+// ══════════════════════════════════════════
+// DB — GitHub è fonte di verità
+// ══════════════════════════════════════════
+const DB_KEY  = 'pv2_db_v1';
+const GH_KEY  = 'pv2_gh_v1';
+const SHA_KEY = 'pv2_sha_v1';
+
+let db = { projects:[] };
+let _selId = null;
+let _filter = 'all';
+let _search = '';
+let _editProjId = null;
+let _editFaseId = null;
+let _editTaskFid = null;
+let _editTaskId = null;
+let _tempParts = [];
+let _ghPushing = false;
+
+function dbLoad(){
+  try{const r=localStorage.getItem(DB_KEY);if(r){const p=JSON.parse(r);if(Array.isArray(p.projects))db=p;}}
+  catch{db={projects:[]};}
+}
+function dbSave(){
+  db.updatedAt=nowIso();
+  localStorage.setItem(DB_KEY,JSON.stringify(db));
+  ghPushBg();
+}
+
+// ══════════════════════════════════════════
+// GITHUB
+// ══════════════════════════════════════════
+function ghCfg(){try{return JSON.parse(localStorage.getItem(GH_KEY)||'null');}catch{return null;}}
+function ghOk(){const c=ghCfg();return !!(c?.tok&&c?.own&&c?.repo&&c?.path);}
+function ghUrl(){const c=ghCfg();return `https://api.github.com/repos/${c.own}/${c.repo}/contents/${c.path}`;}
+function ghHdr(){const c=ghCfg();return{'Authorization':`Bearer ${c.tok}`,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'};}
+function getSha(){return localStorage.getItem(SHA_KEY);}
+function saveSha(s){if(s)localStorage.setItem(SHA_KEY,s);}
+function setStatus(msg,cls){$('ghStatus').textContent=msg;$('ghStatus').className=cls;}
+
+async function ghPushBg(){
+  if(!ghOk()||_ghPushing)return;
+  _ghPushing=true;
+  try{
+    const body={message:'Project Vault sync',content:btoa(unescape(encodeURIComponent(JSON.stringify(db,null,2))))};
+    const sha=getSha();if(sha)body.sha=sha;
+    const r=await fetch(ghUrl(),{method:'PUT',headers:ghHdr(),body:JSON.stringify(body)});
+    if(r.ok){const j=await r.json();saveSha(j.content?.sha);setStatus(`✓ Sincronizzato — ${new Date().toLocaleString('it-IT')}`,'ok');}
+    else if(r.status===409){
+      const rg=await fetch(ghUrl(),{headers:ghHdr()});
+      if(rg.ok){const jg=await rg.json();saveSha(jg.sha);body.sha=jg.sha;
+        const r2=await fetch(ghUrl(),{method:'PUT',headers:ghHdr(),body:JSON.stringify(body)});
+        if(r2.ok){const j2=await r2.json();saveSha(j2.content?.sha);setStatus(`✓ Sincronizzato — ${new Date().toLocaleString('it-IT')}`,'ok');}
+        else setStatus('⚠️ Errore salvataggio','err');
+      }
+    }else setStatus('⚠️ Errore salvataggio GitHub','err');
+  }catch{setStatus('⚠️ Errore connessione','err');}
+  finally{_ghPushing=false;}
+}
+
+async function ghPull(){
+  if(!ghOk())return;
+  setStatus('🔄 Sincronizzazione…','sync');
+  try{
+    const r=await fetch(ghUrl(),{headers:ghHdr()});
+    if(r.status===404){setStatus('✓ Pronto','ok');return;}
+    if(!r.ok){setStatus('⚠️ Errore lettura GitHub','err');return;}
+    const j=await r.json();saveSha(j.sha);
+    const remote=JSON.parse(atob(j.content.replace(/\n/g,'')));
+    if(Array.isArray(remote.projects)){
+      const byId=new Map(db.projects.filter(p=>p?.id).map(p=>[p.id,p]));
+      for(const rp of remote.projects){
+        if(!rp?.id)continue;
+        const lp=byId.get(rp.id);
+        if(!lp||(rp.updatedAt||'')>(lp.updatedAt||''))byId.set(rp.id,rp);
+      }
+      db.projects=[...byId.values()];
+      localStorage.setItem(DB_KEY,JSON.stringify(db));
+    }
+    setStatus(`✓ Sincronizzato — ${new Date().toLocaleString('it-IT')}`,'ok');
+    renderList();
+    if(_selId)renderDetail();
+  }catch{setStatus('⚠️ Errore sync','err');}
+}
+
+// ══════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════
+const STATUS_LBL={idea:'💡 Idea',attivo:'🟢 Attivo',pausa:'⏸ In pausa',completato:'✅ Completato',archiviato:'📦 Archiviato'};
+const STATUS_ORD=['attivo','idea','pausa','completato','archiviato'];
+function getProj(id){return db.projects.find(p=>p.id===id);}
+function getPhase(fid){return getProj(_selId)?.phases?.find(f=>f.id===fid);}
+function getTask(fid,tid){return getPhase(fid)?.tasks?.find(t=>t.id===tid);}
+
+// ══════════════════════════════════════════
+// RENDER LISTA
+// ══════════════════════════════════════════
+function renderList(){
+  let list=db.projects.filter(p=>p?.id&&p?.name);
+  if(_filter!=='all')list=list.filter(p=>p.status===_filter);
+  if(_search)list=list.filter(p=>
+    (p.name||'').toLowerCase().includes(_search)||
+    (p.owner||'').toLowerCase().includes(_search)||
+    (p.notes||'').toLowerCase().includes(_search)||
+    (p.participants||[]).some(x=>x.toLowerCase().includes(_search))
+  );
+  list.sort((a,b)=>STATUS_ORD.indexOf(a.status)-STATUS_ORD.indexOf(b.status));
+  const el=$('projList');
+  if(!list.length){el.innerHTML='<p style="font-size:13px;color:var(--muted);text-align:center;padding:20px;">Nessun progetto.</p>';return;}
+  el.innerHTML=list.map(p=>{
+    const tasks=(p.phases||[]).flatMap(f=>f.tasks||[]);
+    const done=tasks.filter(t=>t.done).length;
+    const tot=tasks.length;
+    const over=tasks.filter(t=>!t.done&&t.date&&t.date<todayStr()).length;
+    const sel=p.id===_selId?' sel':'';
+    const keyDt=p.keyEventDate?` · 🎯 ${fdt(p.keyEventDate)}`:'';
+    return `<div class="proj-card${sel}" data-id="${p.id}">
+      <div class="proj-card-name">${esc(p.name)}</div>
+      <div class="proj-card-meta">${esc(p.owner||'')}${keyDt}</div>
+      <div class="proj-card-foot">
+        <span class="badge b-${p.status}">${STATUS_LBL[p.status]||p.status}</span>
+        ${tot>0?`<span style="font-size:11px;color:var(--muted);">${done}/${tot}${over>0?` · <span style="color:var(--red);font-weight:600;">${over} scad.</span>`:''}</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  el.querySelectorAll('.proj-card').forEach(c=>{
+    c.addEventListener('click',()=>{_selId=c.dataset.id;renderList();renderDetail();});
+  });
+}
+
+// ══════════════════════════════════════════
+// RENDER DETTAGLIO
+// ══════════════════════════════════════════
+function renderDetail(){
+  const panel=$('mainPanel');
+  if(!_selId){panel.innerHTML='<div class="detail-empty"><div class="icon">◈</div><p>Seleziona un progetto o creane uno nuovo.</p></div>';return;}
+  const p=getProj(_selId);
+  if(!p){panel.innerHTML='<div class="detail-empty"><div class="icon">◈</div><p>Progetto non trovato.</p></div>';return;}
+  const td=todayStr();
+  const tasks=(p.phases||[]).flatMap(f=>f.tasks||[]);
+  const done=tasks.filter(t=>t.done).length;
+  const tot=tasks.length;
+  const over=tasks.filter(t=>!t.done&&t.date&&t.date<td).length;
+
+  const phasesHtml=(p.phases||[]).map(f=>renderPhaseHtml(f,td)).join('');
+  const logHtml=(p.log||[]).slice().reverse().map(l=>`
+    <div class="log-item">
+      <span class="log-date">${fdt(l.date)}</span>
+      <span class="log-text">${esc(l.text)}</span>
+      <span class="log-author">${esc(l.author||'')}</span>
+    </div>`).join('');
+
+  panel.innerHTML=`
+  <div class="card">
+    <div class="proj-header">
+      <div>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;">
+          <span class="badge b-${p.status}">${STATUS_LBL[p.status]||p.status}</span>
+        </div>
+        <div class="proj-title">${esc(p.name)}</div>
+        ${p.keyEvent?`<div class="proj-keyev">🎯 ${esc(p.keyEvent)}${p.keyEventDate?' · '+fdt(p.keyEventDate):''}</div>`:''}
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0;">
+        <button class="btn-amber btn-sm" id="btnReport">📄 Report</button>
+        <button class="btn-sec btn-sm" id="btnEdit">✏️ Modifica</button>
+      </div>
+    </div>
+    <div class="meta-row">
+      <div class="meta-cell"><div class="lbl">Responsabile</div><div class="val">${esc(p.owner||'—')}</div></div>
+      <div class="meta-cell"><div class="lbl">Periodo</div><div class="val">${p.startDate?fdt(p.startDate):'—'}${p.endDate?' → '+fdt(p.endDate):''}</div></div>
+      <div class="meta-cell"><div class="lbl">Avanzamento</div><div class="val">${tot>0?`${done}/${tot} (${Math.round(done/tot*100)}%)`:'Nessuna attività'}${over>0?` · <b style="color:var(--red)">${over} scadute</b>`:''}</div></div>
+    </div>
+    ${(p.participants||[]).length?`<div style="margin-bottom:10px;"><div class="card-title" style="margin-bottom:6px;">Partecipanti</div><div class="pills">${(p.participants).map(n=>`<span class="pill">${esc(n)}</span>`).join('')}</div></div>`:''}
+    ${p.notes?`<div class="notes-box">${esc(p.notes)}</div>`:''}
+  </div>
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+    <span style="font-size:13px;font-weight:600;color:var(--mid);">Fasi e attività</span>
+    <button class="btn-navy btn-sm" id="btnAddFase">+ Aggiungi fase</button>
+  </div>
+  <div id="phaseContainer">
+    ${phasesHtml||'<p style="text-align:center;color:var(--muted);font-size:13px;padding:24px 0;">Nessuna fase. Aggiungine una per iniziare.</p>'}
+  </div>
+
+  <div class="card" style="margin-top:12px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div class="card-title" style="margin:0;">Log / Note di avanzamento</div>
+      <button class="btn-navy btn-sm" id="btnAddLog">+ Aggiungi nota</button>
+    </div>
+    <div id="logList">
+      ${logHtml||'<p style="font-size:13px;color:var(--muted);">Nessuna nota di avanzamento.</p>'}
+    </div>
+  </div>`;
+
+  $('btnEdit').onclick=()=>openProjModal(p.id);
+  $('btnReport').onclick=()=>openReport(p.id);
+  $('btnAddFase').onclick=()=>openFaseModal(null);
+  $('btnAddLog').onclick=()=>openLogModal();
+
+  panel.querySelectorAll('.phase-hdr').forEach(h=>{
+    h.addEventListener('click',e=>{
+      if(e.target.closest('button'))return;
+      const f=getPhase(h.dataset.fid);if(f){f.collapsed=!f.collapsed;dbSave();renderDetail();}
+    });
+  });
+  panel.querySelectorAll('.btn-ef').forEach(b=>b.onclick=e=>{e.stopPropagation();openFaseModal(b.dataset.fid);});
+  panel.querySelectorAll('.btn-af').forEach(b=>b.onclick=e=>{e.stopPropagation();openTaskModal(b.dataset.fid,null);});
+  panel.querySelectorAll('.chk').forEach(c=>{
+    c.addEventListener('click',()=>{
+      const t=getTask(c.dataset.fid,c.dataset.tid);
+      if(t){t.done=!t.done;t.updatedAt=nowIso();const proj=getProj(_selId);if(proj)proj.updatedAt=nowIso();dbSave();renderDetail();}
+    });
+  });
+  panel.querySelectorAll('.btn-et').forEach(b=>b.onclick=()=>openTaskModal(b.dataset.fid,b.dataset.tid));
+  panel.querySelectorAll('.btn-dt').forEach(b=>b.onclick=()=>{
+    if(!confirm('Eliminare questa attività?'))return;
+    const f=getPhase(b.dataset.fid);if(f){f.tasks=f.tasks.filter(t=>t.id!==b.dataset.tid);dbSave();renderDetail();}
+  });
+  panel.querySelectorAll('.qa-btn').forEach(btn=>btn.onclick=()=>doQuickAdd(btn.dataset.fid));
+  panel.querySelectorAll('.qa-txt').forEach(inp=>{
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter')doQuickAdd(inp.dataset.fid);});
+  });
+}
+
+function renderPhaseHtml(f,td){
+  const tasks=f.tasks||[];
+  const done=tasks.filter(t=>t.done).length;
+  const tot=tasks.length;
+  const pct=tot>0?Math.round(done/tot*100):0;
+  const dates=[f.startDate?fdt(f.startDate):'',f.endDate?fdt(f.endDate):''].filter(Boolean).join(' – ');
+  const taskRows=tasks.map(t=>{
+    const ov=!t.done&&t.date&&t.date<td;
+    const sn=!t.done&&t.date&&t.date>=td&&t.date<=addDays(td,7);
+    const dl=t.date?fdt(t.date):(t.week||'');
+    const dc=ov?'ov':sn?'soon':'';
+    return `<div class="task-row${t.done?' done':''}">
+      <div class="chk${t.done?' on':''}" data-fid="${f.id}" data-tid="${t.id}">${t.done?'✓':''}</div>
+      <div class="task-body">
+        <div class="task-txt">${esc(t.text)}</div>
+        <div class="task-meta">
+          ${t.owner?`<span class="task-owner">👤 ${esc(t.owner)}</span>`:''}
+          ${dl?`<span class="task-date ${dc}">📅 ${esc(dl)}</span>`:''}
+        </div>
+      </div>
+      <div class="task-acts">
+        <button class="btn-icon btn-et" data-fid="${f.id}" data-tid="${t.id}" title="Modifica">✏️</button>
+        <button class="btn-icon btn-dt" data-fid="${f.id}" data-tid="${t.id}" title="Elimina">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+  return `<div class="phase-block">
+    <div class="phase-hdr" data-fid="${f.id}">
+      <div class="phase-hdr-l">
+        <span class="phase-tog">${f.collapsed?'▶':'▼'}</span>
+        <span class="phase-name">${esc(f.name||'(fase)')}</span>
+        ${dates?`<span class="phase-dates">${esc(dates)}</span>`:''}
+      </div>
+      <div class="phase-hdr-r">
+        ${tot>0?`<span class="phase-prog">${done}/${tot} (${pct}%)</span>`:''}
+        <button class="btn-icon btn-ef" data-fid="${f.id}" style="color:rgba(255,255,255,.65);" title="Modifica fase">✏️</button>
+        <button class="btn-icon btn-af" data-fid="${f.id}" style="color:rgba(255,255,255,.65);font-size:18px;" title="Aggiungi attività">+</button>
+      </div>
+    </div>
+    ${tot>0?`<div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>`:''}
+    ${!f.collapsed?`<div>
+      <div class="task-list">${taskRows}</div>
+      <div class="quick-add">
+        <input class="qa-txt" data-fid="${f.id}" placeholder="+ Attività rapida…"/>
+        <input class="qa-own" data-fid="${f.id}" placeholder="👤 Responsabile"/>
+        <input class="qa-dt" data-fid="${f.id}" type="date"/>
+        <button class="btn-navy btn-xs qa-btn" data-fid="${f.id}">+ Aggiungi</button>
+      </div>
+    </div>`:''}
+  </div>`;
+}
+
+function doQuickAdd(fid){
+  const txtEl=document.querySelector(`.qa-txt[data-fid="${fid}"]`);
+  const ownEl=document.querySelector(`.qa-own[data-fid="${fid}"]`);
+  const dtEl=document.querySelector(`.qa-dt[data-fid="${fid}"]`);
+  const txt=txtEl?.value.trim();if(!txt)return;
+  const f=getPhase(fid);if(!f)return;
+  f.tasks.push({id:uid(),text:txt,owner:ownEl?.value.trim()||'',date:dtEl?.value||'',week:'',done:false,createdAt:nowIso()});
+  const proj=getProj(_selId);if(proj)proj.updatedAt=nowIso();
+  dbSave();renderDetail();
+}
+
+// ══════════════════════════════════════════
+// MODAL PROGETTO
+// ══════════════════════════════════════════
+function openProjModal(id){
+  _editProjId=id||null;_tempParts=[];
+  const p=id?getProj(id):null;
+  $('mProjTitle').textContent=id?'Modifica progetto':'Nuovo progetto';
+  $('mProjDel').style.display=id?'':'none';
+  $('fPName').value=p?.name||'';
+  $('fPStatus').value=p?.status||'attivo';
+  $('fPOwner').value=p?.owner||'';
+  $('fPStart').value=p?.startDate||'';
+  $('fPEnd').value=p?.endDate||'';
+  $('fPKeyEv').value=p?.keyEvent||'';
+  $('fPKeyDt').value=p?.keyEventDate||'';
+  $('fPNotes').value=p?.notes||'';
+  _tempParts=[...(p?.participants||[])];
+  renderParts();
+  $('mProj').classList.remove('h');
+  setTimeout(()=>$('fPName').focus(),50);
+}
+
+function renderParts(){
+  $('fPParts').innerHTML=_tempParts.map((n,i)=>
+    `<span class="pill">${esc(n)}<span class="rm" data-i="${i}"> ✕</span></span>`
+  ).join('');
+  $('fPParts').querySelectorAll('.rm').forEach(r=>r.onclick=()=>{_tempParts.splice(Number(r.dataset.i),1);renderParts();});
+}
+
+$('btnAddPart').onclick=()=>{
+  const v=$('fPPartInp').value.trim();
+  if(v&&!_tempParts.includes(v)){_tempParts.push(v);$('fPPartInp').value='';renderParts();}
+};
+$('fPPartInp').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();$('btnAddPart').click();}};
+
+$('mProjSave').onclick=()=>{
+  const name=$('fPName').value.trim();
+  if(!name){alert('Inserisci il nome del progetto.');return;}
+  if(_editProjId){
+    const p=getProj(_editProjId);
+    if(p)Object.assign(p,{name,status:$('fPStatus').value,owner:$('fPOwner').value.trim(),
+      startDate:$('fPStart').value,endDate:$('fPEnd').value,
+      keyEvent:$('fPKeyEv').value.trim(),keyEventDate:$('fPKeyDt').value,
+      notes:$('fPNotes').value.trim(),participants:[..._tempParts],updatedAt:nowIso()});
+  }else{
+    const p={id:uid(),name,status:$('fPStatus').value,owner:$('fPOwner').value.trim(),
+      startDate:$('fPStart').value,endDate:$('fPEnd').value,
+      keyEvent:$('fPKeyEv').value.trim(),keyEventDate:$('fPKeyDt').value,
+      notes:$('fPNotes').value.trim(),participants:[..._tempParts],
+      phases:[],log:[],createdAt:todayStr(),updatedAt:nowIso()};
+    db.projects.push(p);_selId=p.id;
+  }
+  dbSave();$('mProj').classList.add('h');renderList();renderDetail();
+};
+
+$('mProjDel').onclick=()=>{
+  if(!confirm('Eliminare definitivamente questo progetto?'))return;
+  db.projects=db.projects.filter(p=>p.id!==_editProjId);
+  if(_selId===_editProjId)_selId=null;
+  dbSave();$('mProj').classList.add('h');renderList();renderDetail();
+};
+$('mProjClose').onclick=()=>$('mProj').classList.add('h');
+
+// ══════════════════════════════════════════
+// MODAL FASE
+// ══════════════════════════════════════════
+function openFaseModal(fid){
+  _editFaseId=fid||null;
+  const f=fid?getPhase(fid):null;
+  $('mFaseTitle').textContent=fid?'Modifica fase':'Nuova fase';
+  $('mFaseDel').style.display=fid?'':'none';
+  $('fFName').value=f?.name||'';
+  $('fFStart').value=f?.startDate||'';
+  $('fFEnd').value=f?.endDate||'';
+  $('mFase').classList.remove('h');
+  setTimeout(()=>$('fFName').focus(),50);
+}
+
+$('mFaseSave').onclick=()=>{
+  const name=$('fFName').value.trim();
+  if(!name){alert('Inserisci il nome della fase.');return;}
+  const p=getProj(_selId);if(!p)return;
+  if(_editFaseId){
+    const f=getPhase(_editFaseId);
+    if(f){f.name=name;f.startDate=$('fFStart').value;f.endDate=$('fFEnd').value;}
+  }else{
+    if(!Array.isArray(p.phases))p.phases=[];
+    p.phases.push({id:uid(),name,startDate:$('fFStart').value,endDate:$('fFEnd').value,tasks:[],collapsed:false});
+  }
+  p.updatedAt=nowIso();dbSave();$('mFase').classList.add('h');renderDetail();
+};
+$('mFaseDel').onclick=()=>{
+  if(!confirm('Eliminare questa fase e tutte le sue attività?'))return;
+  const p=getProj(_selId);if(!p)return;
+  p.phases=p.phases.filter(f=>f.id!==_editFaseId);p.updatedAt=nowIso();
+  dbSave();$('mFase').classList.add('h');renderDetail();
+};
+$('mFaseClose').onclick=()=>$('mFase').classList.add('h');
+
+// ══════════════════════════════════════════
+// MODAL TASK
+// ══════════════════════════════════════════
+function openTaskModal(fid,tid){
+  _editTaskFid=fid;_editTaskId=tid||null;
+  const f=getPhase(fid);
+  const t=tid?f?.tasks?.find(x=>x.id===tid):null;
+  $('mTaskTitle').textContent=tid?'Modifica attività':'Nuova attività';
+  $('fTTxt').value=t?.text||'';
+  $('fTOwner').value=t?.owner||'';
+  $('fTDate').value=t?.date||'';
+  $('fTWeek').value=t?.week||'';
+  $('fTDone').value=t?.done?'1':'0';
+  $('mTask').classList.remove('h');
+  setTimeout(()=>$('fTTxt').focus(),50);
+}
+
+$('mTaskSave').onclick=()=>{
+  const txt=$('fTTxt').value.trim();
+  if(!txt){alert('Inserisci la descrizione.');return;}
+  const f=getPhase(_editTaskFid);if(!f)return;
+  if(_editTaskId){
+    const t=f.tasks.find(x=>x.id===_editTaskId);
+    if(t)Object.assign(t,{text:txt,owner:$('fTOwner').value.trim(),
+      date:$('fTDate').value,week:$('fTWeek').value.trim(),
+      done:$('fTDone').value==='1',updatedAt:nowIso()});
+  }else{
+    f.tasks.push({id:uid(),text:txt,owner:$('fTOwner').value.trim(),
+      date:$('fTDate').value,week:$('fTWeek').value.trim(),
+      done:$('fTDone').value==='1',createdAt:nowIso()});
+  }
+  const p=getProj(_selId);if(p)p.updatedAt=nowIso();
+  dbSave();$('mTask').classList.add('h');renderDetail();
+};
+$('mTaskClose').onclick=()=>$('mTask').classList.add('h');
+
+// ══════════════════════════════════════════
+// MODAL LOG
+// ══════════════════════════════════════════
+function openLogModal(){
+  $('fLogAuthor').value='';$('fLogText').value='';
+  $('mLog').classList.remove('h');
+  setTimeout(()=>$('fLogText').focus(),50);
+}
+
+$('mLogSave').onclick=()=>{
+  const txt=$('fLogText').value.trim();
+  if(!txt){alert('Inserisci il testo della nota.');return;}
+  const p=getProj(_selId);if(!p)return;
+  if(!Array.isArray(p.log))p.log=[];
+  p.log.push({id:uid(),text:txt,author:$('fLogAuthor').value.trim(),date:todayStr(),createdAt:nowIso()});
+  p.updatedAt=nowIso();dbSave();$('mLog').classList.add('h');renderDetail();
+};
+$('mLogClose').onclick=()=>$('mLog').classList.add('h');
+
+// ══════════════════════════════════════════
+// REPORT PDF
+// ══════════════════════════════════════════
+function openReport(id){
+  const p=getProj(id);if(!p)return;
+  const win=window.open('','_blank');
+  win.document.write(buildReport(p));
+  win.document.close();
+}
+
+function buildReport(p){
+  const td=todayStr();
+  const e=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const fd=s=>{if(!s)return'—';const[y,m,d]=s.split('-');return`${d}/${m}/${y}`;};
+  const allTasks=(p.phases||[]).flatMap(f=>(f.tasks||[]).map(t=>({...t,fn:f.name})));
+  const done=allTasks.filter(t=>t.done).length,tot=allTasks.length;
+  const over=allTasks.filter(t=>!t.done&&t.date&&t.date<td);
+  const soon=allTasks.filter(t=>!t.done&&t.date&&t.date>=td&&t.date<=addDays(td,7));
+
+  const phasesHtml=(p.phases||[]).map(f=>{
+    const ft=f.tasks||[];const fd2=ft.filter(t=>t.done).length;
+    const fp=ft.length>0?Math.round(fd2/ft.length*100):0;
+    const dates=[f.startDate?fd(f.startDate):'',f.endDate?fd(f.endDate):''].filter(Boolean).join(' – ');
+    const rows=ft.map(t=>{
+      const ov=!t.done&&t.date&&t.date<td;
+      const dl=t.date?fd(t.date):(t.week||'—');
+      let badge=ov?'<span style="background:#fdf0f0;color:#b52a2a;font-size:10px;font-weight:700;border-radius:4px;padding:1px 5px;">⚠ scaduta</span>':'';
+      return `<tr style="${t.done?'color:#aaa;text-decoration:line-through;':''}">
+        <td style="width:20px;padding:5px 8px;">${t.done?'✓':'☐'}</td>
+        <td style="padding:5px 8px;">${e(t.text)}</td>
+        <td style="padding:5px 8px;">${e(t.owner||'—')}</td>
+        <td style="padding:5px 8px;font-family:monospace;">${e(dl)} ${badge}</td>
+      </tr>`;
+    }).join('');
+    return `<div style="border:1px solid #dde2ec;border-radius:8px;overflow:hidden;margin-bottom:12px;page-break-inside:avoid;">
+      <div style="background:#1a2744;color:#fff;padding:8px 12px;font-size:12px;font-weight:700;">
+        ${e(f.name||'(fase)')}${dates?`<span style="opacity:.6;font-weight:400;margin-left:8px;">${e(dates)}</span>`:''}
+        <span style="float:right;opacity:.7;font-weight:400;">${fd2}/${ft.length} (${fp}%)</span>
+      </div>
+      ${ft.length>0?`<div style="height:3px;background:#e8a020;width:${fp}%;"></div>`:''}
+      ${ft.length>0?`<table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <thead><tr style="background:#f2f4f8;">
+          <th style="padding:5px 8px;text-align:left;"></th>
+          <th style="padding:5px 8px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:#7a85a0;">Attività</th>
+          <th style="padding:5px 8px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:#7a85a0;">Responsabile</th>
+          <th style="padding:5px 8px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:#7a85a0;">Scadenza</th>
+        </tr></thead><tbody>${rows}</tbody></table>`
+      :`<p style="padding:10px 12px;color:#aaa;font-size:12px;">Nessuna attività.</p>`}
+    </div>`;
+  }).join('');
+
+  const logHtml=(p.log||[]).slice().reverse().map(l=>
+    `<tr><td style="padding:5px 8px;font-family:monospace;white-space:nowrap;">${fd(l.date)}</td>
+    <td style="padding:5px 8px;">${e(l.text)}</td>
+    <td style="padding:5px 8px;color:#7a85a0;">${e(l.author||'')}</td></tr>`
+  ).join('');
+
+  return `<!doctype html><html lang="it"><head><meta charset="utf-8"/>
+  <title>Report: ${e(p.name)}</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>*{box-sizing:border-box;}body{font-family:'DM Sans',sans-serif;font-size:13px;color:#1a2133;background:#fff;padding:28px 36px;}
+  h1{font-size:21px;font-weight:700;color:#1a2744;margin-bottom:3px;}
+  .sub{color:#7a85a0;font-size:12px;margin-bottom:20px;}
+  .sec{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#7a85a0;border-bottom:1px solid #dde2ec;padding-bottom:5px;margin:18px 0 10px;}
+  .kg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;}
+  .kc{background:#f2f4f8;border-radius:8px;padding:10px 12px;}
+  .kv{font-size:18px;font-weight:700;color:#1a2744;}.kl{font-size:10px;color:#7a85a0;margin-top:2px;}
+  .kv.g{color:#1a7a3a;}.kv.r{color:#b52a2a;}.kv.a{color:#c75a00;}
+  .mg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+  .mc{background:#f2f4f8;border-radius:8px;padding:9px 11px;}
+  .ml{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#7a85a0;margin-bottom:3px;}
+  .mv{font-size:13px;font-weight:500;}
+  .notes{background:#fdf3e0;border:1px solid #f0d090;border-radius:8px;padding:11px 13px;font-size:13px;color:#4a5570;white-space:pre-wrap;line-height:1.6;}
+  .pill{display:inline-block;padding:2px 9px;border-radius:20px;background:#eef3fd;color:#2255c4;font-size:11px;font-weight:500;margin:2px;}
+  table{width:100%;border-collapse:collapse;}
+  @media print{.no-print{display:none!important;}}
+  </style></head><body>
+  <div class="no-print" style="background:#1a2744;color:#fff;padding:10px 18px;margin:-28px -36px 22px;display:flex;justify-content:space-between;align-items:center;">
+    <span style="font-weight:600;">📄 Report progetto — ${e(p.name)}</span>
+    <button onclick="window.print()" style="background:#e8a020;color:#1a2744;border:none;border-radius:8px;padding:7px 16px;font-weight:700;cursor:pointer;">🖨 Stampa / PDF</button>
+  </div>
+  <h1>${e(p.name)}</h1>
+  <div class="sub">Generato il ${fd(td)} · ${STATUS_LBL[p.status]||p.status}</div>
+  <div class="kg">
+    <div class="kc"><div class="kv">${tot}</div><div class="kl">Attività totali</div></div>
+    <div class="kc"><div class="kv g">${done}</div><div class="kl">Completate (${tot>0?Math.round(done/tot*100):0}%)</div></div>
+    <div class="kc"><div class="kv r">${over.length}</div><div class="kl">Scadute</div></div>
+    <div class="kc"><div class="kv a">${soon.length}</div><div class="kl">In scadenza (7gg)</div></div>
+  </div>
+  <div class="mg">
+    <div class="mc"><div class="ml">Responsabile</div><div class="mv">${e(p.owner||'—')}</div></div>
+    <div class="mc"><div class="ml">Periodo</div><div class="mv">${p.startDate?fd(p.startDate):'—'}${p.endDate?' → '+fd(p.endDate):''}</div></div>
+    <div class="mc"><div class="ml">Evento chiave</div><div class="mv">${e(p.keyEvent||'—')}${p.keyEventDate?' · '+fd(p.keyEventDate):''}</div></div>
+  </div>
+  ${(p.participants||[]).length?`<div class="sec">Partecipanti</div><div>${(p.participants).map(n=>`<span class="pill">${e(n)}</span>`).join('')}</div>`:''}
+  ${p.notes?`<div class="sec">Obiettivo / Note</div><div class="notes">${e(p.notes)}</div>`:''}
+  ${over.length?`<div class="sec" style="color:#b52a2a;">⚠ Attività scadute (${over.length})</div>
+    <table><thead><tr style="background:#f2f4f8;">
+      <th style="padding:5px 8px;text-align:left;">Attività</th>
+      <th style="padding:5px 8px;text-align:left;">Fase</th>
+      <th style="padding:5px 8px;text-align:left;">Responsabile</th>
+      <th style="padding:5px 8px;text-align:left;">Scadenza</th>
+    </tr></thead><tbody>
+    ${over.map(t=>`<tr><td style="padding:5px 8px;">${e(t.text)}</td><td style="padding:5px 8px;">${e(t.fn||'')}</td><td style="padding:5px 8px;">${e(t.owner||'—')}</td><td style="padding:5px 8px;color:#b52a2a;font-weight:600;">${fd(t.date)}</td></tr>`).join('')}
+    </tbody></table>`:''}
+  <div class="sec">Fasi e attività</div>
+  ${phasesHtml||'<p style="color:#aaa;">Nessuna fase.</p>'}
+  ${(p.log||[]).length?`<div class="sec">Log / Note di avanzamento</div>
+    <table><thead><tr style="background:#f2f4f8;">
+      <th style="padding:5px 8px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:#7a85a0;">Data</th>
+      <th style="padding:5px 8px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:#7a85a0;">Nota</th>
+      <th style="padding:5px 8px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:#7a85a0;">Autore</th>
+    </tr></thead><tbody>${logHtml}</tbody></table>`:''}
+  </body></html>`;
+}
+
+// ══════════════════════════════════════════
+// MODAL GITHUB
+// ══════════════════════════════════════════
+$('btnSync').onclick=()=>{
+  if(ghOk()){ghPull();return;}
+  const c=ghCfg();
+  $('fGhTok').value=c?.tok||'';
+  $('fGhOwn').value=c?.own||'';
+  $('fGhRepo').value=c?.repo||'';
+  $('fGhPath').value=c?.path||'data/project-vault.json';
+  $('mGh').classList.remove('h');
+};
+$('mGhSave').onclick=()=>{
+  const c={tok:$('fGhTok').value.trim(),own:$('fGhOwn').value.trim(),
+    repo:$('fGhRepo').value.trim(),path:$('fGhPath').value.trim()||'data/project-vault.json'};
+  if(!c.tok||!c.own||!c.repo){alert('Compila tutti i campi.');return;}
+  localStorage.setItem(GH_KEY,JSON.stringify(c));
+  $('mGh').classList.add('h');
+  ghPull();
+};
+$('mGhClear').onclick=()=>{
+  if(!confirm('Rimuovere configurazione GitHub?'))return;
+  localStorage.removeItem(GH_KEY);localStorage.removeItem(SHA_KEY);
+  setStatus('GitHub Sync non configurato','info');$('mGh').classList.add('h');
+};
+$('mGhClose').onclick=()=>$('mGh').classList.add('h');
+
+// ══════════════════════════════════════════
+// FILTRI E AVVIO
+// ══════════════════════════════════════════
+$('btnNewProj').onclick=()=>openProjModal(null);
+$('searchQ').oninput=e=>{_search=e.target.value.toLowerCase().trim();renderList();};
+document.querySelectorAll('.f-btn').forEach(b=>{
+  b.onclick=()=>{document.querySelectorAll('.f-btn').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');_filter=b.dataset.f;renderList();};
+});
+['mProj','mFase','mTask','mLog','mGh'].forEach(id=>{
+  $(id).addEventListener('click',e=>{if(e.target===e.currentTarget)$(id).classList.add('h');});
+});
+
+dbLoad();
+renderList();
+renderDetail();
+if(ghOk()){setStatus('🔄 Connessione…','sync');ghPull();}
+else setStatus('GitHub Sync non configurato — clicca ☁️ Sync','info');
+</script>
+</body>
+</html>
