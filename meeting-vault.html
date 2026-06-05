@@ -1000,13 +1000,24 @@ function renderModalParts(){
 function renderModalAgenda(){
   $('fMAgendaList').innerHTML=_tempAgenda.map((a,i)=>{
     const txt = typeof a==='string'?a:(a.text||'');
-    return `<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--border);border-radius:var(--r8);background:var(--bg);">
-      <span style="font-size:11px;font-weight:700;color:var(--muted);min-width:18px;">${i+1}.</span>
-      <span style="flex:1;font-size:13px;">${esc(txt)}</span>
-      <button class="btn-icon" data-i="${i}" style="color:var(--red);font-size:12px;">✕</button>
+    return `<div style="display:flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--border);border-radius:var(--r8);background:var(--bg);" data-i="${i}">
+      <span style="font-size:11px;font-weight:700;color:var(--muted);min-width:18px;flex-shrink:0;">${i+1}.</span>
+      <input class="agenda-edit-inp" data-i="${i}" value="${esc(txt)}"
+        style="flex:1;border:none;background:transparent;font-size:13px;padding:2px 4px;border-radius:4px;"/>
+      <button class="btn-icon btn-del-ag" data-i="${i}" style="color:var(--red);font-size:12px;flex-shrink:0;">✕</button>
     </div>`;
   }).join('');
-  $('fMAgendaList').querySelectorAll('.btn-icon').forEach(b=>b.onclick=()=>{_tempAgenda.splice(Number(b.dataset.i),1);renderModalAgenda();});
+  // Salva modifica testo on-blur
+  $('fMAgendaList').querySelectorAll('.agenda-edit-inp').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      const i=Number(inp.dataset.i);
+      const a=_tempAgenda[i];
+      if(a) { if(typeof a==='string') _tempAgenda[i]={text:inp.value.trim(),notes:''}; else a.text=inp.value.trim(); }
+    });
+    inp.addEventListener('focus', ()=>{ inp.style.background='#fff'; inp.style.border='1px solid var(--blue)'; });
+    inp.addEventListener('blur',  ()=>{ inp.style.background='transparent'; inp.style.border='none'; });
+  });
+  $('fMAgendaList').querySelectorAll('.btn-del-ag').forEach(b=>b.onclick=()=>{_tempAgenda.splice(Number(b.dataset.i),1);renderModalAgenda();});
 }
 
 $('btnAddPart').onclick=()=>{
