@@ -42,40 +42,7 @@
       "actions": [],
       "createdAt": "2026-06-04T15:09:37.055Z",
       "updatedAt": "2026-06-05T06:15:06.053Z"
-    },
-    {
-      "id": "mq0ll2s285rrxn",
-      "code": "26-002",
-      "title": "caterina",
-      "date": "2026-06-05",
-      "timeStart": "",
-      "timeEnd": "",
-      "client": "",
-      "topics": [
-        "didattica"
-      ],
-      "participants": [],
-      "agenda": [
-        {
-          "text": "studente maxion che va in palestra invece della sala parto",
-          "notes": ""
-        }
-      ],
-      "notes": "",
-      "actions": [
-        {
-          "id": "mq0llmsmfig5mq",
-          "text": "caterina deve farmi sapere se ha partorito",
-          "who": "caterina",
-          "date": "2026-06-04",
-          "done": false,
-          "createdAt": "2026-06-05T07:23:52.102Z",
-          "updatedAt": "2026-06-05T07:24:14.799Z"
-        }
-      ],
-      "createdAt": "2026-06-05T07:23:26.162Z",
-      "updatedAt": "2026-06-05T07:24:14.799Z"
     }
   ],
-  "updatedAt": "2026-06-05T07:24:14.799Z"
+  "updatedAt": "2026-06-05T07:24:37.651Z"
 }
