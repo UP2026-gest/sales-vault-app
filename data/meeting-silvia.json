@@ -45,7 +45,39 @@
       ],
       "createdAt": "2026-06-05T09:00:13.791Z",
       "updatedAt": "2026-06-09T09:59:58.329Z"
+    },
+    {
+      "id": "mq9aayttp3f4a2",
+      "code": "26-002",
+      "title": "Riunione settimanale UP",
+      "date": "2026-06-12",
+      "timeStart": "11:00",
+      "timeEnd": "",
+      "client": "",
+      "topics": [
+        "commerciale",
+        "didattica"
+      ],
+      "participants": [],
+      "agenda": [
+        {
+          "text": "attività 18 giugno - altri inviti? - presentazione Angelica",
+          "notes": ""
+        },
+        {
+          "text": "attività docenti 2 luglio - 6 confermati per ora",
+          "notes": ""
+        },
+        {
+          "text": "cluster come sono andati?",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-06-11T09:17:34.289Z",
+      "updatedAt": "2026-06-11T09:17:34.289Z"
     }
   ],
-  "updatedAt": "2026-06-09T09:59:58.329Z"
+  "updatedAt": "2026-06-11T09:17:34.289Z"
 }
