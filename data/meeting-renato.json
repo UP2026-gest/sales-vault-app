@@ -134,7 +134,58 @@
       "actions": [],
       "createdAt": "2026-06-05T07:52:41.731Z",
       "updatedAt": "2026-06-05T08:09:09.955Z"
+    },
+    {
+      "id": "mqahxliqgmwhys",
+      "code": "26-003",
+      "title": "(Copia) meeting UP",
+      "date": "2026-06-12",
+      "timeStart": "11:00",
+      "timeEnd": "12:00",
+      "client": "",
+      "topics": [
+        "commerciale",
+        "didattica",
+        "amministrazione",
+        "mkt"
+      ],
+      "participants": [
+        "Stefania",
+        "Silvia",
+        "Valentina",
+        "Lucia"
+      ],
+      "agenda": [
+        {
+          "text": "Database, invio cluster A con proposta test, valutare estensione anche per B e C",
+          "notes": ""
+        },
+        {
+          "text": "Corso Silvia, abbiamo prenotato?",
+          "notes": ""
+        },
+        {
+          "text": "landing page italiano su pagina FB vietnamiti, Chinh ha detto che dobbiamo pubblicare noi",
+          "notes": ""
+        },
+        {
+          "text": "Network up, inviti mandati, contratti da confermare, sala e catering da prenotare, email da fare, canale w.a. da fare, gadget per partecipanti e pacchetto di benvenuto per chi aderisce",
+          "notes": ""
+        },
+        {
+          "text": "Assistenti sociali, hanno risposto a mie richieste",
+          "notes": ""
+        },
+        {
+          "text": "Evento 18/06",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-06-12T05:38:53.619Z",
+      "updatedAt": "2026-06-12T05:38:53.619Z"
     }
   ],
-  "updatedAt": "2026-06-05T09:53:56.329Z"
+  "updatedAt": "2026-06-12T05:38:53.619Z"
 }
