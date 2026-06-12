@@ -208,11 +208,19 @@
           "date": "2026-06-19",
           "done": false,
           "createdAt": "2026-06-12T10:11:17.987Z"
+        },
+        {
+          "id": "mqarpru32ckcmh",
+          "text": "Fabio Zubani per attività presso Fit Factory",
+          "who": "Stefania",
+          "date": "2026-07-03",
+          "done": false,
+          "createdAt": "2026-06-12T10:12:44.715Z"
         }
       ],
       "createdAt": "2026-06-12T05:38:53.619Z",
-      "updatedAt": "2026-06-12T10:11:35.851Z"
+      "updatedAt": "2026-06-12T10:12:44.715Z"
     }
   ],
-  "updatedAt": "2026-06-12T10:11:35.851Z"
+  "updatedAt": "2026-06-12T10:12:44.715Z"
 }
