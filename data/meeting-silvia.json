@@ -98,10 +98,19 @@
         }
       ],
       "notes": "",
-      "actions": [],
+      "actions": [
+        {
+          "id": "mqam4art1plmhp",
+          "text": "creazione casella mail network@upformazione.com",
+          "who": "",
+          "date": "",
+          "done": false,
+          "createdAt": "2026-06-12T07:36:04.745Z"
+        }
+      ],
       "createdAt": "2026-06-12T07:35:23.777Z",
-      "updatedAt": "2026-06-12T07:35:23.777Z"
+      "updatedAt": "2026-06-12T07:36:04.745Z"
     }
   ],
-  "updatedAt": "2026-06-12T07:35:23.777Z"
+  "updatedAt": "2026-06-12T07:36:04.745Z"
 }
