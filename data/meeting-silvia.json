@@ -77,7 +77,31 @@
       "actions": [],
       "createdAt": "2026-06-11T09:17:34.289Z",
       "updatedAt": "2026-06-11T09:17:34.289Z"
+    },
+    {
+      "id": "mqam3f5tedvqgt",
+      "code": "26-003",
+      "title": "Renato venerdì",
+      "date": "2026-06-12",
+      "timeStart": "09:30",
+      "timeEnd": "",
+      "client": "",
+      "topics": [
+        "commerciale",
+        "didattica"
+      ],
+      "participants": [],
+      "agenda": [
+        {
+          "text": "preparazione incontro del 2 luglio con docenti",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-06-12T07:35:23.777Z",
+      "updatedAt": "2026-06-12T07:35:23.777Z"
     }
   ],
-  "updatedAt": "2026-06-11T09:17:34.289Z"
+  "updatedAt": "2026-06-12T07:35:23.777Z"
 }
