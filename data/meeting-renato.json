@@ -186,11 +186,19 @@
           "date": "2026-06-18",
           "done": false,
           "createdAt": "2026-06-12T05:41:42.034Z"
+        },
+        {
+          "id": "mqaocxj7s71r6d",
+          "text": "contratti network da far verificare ad avvocati",
+          "who": "stefania",
+          "date": "2026-06-12",
+          "done": false,
+          "createdAt": "2026-06-12T08:38:46.724Z"
         }
       ],
       "createdAt": "2026-06-12T05:38:53.619Z",
-      "updatedAt": "2026-06-12T07:38:35.938Z"
+      "updatedAt": "2026-06-12T08:38:46.724Z"
     }
   ],
-  "updatedAt": "2026-06-12T07:38:35.938Z"
+  "updatedAt": "2026-06-12T08:38:46.724Z"
 }
