@@ -106,11 +106,19 @@
           "date": "",
           "done": false,
           "createdAt": "2026-06-12T07:36:04.745Z"
+        },
+        {
+          "id": "mqam4nyh77215r",
+          "text": "creazione canale",
+          "who": "",
+          "date": "",
+          "done": false,
+          "createdAt": "2026-06-12T07:36:21.833Z"
         }
       ],
       "createdAt": "2026-06-12T07:35:23.777Z",
-      "updatedAt": "2026-06-12T07:36:04.745Z"
+      "updatedAt": "2026-06-12T07:36:21.833Z"
     }
   ],
-  "updatedAt": "2026-06-12T07:36:04.745Z"
+  "updatedAt": "2026-06-12T07:36:21.833Z"
 }
