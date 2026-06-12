@@ -199,11 +199,19 @@
           "date": "2026-06-12",
           "done": false,
           "createdAt": "2026-06-12T08:38:46.724Z"
+        },
+        {
+          "id": "mqarnwwzc02kyh",
+          "text": "traduzione inglese per landing page italiano per stranieri",
+          "who": "Silvia",
+          "date": "2026-06-19",
+          "done": false,
+          "createdAt": "2026-06-12T10:11:17.987Z"
         }
       ],
       "createdAt": "2026-06-12T05:38:53.619Z",
-      "updatedAt": "2026-06-12T10:10:41.499Z"
+      "updatedAt": "2026-06-12T10:11:17.987Z"
     }
   ],
-  "updatedAt": "2026-06-12T10:10:41.499Z"
+  "updatedAt": "2026-06-12T10:11:17.987Z"
 }
