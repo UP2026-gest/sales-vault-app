@@ -122,8 +122,8 @@
     {
       "id": "mqjnc1lm35rrk9",
       "code": "26-004",
-      "title": "(Copia) Riunione settimanale UP",
-      "date": "2026-06-18",
+      "title": "Riunione settimanale UP",
+      "date": "2026-06-19",
       "timeStart": "11:00",
       "timeEnd": "",
       "client": "",
@@ -134,11 +134,11 @@
       "participants": [],
       "agenda": [
         {
-          "text": "attività 18 giugno - 4 partecipanti - presentazione Angelica",
+          "text": "attività 18 giugno -feedback",
           "notes": ""
         },
         {
-          "text": "attività docenti 2 luglio - 10 confermati per ora",
+          "text": "attività docenti 2 luglio - 13 confermati per ora",
           "notes": ""
         },
         {
@@ -149,8 +149,8 @@
       "notes": "",
       "actions": [],
       "createdAt": "2026-06-18T15:20:01.306Z",
-      "updatedAt": "2026-06-18T15:20:01.306Z"
+      "updatedAt": "2026-06-18T15:21:08.594Z"
     }
   ],
-  "updatedAt": "2026-06-18T15:20:01.307Z"
+  "updatedAt": "2026-06-18T15:21:08.594Z"
 }
