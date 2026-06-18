@@ -118,7 +118,39 @@
       ],
       "createdAt": "2026-06-12T07:35:23.777Z",
       "updatedAt": "2026-06-12T07:36:21.833Z"
+    },
+    {
+      "id": "mqjnc1lm35rrk9",
+      "code": "26-004",
+      "title": "(Copia) Riunione settimanale UP",
+      "date": "2026-06-18",
+      "timeStart": "11:00",
+      "timeEnd": "",
+      "client": "",
+      "topics": [
+        "commerciale",
+        "didattica"
+      ],
+      "participants": [],
+      "agenda": [
+        {
+          "text": "attività 18 giugno - 4 partecipanti - presentazione Angelica",
+          "notes": ""
+        },
+        {
+          "text": "attività docenti 2 luglio - 10 confermati per ora",
+          "notes": ""
+        },
+        {
+          "text": "cluster come sono andati?",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-06-18T15:20:01.306Z",
+      "updatedAt": "2026-06-18T15:20:01.306Z"
     }
   ],
-  "updatedAt": "2026-06-12T09:21:07.304Z"
+  "updatedAt": "2026-06-18T15:20:01.307Z"
 }
