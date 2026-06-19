@@ -234,7 +234,7 @@
     {
       "id": "mqknlwdlvc8gtp",
       "code": "26-004",
-      "title": "(Copia) meeting UP",
+      "title": "meeting UP",
       "date": "2026-06-19",
       "timeStart": "11:00",
       "timeEnd": "12:00",
@@ -267,13 +267,17 @@
         {
           "text": "globalan, chiesto aggiornamento per collaboratrice su roma",
           "notes": ""
+        },
+        {
+          "text": "cambiare struttura e promozione attività",
+          "notes": ""
         }
       ],
       "notes": "",
       "actions": [],
       "createdAt": "2026-06-19T08:15:27.273Z",
-      "updatedAt": "2026-06-19T08:17:59.162Z"
+      "updatedAt": "2026-06-19T09:11:31.616Z"
     }
   ],
-  "updatedAt": "2026-06-19T08:18:25.672Z"
+  "updatedAt": "2026-06-19T09:11:31.616Z"
 }
