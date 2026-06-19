@@ -79,8 +79,9 @@
           "text": "gadget",
           "who": "Vale",
           "date": "2026-06-12",
-          "done": false,
-          "createdAt": "2026-06-05T09:52:14.392Z"
+          "done": true,
+          "createdAt": "2026-06-05T09:52:14.392Z",
+          "updatedAt": "2026-06-19T08:18:19.497Z"
         },
         {
           "id": "mq0qx4q019jop5",
@@ -274,5 +275,5 @@
       "updatedAt": "2026-06-19T08:17:59.162Z"
     }
   ],
-  "updatedAt": "2026-06-19T08:18:18.413Z"
+  "updatedAt": "2026-06-19T08:18:19.497Z"
 }
