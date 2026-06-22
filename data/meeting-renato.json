@@ -167,8 +167,8 @@
           "notes": "VALE PREPARA IL TESTO IN ITALIANO, SILVIA LO TRADUCE IN INGLESE E POI STEFANIA IN VIETNAMITA"
         },
         {
-          "text": "Network up, inviti mandati, contratti da confermare, email network fatta, canale w.a. da fare (ma è visibile a tutti?), gadget per partecipanti e pacchetto di benvenuto per chi aderisce",
-          "notes": "inviti mandati e un buon numero ha già confermato, scaletta fatta da vedere insieme, casella network@ aperta e pw inviata, novità su contratti? LUNEDì O MARTEDì AVREMO CONFERMA. gadget? VALE CHIEDE IL MINIMO"
+          "text": "Network up, inviti mandati, contratti da confermare, email network fatta, canale w.a. da fare (ma Ã¨ visibile a tutti?), gadget per partecipanti e pacchetto di benvenuto per chi aderisce",
+          "notes": "inviti mandati e un buon numero ha giÃ  confermato, scaletta fatta da vedere insieme, casella network@ aperta e pw inviata, novitÃ  su contratti? LUNEDÃ¬ O MARTEDÃ¬ AVREMO CONFERMA. gadget? VALE CHIEDE IL MINIMO"
         },
         {
           "text": "Assistenti sociali, hanno risposto a mie richieste?",
@@ -176,10 +176,10 @@
         },
         {
           "text": "Evento 18/06",
-          "notes": "4 iscritti, Dennis più due che non conosciamo + SORELLA STEFANIA. Come promuoviamo ancora? Cosa facciamo per i prossimi eventi? POI STEFANIA SENTIRà IL PERSONAL TRAINER FABIO ZUBANI FIT FACTORY"
+          "notes": "4 iscritti, Dennis piÃ¹ due che non conosciamo + SORELLA STEFANIA. Come promuoviamo ancora? Cosa facciamo per i prossimi eventi? POI STEFANIA SENTIRÃ  IL PERSONAL TRAINER FABIO ZUBANI FIT FACTORY"
         },
         {
-          "text": "Ordine medici Como, dobbiamo fare piano per promuovere? E per avvocati? Landing page e materiale sono già pronti",
+          "text": "Ordine medici Como, dobbiamo fare piano per promuovere? E per avvocati? Landing page e materiale sono giÃ  pronti",
           "notes": "VALE DEVE PREPARARE I POST E I CONTENUTI, POI PROMUOVEREMO A SETTEMBRE"
         }
       ],
@@ -213,7 +213,7 @@
         },
         {
           "id": "mqarpru32ckcmh",
-          "text": "Fabio Zubani per attività presso Fit Factory",
+          "text": "Fabio Zubani per attivitÃ  presso Fit Factory",
           "who": "Stefania",
           "date": "2026-07-03",
           "done": false,
@@ -254,14 +254,14 @@
       "agenda": [
         {
           "text": "Database, invio email, come sta andando?",
-          "notes": "LE HO CHIESTO DI FARMI AVERE ALLA FINE IL RIEPILOGO DI QUELLE CHE NON SONO STATE APERTE E UN FILE EXCEL CON IL RIEPILOGO DI TUTTO, COSì POSSO TELEFONARE. TERREMO COME PROMO SOLO IL TEST ONLINE AZIENDALE MA ANCHE PER TEDESCO OLTRE CHE SPAGNOLO E INGLESE."
+          "notes": "LE HO CHIESTO DI FARMI AVERE ALLA FINE IL RIEPILOGO DI QUELLE CHE NON SONO STATE APERTE E UN FILE EXCEL CON IL RIEPILOGO DI TUTTO, COSÃ¬ POSSO TELEFONARE. TERREMO COME PROMO SOLO IL TEST ONLINE AZIENDALE MA ANCHE PER TEDESCO OLTRE CHE SPAGNOLO E INGLESE."
         },
         {
           "text": "landing page italiano su pagina FB vietnamiti, traduzione? poi pubblicare",
-          "notes": "LA TRADUZIONE IN INGLESE è PRONTA, VALE SOLLECITA STEFANIA PER VIETNAMITA"
+          "notes": "LA TRADUZIONE IN INGLESE Ã¨ PRONTA, VALE SOLLECITA STEFANIA PER VIETNAMITA"
         },
         {
-          "text": "Network up, inviti mandati, contratti da confermare, email network fatta, canale w.a. da fare (ma è visibile a tutti?), gadget per partecipanti e pacchetto di benvenuto per chi aderisce",
+          "text": "Network up, inviti mandati, contratti da confermare, email network fatta, canale w.a. da fare (ma Ã¨ visibile a tutti?), gadget per partecipanti e pacchetto di benvenuto per chi aderisce",
           "notes": "email fatta, gadget ordinati, Jelena allertata, CONTRATTI SOLLECITARE STEFANIA, VALE CHIEDE A AI QUALE SIA LO STRUMENTO PER CANALE/COMMUNITY, WHATSAPP/TELEGRAM ETC."
         },
         {
@@ -269,15 +269,24 @@
           "notes": ""
         },
         {
-          "text": "cambiare struttura e promozione attività",
-          "notes": "FISSARE CALENDARIO CON 3 ATTIVITà? FARE QUALCOSA DI PIù TEMATICO (BIRRA, ALTRO)? FARLE ESTERNE? EVENTI SU FB? LUCIA PROPONE LA GITA SUL MOTOSCAFO NOLEGGIATO. VALE PROPONE DI CREARE UNA SEZIONE EVENTI SUL SITO, EVENTUALMENTE CON IL POP UP.\n"
+          "text": "cambiare struttura e promozione attivitÃ ",
+          "notes": "FISSARE CALENDARIO CON 3 ATTIVITÃ ? FARE QUALCOSA DI PIÃ¹ TEMATICO (BIRRA, ALTRO)? FARLE ESTERNE? EVENTI SU FB? LUCIA PROPONE LA GITA SUL MOTOSCAFO NOLEGGIATO. VALE PROPONE DI CREARE UNA SEZIONE EVENTI SUL SITO, EVENTUALMENTE CON IL POP UP.\n"
         }
       ],
       "notes": "",
-      "actions": [],
+      "actions": [
+        {
+          "id": "mqoxnozr0aboei",
+          "text": "riepilogo invio email database per mia valutazione e telefonate",
+          "who": "Valentina",
+          "date": "2026-06-30",
+          "done": false,
+          "createdAt": "2026-06-22T08:07:51.879Z"
+        }
+      ],
       "createdAt": "2026-06-19T08:15:27.273Z",
-      "updatedAt": "2026-06-19T10:21:06.857Z"
+      "updatedAt": "2026-06-22T08:07:51.879Z"
     }
   ],
-  "updatedAt": "2026-06-19T10:21:06.857Z"
+  "updatedAt": "2026-06-22T08:07:51.879Z"
 }
