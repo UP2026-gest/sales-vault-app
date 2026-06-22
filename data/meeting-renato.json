@@ -291,10 +291,10 @@
     {
       "id": "mqoxrqydcxwtfm",
       "code": "26-005",
-      "title": "(Copia) Meeting UP MSF Piazza",
+      "title": "Meeting UP MSF Piazza",
       "date": "2026-06-22",
-      "timeStart": "12:00",
-      "timeEnd": "12:30",
+      "timeStart": "14:30",
+      "timeEnd": "15:30",
       "client": "",
       "topics": [
         "gestionale"
@@ -305,23 +305,27 @@
       ],
       "agenda": [
         {
-          "text": "Chinh, pagina su FB",
+          "text": "landing page vietnamiti, traduzione in vietnamita?",
           "notes": ""
         },
         {
-          "text": "Templus, richiesta per 18/06 ma rimandata",
+          "text": "network docenti UP, 13 docenti già confermati, Jelena farà testimonianza, ci serve conferma dei contratti da avvocati",
           "notes": ""
         },
         {
-          "text": "Assistenti sociali, ho avuto risposta, non fanno promozione, faremo un paio di eventi gratuiti e poi uno a pagamento",
+          "text": "Globalan, Umair sta valutando un suo percorso di coaching personale, per poi fare formazione ai collaboratori. Sono in contatto con Linda per fissare appuntamento per progetto su commerciale Roma",
+          "notes": ""
+        },
+        {
+          "text": "Zanelli incisioni, il corso finirà tra poco, è molto contento e vorrebbe riprendere verso autunno/inverno",
           "notes": ""
         }
       ],
       "notes": "",
       "actions": [],
       "createdAt": "2026-06-22T08:11:01.045Z",
-      "updatedAt": "2026-06-22T08:11:01.045Z"
+      "updatedAt": "2026-06-22T08:18:44.147Z"
     }
   ],
-  "updatedAt": "2026-06-22T08:11:01.045Z"
+  "updatedAt": "2026-06-22T08:18:44.148Z"
 }
