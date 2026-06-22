@@ -208,8 +208,9 @@
           "text": "traduzione inglese per landing page italiano per stranieri",
           "who": "Silvia",
           "date": "2026-06-19",
-          "done": false,
-          "createdAt": "2026-06-12T10:11:17.987Z"
+          "done": true,
+          "createdAt": "2026-06-12T10:11:17.987Z",
+          "updatedAt": "2026-06-22T08:09:56.362Z"
         },
         {
           "id": "mqarpru32ckcmh",
@@ -288,5 +289,5 @@
       "updatedAt": "2026-06-22T08:08:30.413Z"
     }
   ],
-  "updatedAt": "2026-06-22T08:08:30.413Z"
+  "updatedAt": "2026-06-22T08:09:56.362Z"
 }
