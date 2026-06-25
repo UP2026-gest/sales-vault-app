@@ -150,7 +150,39 @@
       "actions": [],
       "createdAt": "2026-06-18T15:20:01.306Z",
       "updatedAt": "2026-06-18T15:21:08.594Z"
+    },
+    {
+      "id": "mqtc8v6380ac34",
+      "code": "26-005",
+      "title": "(Copia) Riunione settimanale UP",
+      "date": "2026-06-25",
+      "timeStart": "11:00",
+      "timeEnd": "",
+      "client": "",
+      "topics": [
+        "commerciale",
+        "didattica"
+      ],
+      "participants": [],
+      "agenda": [
+        {
+          "text": "attività 18 giugno -feedback",
+          "notes": ""
+        },
+        {
+          "text": "attività docenti 2 luglio - 13 confermati per ora",
+          "notes": ""
+        },
+        {
+          "text": "cluster come sono andati?",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-06-25T10:07:18.987Z",
+      "updatedAt": "2026-06-25T10:07:18.987Z"
     }
   ],
-  "updatedAt": "2026-06-18T15:21:08.594Z"
+  "updatedAt": "2026-06-25T10:07:18.987Z"
 }
