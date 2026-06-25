@@ -172,13 +172,17 @@
         {
           "text": "traduzioni richieste - spiegare perché domande",
           "notes": ""
+        },
+        {
+          "text": "casella info posso pulire?",
+          "notes": ""
         }
       ],
       "notes": "",
       "actions": [],
       "createdAt": "2026-06-25T10:07:18.987Z",
-      "updatedAt": "2026-06-25T10:08:47.811Z"
+      "updatedAt": "2026-06-25T10:09:06.171Z"
     }
   ],
-  "updatedAt": "2026-06-25T10:08:47.811Z"
+  "updatedAt": "2026-06-25T10:09:06.171Z"
 }
