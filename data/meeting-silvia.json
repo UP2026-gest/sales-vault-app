@@ -182,7 +182,23 @@
       "actions": [],
       "createdAt": "2026-06-25T10:07:18.987Z",
       "updatedAt": "2026-06-26T09:39:57.048Z"
+    },
+    {
+      "id": "mr4ppkcz043b6w",
+      "code": "26-006",
+      "title": "Riunione",
+      "date": "2026-07-03",
+      "timeStart": "",
+      "timeEnd": "",
+      "client": "",
+      "topics": [],
+      "participants": [],
+      "agenda": [],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-07-03T09:09:41.075Z",
+      "updatedAt": "2026-07-03T09:09:41.075Z"
     }
   ],
-  "updatedAt": "2026-06-26T09:39:57.048Z"
+  "updatedAt": "2026-07-03T09:09:41.075Z"
 }
