@@ -384,10 +384,10 @@
     {
       "id": "mr4o94mowc0zob",
       "code": "26-007",
-      "title": "(Copia) Meeting UP MSF Piazza",
+      "title": "Meeting UP MSF Piazza",
       "date": "2026-07-03",
-      "timeStart": "14:30",
-      "timeEnd": "15:30",
+      "timeStart": "12:00",
+      "timeEnd": "12:30",
       "client": "",
       "topics": [
         "gestionale"
@@ -421,8 +421,8 @@
       "notes": "",
       "actions": [],
       "createdAt": "2026-07-03T08:28:54.576Z",
-      "updatedAt": "2026-07-03T08:28:54.576Z"
+      "updatedAt": "2026-07-03T08:29:35.449Z"
     }
   ],
-  "updatedAt": "2026-07-03T08:28:54.576Z"
+  "updatedAt": "2026-07-03T08:29:35.449Z"
 }
