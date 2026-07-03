@@ -329,7 +329,54 @@
       "actions": [],
       "createdAt": "2026-06-22T08:11:01.045Z",
       "updatedAt": "2026-06-22T12:47:33.818Z"
+    },
+    {
+      "id": "mr4o3ebo366epf",
+      "code": "26-006",
+      "title": "(Copia) meeting UP",
+      "date": "2026-07-03",
+      "timeStart": "11:00",
+      "timeEnd": "12:00",
+      "client": "",
+      "topics": [
+        "commerciale",
+        "didattica",
+        "amministrazione",
+        "mkt"
+      ],
+      "participants": [
+        "Stefania",
+        "Silvia",
+        "Valentina",
+        "Lucia"
+      ],
+      "agenda": [
+        {
+          "text": "Database, invio email, come sta andando?",
+          "notes": "LE HO CHIESTO DI FARMI AVERE ALLA FINE IL RIEPILOGO DI QUELLE CHE NON SONO STATE APERTE E UN FILE EXCEL CON IL RIEPILOGO DI TUTTO, COSÃÂ¬ POSSO TELEFONARE. TERREMO COME PROMO SOLO IL TEST ONLINE AZIENDALE MA ANCHE PER TEDESCO OLTRE CHE SPAGNOLO E INGLESE."
+        },
+        {
+          "text": "landing page italiano su pagina FB vietnamiti, traduzione? poi pubblicare",
+          "notes": "LA TRADUZIONE IN INGLESE ÃÂ¨ PRONTA, VALE SOLLECITA STEFANIA PER VIETNAMITA"
+        },
+        {
+          "text": "Network up, inviti mandati, contratti da confermare, email network fatta, canale w.a. da fare (ma ÃÂ¨ visibile a tutti?), gadget per partecipanti e pacchetto di benvenuto per chi aderisce",
+          "notes": "email fatta, gadget ordinati, Jelena allertata, CONTRATTI SOLLECITARE STEFANIA, VALE CHIEDE A AI QUALE SIA LO STRUMENTO PER CANALE/COMMUNITY, WHATSAPP/TELEGRAM ETC."
+        },
+        {
+          "text": "globalan, chiesto aggiornamento per collaboratrice su roma",
+          "notes": ""
+        },
+        {
+          "text": "cambiare struttura e promozione attivitÃÂ ",
+          "notes": "FISSARE CALENDARIO CON 3 ATTIVITÃÂ ? FARE QUALCOSA DI PIÃÂ¹ TEMATICO (BIRRA, ALTRO)? FARLE ESTERNE? EVENTI SU FB? LUCIA PROPONE LA GITA SUL MOTOSCAFO NOLEGGIATO. VALE PROPONE DI CREARE UNA SEZIONE EVENTI SUL SITO, EVENTUALMENTE CON IL POP UP.\n"
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-07-03T08:24:27.204Z",
+      "updatedAt": "2026-07-03T08:24:27.204Z"
     }
   ],
-  "updatedAt": "2026-06-22T12:47:33.818Z"
+  "updatedAt": "2026-07-03T08:24:27.204Z"
 }
