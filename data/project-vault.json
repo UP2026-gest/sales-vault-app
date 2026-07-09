@@ -47,7 +47,23 @@
       "log": [],
       "createdAt": "2026-07-09",
       "updatedAt": "2026-07-09T15:31:41.844Z"
+    },
+    {
+      "id": "mrdoq7ghgw4nox",
+      "name": "prova 2",
+      "status": "attivo",
+      "owner": "",
+      "startDate": "",
+      "endDate": "",
+      "keyEvent": "",
+      "keyEventDate": "",
+      "notes": "",
+      "participants": [],
+      "phases": [],
+      "log": [],
+      "createdAt": "2026-07-09",
+      "updatedAt": "2026-07-09T15:52:06.977Z"
     }
   ],
-  "savedAt": "2026-07-09T15:51:36.886Z"
+  "savedAt": "2026-07-09T15:52:30.232Z"
 }
