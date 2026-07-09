@@ -758,6 +758,10 @@ $('linkSetup').onclick = () => {
 // APP PRINCIPALE
 // ══════════════════════════════════════════
 function startApp(){
+  // Nasconde SEMPRE le schermate di login/setup: così sia il login manuale
+  // sia l'auto-login (utente ricordato) arrivano all'app correttamente.
+  $('lockScreen').classList.add('h');
+  const setupEl = $('setupScreen'); if(setupEl) setupEl.classList.add('h');
   $('barUser').textContent=`👤 ${currentUser.name}`;
   dbLoad();
   renderList();
@@ -1372,11 +1376,22 @@ if(!cfg||!cfg.users||cfg.users.length===0){
 } else {
   // Se c'è un utente ricordato da un accesso precedente, entra direttamente
   // senza chiedere di nuovo il PIN (resta valido fino al logout esplicito).
-  const remembered = getRememberedUser();
-  if(remembered){
-    currentUser = remembered;
-    startApp();
-  } else {
+  // Se qualcosa va storto nell'auto-login, ricadi sul login manuale invece
+  // di lasciare l'utente bloccato su una schermata rotta.
+  let entered = false;
+  try {
+    const remembered = getRememberedUser();
+    if(remembered){
+      currentUser = remembered;
+      startApp();
+      entered = true;
+    }
+  } catch(e){
+    console.warn('Auto-login non riuscito, mostro il login manuale:', e);
+    entered = false;
+  }
+  if(!entered){
+    currentUser = null;
     showLock();
   }
 }
