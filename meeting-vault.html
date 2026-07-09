@@ -542,6 +542,21 @@ const addDays = (s,n) => { const d=new Date(s); d.setDate(d.getDate()+n); return
 // ══════════════════════════════════════════
 const CFG_KEY  = 'mv_cfg_v1';   // { users: [{name, pin}] }
 const GH_KEY   = 'mv_gh_v1';    // { tok, own, repo, dir }
+const REMEMBER_KEY = 'mv_remember_v1';  // nome dell'ultimo utente loggato (persistente fino al logout)
+
+// Ricorda l'accesso: dopo un login riuscito l'utente resta autenticato su
+// questo dispositivo/browser finché non preme "Esci". Salviamo solo il NOME,
+// mai il PIN.
+function rememberUser(name){ try { localStorage.setItem(REMEMBER_KEY, name); } catch {} }
+function forgetUser(){ try { localStorage.removeItem(REMEMBER_KEY); } catch {} }
+function getRememberedUser(){
+  try {
+    const name = localStorage.getItem(REMEMBER_KEY);
+    if(!name) return null;
+    const cfg = getCfg();
+    return cfg?.users?.find(u=>u.name===name) || null;
+  } catch { return null; }
+}
 
 function getCfg()  { try { return JSON.parse(localStorage.getItem(CFG_KEY)||'null'); } catch { return null; } }
 function saveCfg(c){ localStorage.setItem(CFG_KEY, JSON.stringify(c)); }
@@ -725,6 +740,7 @@ function doLogin(){
   const user=cfg.users.find(u=>u.name===name&&u.pin===pin);
   if(!user){ $('lockErr').textContent='PIN errato. Riprova.'; $('lockPin').value=''; return; }
   currentUser=user;
+  rememberUser(user.name);   // ricorda l'accesso fino al logout esplicito
   $('lockScreen').classList.add('h');
   startApp();
 }
@@ -751,6 +767,7 @@ function startApp(){
 }
 
 $('btnLogout').onclick = () => {
+  forgetUser();   // solo il logout esplicito dimentica l'accesso
   currentUser=null; db={meetings:[]}; _selId=null;
   showLock();
 };
@@ -1350,8 +1367,19 @@ $('mOverdueClose').onclick=()=>$('mOverdue').classList.add('h');
 // AVVIO
 // ══════════════════════════════════════════
 const cfg=getCfg();
-if(!cfg||!cfg.users||cfg.users.length===0) showSetup();
-else showLock();
+if(!cfg||!cfg.users||cfg.users.length===0){
+  showSetup();
+} else {
+  // Se c'è un utente ricordato da un accesso precedente, entra direttamente
+  // senza chiedere di nuovo il PIN (resta valido fino al logout esplicito).
+  const remembered = getRememberedUser();
+  if(remembered){
+    currentUser = remembered;
+    startApp();
+  } else {
+    showLock();
+  }
+}
 </script>
 </body>
 </html>

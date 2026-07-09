@@ -328,15 +328,18 @@ function save() {
   localStorage.setItem(LS_KEY, JSON.stringify({ projects: S.projects, savedAt: iso() }));
 }
 
+// Salvataggio: scrive subito in locale + aggiorna la UI, poi sincronizza in
+// modo SICURO (pull→merge→push) così un dispositivo con dati vecchi non può
+// mai sovrascrivere/cancellare i dati più recenti presenti su GitHub.
 function saveAndRender() {
   save();
   renderList();
   renderDetail();
-  ghPush(); // push in background — NON tocca S.sel né la UI
+  ghSyncSafe(); // pull+merge+push in background — NON tocca S.sel né la UI
 }
 
 // ════════════════════════════════════════════
-// GITHUB — SOLO push/pull espliciti
+// GITHUB — sincronizzazione sicura pull→merge→push
 // ════════════════════════════════════════════
 function ghCfg() { try { return JSON.parse(localStorage.getItem(GH_KEY)||'null'); } catch { return null; } }
 function ghOk()  { const c=ghCfg(); return !!(c?.tok&&c?.own&&c?.repo&&c?.path); }
@@ -346,58 +349,85 @@ function ghSha(s) { if(s!==undefined) localStorage.setItem(SHA_KEY,s); return lo
 
 function setSyncStatus(msg) { $('syncStatus').textContent = msg; }
 
-// Push in background: non tocca la UI, non tocca S.sel
-async function ghPush() {
-  if (!ghOk() || S.ghBusy) return;
-  S.ghBusy = true;
-  try {
-    const payload = { projects: S.projects, savedAt: iso() };
-    const body = { message:'Project Vault sync', content: btoa(unescape(encodeURIComponent(JSON.stringify(payload,null,2)))) };
-    const sha = ghSha(); if (sha) body.sha = sha;
-    const r = await fetch(ghUrl(), { method:'PUT', headers:ghHdr(), body:JSON.stringify(body) });
-    if (r.ok) {
-      const j = await r.json(); ghSha(j.content?.sha);
-      setSyncStatus(`✓ Sincronizzato ${new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})}`);
-    } else if (r.status === 409) {
-      // SHA conflict: rileggi e riprova
-      const rg = await fetch(ghUrl(), { headers:ghHdr() });
-      if (rg.ok) {
-        const jg = await rg.json(); ghSha(jg.sha); body.sha = jg.sha;
-        const r2 = await fetch(ghUrl(), { method:'PUT', headers:ghHdr(), body:JSON.stringify(body) });
-        if (r2.ok) { const j2=await r2.json(); ghSha(j2.content?.sha); setSyncStatus(`✓ Sincronizzato`); }
-      }
-    }
-  } catch { /* silenzioso — non disturbare l'utente per errori di rete */ }
-  finally { S.ghBusy = false; }
+// Fonde una lista di progetti remoti dentro S.projects.
+// Regola: per ogni id vince updatedAt più recente; a parità vince il locale
+// (>=). I progetti che esistono solo in locale o solo in remoto vengono
+// mantenuti entrambi — così nessuno può cancellare il lavoro dell'altro.
+// NON tocca S.sel.
+function mergeRemote(remoteProjects) {
+  const byId = new Map(S.projects.filter(p=>p?.id).map(p=>[p.id,p]));
+  for (const rp of remoteProjects) {
+    if (!rp?.id || typeof rp.name !== 'string') continue; // salta oggetti non validi
+    const lp = byId.get(rp.id);
+    // local vince a parità di timestamp (>=): remoto sostituisce solo se STRETTAMENTE più recente
+    if (!lp || (rp.updatedAt||'') > (lp.updatedAt||'')) byId.set(rp.id, rp);
+  }
+  S.projects = [...byId.values()];
 }
 
-// Pull manuale: scarica da GitHub, fa merge, aggiorna localStorage
-// NON tocca S.sel — la UI si aggiorna solo alla fine senza resettare nulla
-async function ghPull() {
-  if (!ghOk()) { openGhModal(); return; }
+// Legge il file remoto. Ritorna { projects, sha } oppure null se non esiste/errore.
+async function ghFetchRemote() {
+  const r = await fetch(ghUrl(), { headers:ghHdr() });
+  if (r.status === 404) return { projects: [], sha: null, missing: true };
+  if (!r.ok) throw new Error('read '+r.status);
+  const j = await r.json();
+  const remote = JSON.parse(atob(j.content.replace(/\n/g,'')));
+  const projects = Array.isArray(remote.projects) ? remote.projects
+    : Array.isArray(remote) ? remote : [];
+  return { projects, sha: j.sha, missing: false };
+}
+
+// Scrive S.projects su GitHub usando lo sha fornito. Ritorna il nuovo sha.
+async function ghWrite(sha) {
+  const payload = { projects: S.projects, savedAt: iso() };
+  const body = { message:'Project Vault sync', content: btoa(unescape(encodeURIComponent(JSON.stringify(payload,null,2)))) };
+  if (sha) body.sha = sha;
+  const r = await fetch(ghUrl(), { method:'PUT', headers:ghHdr(), body:JSON.stringify(body) });
+  if (!r.ok) { const e = new Error('write '+r.status); e.status = r.status; throw e; }
+  const j = await r.json();
+  return j.content?.sha || null;
+}
+
+// SINCRONIZZAZIONE SICURA — usata a ogni salvataggio.
+// 1) pull remoto  2) merge nel locale  3) push del risultato fuso.
+// In caso di conflitto SHA (409) ripete il ciclo con lo sha fresco.
+// Non lancia mai eccezioni verso l'esterno: aggiorna solo lo stato di sync.
+async function ghSyncSafe(retries = 2) {
+  if (!ghOk() || S.ghBusy) return;
+  S.ghBusy = true;
   setSyncStatus('🔄 Sincronizzazione…');
   try {
-    const r = await fetch(ghUrl(), { headers:ghHdr() });
-    if (r.status === 404) { setSyncStatus('✓ Pronto (file remoto non trovato)'); return; }
-    if (!r.ok) { setSyncStatus('⚠ Errore lettura GitHub'); return; }
-    const j = await r.json(); ghSha(j.sha);
-    const remote = JSON.parse(atob(j.content.replace(/\n/g,'')));
-    const remoteProjects = Array.isArray(remote.projects) ? remote.projects
-      : Array.isArray(remote) ? remote : [];
-    // Merge: per ogni progetto vince updatedAt più recente
-    const byId = new Map(S.projects.filter(p=>p?.id).map(p=>[p.id,p]));
-    for (const rp of remoteProjects) {
-      if (!rp?.id || typeof rp.name !== 'string') continue; // salta oggetti non validi
-      const lp = byId.get(rp.id);
-      if (!lp || (rp.updatedAt||'') > (lp.updatedAt||'')) byId.set(rp.id, rp);
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        const remote = await ghFetchRemote();
+        mergeRemote(remote.projects); // fonde il remoto nel locale
+        ghSha(remote.sha || '');
+        save(); // persiste il merge in locale prima di scrivere
+        const newSha = await ghWrite(remote.sha);
+        ghSha(newSha || '');
+        save();
+        setSyncStatus(`✓ Sincronizzato ${new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})}`);
+        // aggiorna la UI col merge (senza toccare S.sel)
+        renderList(); renderDetail();
+        return;
+      } catch (e) {
+        if (e.status === 409 && attempt < retries) continue; // sha stale: riprova
+        throw e;
+      }
     }
-    S.projects = [...byId.values()];
-    save(); // salva il merge in locale
-    setSyncStatus(`✓ Sincronizzato ${new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})}`);
-    // Aggiorna la UI senza toccare S.sel
-    renderList();
-    renderDetail();
-  } catch (e) { setSyncStatus('⚠ Errore sync'); }
+  } catch (e) {
+    setSyncStatus('⚠ Errore sync — dati salvati in locale');
+  } finally {
+    S.ghBusy = false;
+  }
+}
+
+// Pull manuale (pulsante ☁️ Sync): scarica, fonde, aggiorna la UI.
+// NON tocca S.sel. Non pusha (a meno che il locale abbia roba nuova → sì, via ghSyncSafe).
+async function ghPull() {
+  if (!ghOk()) { openGhModal(); return; }
+  // Il pull manuale usa lo stesso percorso sicuro: scarica, fonde e ripush del merge.
+  await ghSyncSafe();
 }
 
 // ════════════════════════════════════════════
@@ -910,13 +940,43 @@ document.querySelectorAll('.f-btn').forEach(b => {
 });
 
 // ════════════════════════════════════════════
-// AVVIO — carica solo da localStorage, niente pull automatico
+// AVVIO
 // ════════════════════════════════════════════
+// Regola anti-perdita-dati:
+// - Se localStorage HA già progetti → è la fonte di verità, niente pull
+//   automatico (evita la race condition che resettava S.sel).
+// - Se localStorage è VUOTO ma GitHub è configurato → è un dispositivo/browser
+//   nuovo: scarica una volta dal cloud PRIMA che l'utente possa salvare, così
+//   non rischia di sovrascrivere il file remoto con un elenco vuoto.
 load();
 renderList();
 renderDetail();
-if (ghOk()) setSyncStatus('☁ GitHub configurato — clicca Sync per aggiornare');
-else setSyncStatus('GitHub Sync non configurato — clicca ☁️ Sync');
+
+async function boot() {
+  if (!ghOk()) {
+    setSyncStatus('GitHub Sync non configurato — clicca ☁️ Sync');
+    return;
+  }
+  if (S.projects.length > 0) {
+    // localStorage popolato: fonte di verità. Nessun pull automatico.
+    setSyncStatus('☁ GitHub configurato — clicca Sync per aggiornare');
+    return;
+  }
+  // localStorage vuoto → bootstrap dal cloud (una sola volta, non tocca S.sel)
+  setSyncStatus('🔄 Primo caricamento dal cloud…');
+  try {
+    const remote = await ghFetchRemote();
+    if (remote.missing) { setSyncStatus('✓ Pronto (nessun dato remoto)'); return; }
+    mergeRemote(remote.projects);
+    ghSha(remote.sha || '');
+    save();
+    renderList(); renderDetail();
+    setSyncStatus(`✓ Dati caricati dal cloud ${new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})}`);
+  } catch {
+    setSyncStatus('⚠ Impossibile caricare dal cloud — clicca ☁️ Sync');
+  }
+}
+boot();
 </script>
 </body>
 </html>
