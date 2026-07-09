@@ -55,6 +55,12 @@ a.nav-link:hover{background:rgba(255,255,255,.2);color:#fff;}
 .s-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);}
 .s-input{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--r8);font-family:inherit;font-size:13px;background:var(--bg);color:var(--text);}
 .s-input:focus{outline:none;border-color:var(--blue);}
+.search-wrap{position:relative;}
+.search-wrap .s-input{padding-right:30px;}
+.search-clear{position:absolute;right:5px;top:50%;transform:translateY(-50%);background:var(--border);color:var(--mid);border:none;border-radius:50%;width:20px;height:20px;padding:0;font-size:11px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.search-clear:hover{background:var(--red2);color:var(--red);}
+.search-note{font-size:11.5px;color:var(--orange);background:var(--orange2);border:1px solid #f0d8b8;border-radius:var(--r8);padding:6px 9px;display:flex;align-items:center;justify-content:space-between;gap:6px;}
+.search-note button{background:transparent;border:none;color:var(--orange);font-weight:700;font-size:11.5px;padding:0;text-decoration:underline;cursor:pointer;}
 .filter-row{display:flex;gap:4px;flex-wrap:wrap;}
 .f-btn{padding:3px 9px;font-size:11.5px;font-weight:500;border-radius:20px;border:1px solid var(--border);background:var(--bg);color:var(--muted);cursor:pointer;transition:all .12s;}
 .f-btn.on{background:var(--navy);border-color:var(--navy);color:#fff;}
@@ -160,7 +166,10 @@ label input,label select,label textarea{margin-top:4px;}
 <div class="layout">
   <aside class="sidebar">
     <div class="s-title">Progetti</div>
-    <input class="s-input" id="searchQ" placeholder="Cerca progetto, responsabile…"/>
+    <div class="search-wrap">
+      <input class="s-input" id="searchQ" placeholder="Cerca progetto, responsabile…"/>
+      <button id="searchClear" class="search-clear" title="Cancella ricerca" style="display:none;">✕</button>
+    </div>
     <div>
       <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:5px;">STATO</div>
       <div class="filter-row">
@@ -172,6 +181,7 @@ label input,label select,label textarea{margin-top:4px;}
         <button class="f-btn" data-f="archiviato">Archiviati</button>
       </div>
     </div>
+    <div class="search-note" id="searchNote" style="display:none;"></div>
     <div class="proj-list" id="projList"></div>
     <div style="border-top:1px solid var(--border);padding-top:10px;">
       <button class="btn-sec btn-sm" id="btnBackup" style="width:100%;">⬇ Backup file JSON</button>
@@ -479,6 +489,7 @@ const task  = (fid,tid) => phase(fid)?.tasks?.find(t=>t.id===tid);
 // RENDER LISTA
 // ════════════════════════════════════════════════════════════════════
 function renderList() {
+  const totalProjects = STATE.projects.filter(p=>p?.id&&p?.name).length;
   let list = STATE.projects.filter(p=>p?.id&&p?.name);
   if (STATE.filter !== 'all') list = list.filter(p=>p.status===STATE.filter);
   if (STATE.search) list = list.filter(p=>
@@ -488,8 +499,25 @@ function renderList() {
   );
   list.sort((a,b)=>STATUS_ORD.indexOf(a.status)-STATUS_ORD.indexOf(b.status));
 
+  // Avviso quando un filtro/ricerca sta nascondendo dei progetti esistenti,
+  // così non sembra mai che i dati siano spariti.
+  const noteEl = $('searchNote');
+  const hiddenCount = totalProjects - list.length;
+  if (totalProjects > 0 && hiddenCount > 0 && (STATE.search || STATE.filter !== 'all')) {
+    noteEl.style.display = 'flex';
+    noteEl.innerHTML = `<span>🔍 ${hiddenCount} progett${hiddenCount>1?'i':'o'} nascost${hiddenCount>1?'i':'o'} dal filtro (${totalProjects} in totale)</span><button id="noteReset">Mostra tutti</button>`;
+    $('noteReset').onclick = resetFilters;
+  } else {
+    noteEl.style.display = 'none';
+  }
+
   const el = $('projList');
-  if (!list.length) { el.innerHTML = '<p style="font-size:13px;color:var(--muted);text-align:center;padding:20px;">Nessun progetto.</p>'; return; }
+  if (!list.length) {
+    el.innerHTML = totalProjects > 0
+      ? '<p style="font-size:13px;color:var(--muted);text-align:center;padding:20px;">Nessun progetto corrisponde al filtro.</p>'
+      : '<p style="font-size:13px;color:var(--muted);text-align:center;padding:20px;">Nessun progetto.</p>';
+    return;
+  }
   el.innerHTML = list.map(p => {
     const tasks = (p.phases||[]).flatMap(f=>f.tasks||[]);
     const done = tasks.filter(t=>t.done).length, tot = tasks.length;
@@ -1003,7 +1031,34 @@ $('btnNewProj').onclick = () => openProjModal(null);
 $('btnSaveGh').onclick  = () => ghSave();
 $('btnPullGh').onclick  = () => ghPullConfirm();
 $('btnGhCfg').onclick   = () => openGhModal();
-$('searchQ').oninput = e => { STATE.search = e.target.value.toLowerCase().trim(); renderList(); };
+
+function updateSearchClear(){
+  $('searchClear').style.display = $('searchQ').value ? 'flex' : 'none';
+}
+$('searchQ').oninput = e => {
+  STATE.search = e.target.value.toLowerCase().trim();
+  updateSearchClear();
+  renderList();
+};
+$('searchClear').onclick = () => {
+  $('searchQ').value = '';
+  STATE.search = '';
+  updateSearchClear();
+  renderList();
+  $('searchQ').focus();
+};
+
+// Azzera ricerca E filtro stato in un colpo solo (usato dal link "Mostra tutti")
+function resetFilters(){
+  $('searchQ').value = '';
+  STATE.search = '';
+  STATE.filter = 'all';
+  updateSearchClear();
+  document.querySelectorAll('.f-btn').forEach(x=>x.classList.remove('on'));
+  document.querySelector('.f-btn[data-f="all"]')?.classList.add('on');
+  renderList();
+}
+
 document.querySelectorAll('.f-btn').forEach(b => {
   b.onclick = () => {
     document.querySelectorAll('.f-btn').forEach(x=>x.classList.remove('on'));
@@ -1026,6 +1081,7 @@ load();
 renderList();
 renderDetail();
 refreshSyncBadge();
+updateSearchClear();
 if (ghOk()) setSyncStatus('☁ GitHub configurato — usa ⬇ per caricare, ☁️ per salvare');
 else setSyncStatus('GitHub non configurato — clicca ⚙ per impostarlo');
 </script>
