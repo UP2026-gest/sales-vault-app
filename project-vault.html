@@ -135,6 +135,9 @@ label input,label select,label textarea{margin-top:4px;}
 .modal-hdr{display:flex;justify-content:space-between;align-items:center;padding:13px 17px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1;border-radius:var(--r16) var(--r16) 0 0;}
 .modal-hdr strong{font-size:14px;}
 .modal-body{padding:17px;}
+.gh-badge{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600;}
+.gh-dirty{background:var(--orange2);color:var(--orange);}
+.gh-clean{background:var(--green2);color:var(--green);}
 </style>
 </head>
 <body>
@@ -148,7 +151,9 @@ label input,label select,label textarea{margin-top:4px;}
     <a href="index.html" class="nav-link">◆ Sales Vault</a>
     <a href="meeting-vault.html" class="nav-link">◆ Meeting Vault</a>
     <button class="btn-amber" id="btnNewProj">+ Nuovo progetto</button>
-    <button class="btn-ghost" id="btnSync">☁️ Sync</button>
+    <button class="btn-ghost" id="btnSaveGh">☁️ Salva su GitHub</button>
+    <button class="btn-ghost" id="btnPullGh" title="Scarica i dati da GitHub (con conferma)">⬇ Carica da GitHub</button>
+    <button class="btn-ghost btn-sm" id="btnGhCfg" title="Configura GitHub">⚙</button>
   </div>
 </header>
 
@@ -168,6 +173,11 @@ label input,label select,label textarea{margin-top:4px;}
       </div>
     </div>
     <div class="proj-list" id="projList"></div>
+    <div style="border-top:1px solid var(--border);padding-top:10px;">
+      <button class="btn-sec btn-sm" id="btnBackup" style="width:100%;">⬇ Backup file JSON</button>
+      <input id="importFile" type="file" accept="application/json" hidden/>
+      <button class="btn-sec btn-sm" id="btnImport" style="width:100%;margin-top:6px;">⬆ Importa da file JSON</button>
+    </div>
   </aside>
   <main class="main" id="mainPanel">
     <div class="detail-empty"><div class="icon">◈</div><p>Seleziona un progetto o creane uno nuovo.</p></div>
@@ -260,7 +270,7 @@ label input,label select,label textarea{margin-top:4px;}
 <!-- Modal GitHub -->
 <div class="modal h" id="mGh">
   <div class="modal-box" style="width:min(480px,100%);">
-    <div class="modal-hdr"><strong>☁️ GitHub Sync</strong><button class="btn-sec btn-sm" id="mGhClose">✕ Chiudi</button></div>
+    <div class="modal-hdr"><strong>☁️ Configurazione GitHub</strong><button class="btn-sec btn-sm" id="mGhClose">✕ Chiudi</button></div>
     <div class="modal-body">
       <p style="font-size:13px;color:var(--mid);margin-bottom:14px;">Dati condivisi tra tutti gli utenti UP. Usa le stesse credenziali del Sales Vault.</p>
       <label>Token GitHub (PAT)<input id="fGhTok" type="password" placeholder="ghp_…"/></label>
@@ -278,24 +288,33 @@ label input,label select,label textarea{margin-top:4px;}
 
 <script>
 "use strict";
-// ════════════════════════════════════════════
-// UTILITIES
-// ════════════════════════════════════════════
-const $  = id => document.getElementById(id);
+// ════════════════════════════════════════════════════════════════════
+// PROJECT VAULT — riscritto da zero (v4)
+//
+// PRINCIPIO FONDAMENTALE (per non far più sparire i dati):
+//   • localStorage è l'UNICA fonte di verità.
+//   • Nessuna chiamata di rete parte da sola. MAI.
+//   • Nessun render viene innescato da una risposta di rete asincrona,
+//     tranne un pull ESPLICITO richiesto dall'utente e confermato.
+//   • GitHub è solo un backup: si scrive col pulsante "☁️ Salva su GitHub"
+//     e si legge col pulsante "⬇ Carica da GitHub" (con conferma).
+//   • Di conseguenza: aprire, cliccare, muovere il mouse NON tocca mai i dati.
+// ════════════════════════════════════════════════════════════════════
+
+// ── utilities ──
+const $   = id => document.getElementById(id);
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,8);
 const iso = () => new Date().toISOString();
+const z   = n => String(n).padStart(2,'0');
 const today = () => { const d=new Date(); return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}`; };
-const z = n => String(n).padStart(2,'0');
 const esc = s => String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const fmt = s => { if(!s)return'—'; const[y,m,d]=s.split('-'); return`${d}/${m}/${y}`; };
 const add7 = s => { const d=new Date(s); d.setDate(d.getDate()+7); return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}`; };
 
-// ════════════════════════════════════════════
-// STATO — tutto qui, niente globali sparsi
-// ════════════════════════════════════════════
-const S = {
-  projects: [],       // fonte di verità: solo localStorage
-  sel: null,          // id progetto selezionato — MAI toccato da sync
+// ── stato (in memoria; niente scrive qui senza un'azione dell'utente) ──
+const STATE = {
+  projects: [],
+  sel: null,
   filter: 'all',
   search: '',
   editProjId: null,
@@ -303,152 +322,169 @@ const S = {
   editTaskFid: null,
   editTaskId: null,
   tempParts: [],
-  ghBusy: false,
+  dirty: false,   // ci sono modifiche non ancora salvate su GitHub?
 };
 
-// ════════════════════════════════════════════
-// STORAGE LOCALE
-// ════════════════════════════════════════════
-const LS_KEY  = 'pv3_v1';
-const GH_KEY  = 'pv3_gh';
-const SHA_KEY = 'pv3_sha';
+// ════════════════════════════════════════════════════════════════════
+// STORAGE LOCALE — sincrono, immediato, non tocca la rete
+// ════════════════════════════════════════════════════════════════════
+const LS_KEY  = 'pv4_v1';
+const GH_KEY  = 'pv4_gh';
+const SHA_KEY = 'pv4_sha';
 
 function load() {
   try {
     const raw = localStorage.getItem(LS_KEY);
-    if (raw) {
-      const d = JSON.parse(raw);
-      if (Array.isArray(d)) S.projects = d; // formato legacy
-      else if (Array.isArray(d.projects)) S.projects = d.projects;
-    }
-  } catch { S.projects = []; }
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    if (Array.isArray(d)) STATE.projects = d;
+    else if (Array.isArray(d.projects)) STATE.projects = d.projects;
+  } catch { STATE.projects = []; }
 }
 
-function save() {
-  localStorage.setItem(LS_KEY, JSON.stringify({ projects: S.projects, savedAt: iso() }));
+// Salvataggio LOCALE: unico punto che persiste i dati. Immediato e sicuro.
+function persist() {
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify({ projects: STATE.projects, savedAt: iso() }));
+  } catch(e){ /* quota piena o storage bloccato: avvisa ma non perdere lo stato in memoria */ }
 }
 
-// Salvataggio: scrive subito in locale + aggiorna la UI, poi sincronizza in
-// modo SICURO (pull→merge→push) così un dispositivo con dati vecchi non può
-// mai sovrascrivere/cancellare i dati più recenti presenti su GitHub.
-function saveAndRender() {
-  save();
+// Ogni modifica ai dati passa DA QUI: aggiorna memoria+localStorage+UI, marca "da salvare su GitHub".
+function commit() {
+  persist();
+  STATE.dirty = ghOk();      // se GitHub è configurato, segnala che c'è roba da caricare
   renderList();
   renderDetail();
-  ghSyncSafe(); // pull+merge+push in background — NON tocca S.sel né la UI
+  refreshSyncBadge();
 }
 
-// ════════════════════════════════════════════
-// GITHUB — sincronizzazione sicura pull→merge→push
-// ════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
+// GITHUB — SOLO su azione esplicita dell'utente
+// ════════════════════════════════════════════════════════════════════
 function ghCfg() { try { return JSON.parse(localStorage.getItem(GH_KEY)||'null'); } catch { return null; } }
 function ghOk()  { const c=ghCfg(); return !!(c?.tok&&c?.own&&c?.repo&&c?.path); }
 function ghUrl() { const c=ghCfg(); return `https://api.github.com/repos/${c.own}/${c.repo}/contents/${c.path}`; }
 function ghHdr() { const c=ghCfg(); return { 'Authorization':`Bearer ${c.tok}`, 'Accept':'application/vnd.github+json', 'X-GitHub-Api-Version':'2022-11-28' }; }
-function ghSha(s) { if(s!==undefined) localStorage.setItem(SHA_KEY,s); return localStorage.getItem(SHA_KEY); }
+function ghSha(s){ if(s!==undefined){ if(s) localStorage.setItem(SHA_KEY,s); else localStorage.removeItem(SHA_KEY); } return localStorage.getItem(SHA_KEY); }
 
-function setSyncStatus(msg) { $('syncStatus').textContent = msg; }
-
-// Fonde una lista di progetti remoti dentro S.projects.
-// Regola: per ogni id vince updatedAt più recente; a parità vince il locale
-// (>=). I progetti che esistono solo in locale o solo in remoto vengono
-// mantenuti entrambi — così nessuno può cancellare il lavoro dell'altro.
-// NON tocca S.sel.
-function mergeRemote(remoteProjects) {
-  const byId = new Map(S.projects.filter(p=>p?.id).map(p=>[p.id,p]));
-  for (const rp of remoteProjects) {
-    if (!rp?.id || typeof rp.name !== 'string') continue; // salta oggetti non validi
-    const lp = byId.get(rp.id);
-    // local vince a parità di timestamp (>=): remoto sostituisce solo se STRETTAMENTE più recente
-    if (!lp || (rp.updatedAt||'') > (lp.updatedAt||'')) byId.set(rp.id, rp);
-  }
-  S.projects = [...byId.values()];
+function setSyncStatus(msg){ $('syncStatus').textContent = msg; }
+function refreshSyncBadge(){
+  const btn = $('btnSaveGh');
+  if(!ghOk()){ btn.textContent='☁️ Salva su GitHub'; return; }
+  btn.textContent = STATE.dirty ? '☁️ Salva su GitHub •' : '☁️ Salva su GitHub';
 }
 
-// Legge il file remoto. Ritorna { projects, sha } oppure null se non esiste/errore.
-async function ghFetchRemote() {
-  const r = await fetch(ghUrl(), { headers:ghHdr() });
-  if (r.status === 404) return { projects: [], sha: null, missing: true };
-  if (!r.ok) throw new Error('read '+r.status);
-  const j = await r.json();
-  const remote = JSON.parse(atob(j.content.replace(/\n/g,'')));
-  const projects = Array.isArray(remote.projects) ? remote.projects
-    : Array.isArray(remote) ? remote : [];
-  return { projects, sha: j.sha, missing: false };
-}
-
-// Scrive S.projects su GitHub usando lo sha fornito. Ritorna il nuovo sha.
-async function ghWrite(sha) {
-  const payload = { projects: S.projects, savedAt: iso() };
-  const body = { message:'Project Vault sync', content: btoa(unescape(encodeURIComponent(JSON.stringify(payload,null,2)))) };
-  if (sha) body.sha = sha;
-  const r = await fetch(ghUrl(), { method:'PUT', headers:ghHdr(), body:JSON.stringify(body) });
-  if (!r.ok) { const e = new Error('write '+r.status); e.status = r.status; throw e; }
-  const j = await r.json();
-  return j.content?.sha || null;
-}
-
-// SINCRONIZZAZIONE SICURA — usata a ogni salvataggio.
-// 1) pull remoto  2) merge nel locale  3) push del risultato fuso.
-// In caso di conflitto SHA (409) ripete il ciclo con lo sha fresco.
-// Non lancia mai eccezioni verso l'esterno: aggiorna solo lo stato di sync.
-async function ghSyncSafe(retries = 2) {
-  if (!ghOk() || S.ghBusy) return;
-  S.ghBusy = true;
-  setSyncStatus('🔄 Sincronizzazione…');
-  try {
-    for (let attempt = 0; attempt <= retries; attempt++) {
-      try {
-        const remote = await ghFetchRemote();
-        mergeRemote(remote.projects); // fonde il remoto nel locale
-        ghSha(remote.sha || '');
-        save(); // persiste il merge in locale prima di scrivere
-        const newSha = await ghWrite(remote.sha);
-        ghSha(newSha || '');
-        save();
-        setSyncStatus(`✓ Sincronizzato ${new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})}`);
-        // aggiorna la UI col merge (senza toccare S.sel)
-        renderList(); renderDetail();
-        return;
-      } catch (e) {
-        if (e.status === 409 && attempt < retries) continue; // sha stale: riprova
-        throw e;
-      }
-    }
-  } catch (e) {
-    setSyncStatus('⚠ Errore sync — dati salvati in locale');
-  } finally {
-    S.ghBusy = false;
-  }
-}
-
-// Pull manuale (pulsante ☁️ Sync): scarica, fonde, aggiorna la UI.
-// NON tocca S.sel. Non pusha (a meno che il locale abbia roba nuova → sì, via ghSyncSafe).
-async function ghPull() {
+// SALVA su GitHub (pulsante). Fa un merge prudente col remoto per non cancellare
+// il lavoro altrui, poi scrive. Non tocca STATE.sel. Con conferma implicita (è il pulsante stesso).
+async function ghSave() {
   if (!ghOk()) { openGhModal(); return; }
-  // Il pull manuale usa lo stesso percorso sicuro: scarica, fonde e ripush del merge.
-  await ghSyncSafe();
+  setSyncStatus('🔄 Salvataggio su GitHub…');
+  $('btnSaveGh').disabled = true;
+  try {
+    // 1) leggi il remoto (per merge + sha fresco)
+    let remoteProjects = [], sha = null;
+    const rg = await fetch(ghUrl(), { headers: ghHdr() });
+    if (rg.status === 200) {
+      const jg = await rg.json();
+      sha = jg.sha;
+      try {
+        const remote = JSON.parse(decodeURIComponent(escape(atob(jg.content.replace(/\n/g,'')))));
+        remoteProjects = Array.isArray(remote.projects) ? remote.projects : Array.isArray(remote) ? remote : [];
+      } catch {}
+    } else if (rg.status !== 404) {
+      throw new Error('read '+rg.status);
+    }
+    // 2) merge per id: vince updatedAt più recente; a parità vince il locale
+    const byId = new Map(remoteProjects.filter(p=>p?.id).map(p=>[p.id,p]));
+    for (const lp of STATE.projects) {
+      if (!lp?.id) continue;
+      const rp = byId.get(lp.id);
+      if (!rp || (lp.updatedAt||'') >= (rp.updatedAt||'')) byId.set(lp.id, lp);
+    }
+    const merged = [...byId.values()];
+    // 3) applica il merge in locale (così vedi anche eventuali progetti altrui)
+    STATE.projects = merged;
+    persist();
+    // 4) scrivi
+    const payload = { projects: STATE.projects, savedAt: iso() };
+    const body = { message:'Project Vault save', content: btoa(unescape(encodeURIComponent(JSON.stringify(payload,null,2)))) };
+    if (sha) body.sha = sha;
+    let rw = await fetch(ghUrl(), { method:'PUT', headers:ghHdr(), body:JSON.stringify(body) });
+    // retry una volta su conflitto sha
+    if (rw.status === 409) {
+      const rg2 = await fetch(ghUrl(), { headers: ghHdr() });
+      if (rg2.ok) { const jg2 = await rg2.json(); body.sha = jg2.sha; rw = await fetch(ghUrl(), { method:'PUT', headers:ghHdr(), body:JSON.stringify(body) }); }
+    }
+    if (!rw.ok) throw new Error('write '+rw.status);
+    const jw = await rw.json();
+    ghSha(jw.content?.sha || '');
+    STATE.dirty = false;
+    setSyncStatus(`✓ Salvato su GitHub ${new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})}`);
+    renderList(); renderDetail(); refreshSyncBadge();
+  } catch (e) {
+    setSyncStatus('⚠ Errore salvataggio — i dati restano al sicuro in locale');
+    alert('Non sono riuscito a salvare su GitHub.\nI tuoi dati NON sono andati persi: restano salvati in locale su questo browser.\nControlla la connessione o la configurazione (⚙) e riprova.');
+  } finally {
+    $('btnSaveGh').disabled = false;
+  }
 }
 
-// ════════════════════════════════════════════
+// CARICA da GitHub (pulsante). Chiede SEMPRE conferma perché sovrascrive/fonde.
+async function ghPullConfirm() {
+  if (!ghOk()) { openGhModal(); return; }
+  const msg = STATE.projects.length
+    ? 'Scaricare i dati da GitHub e fonderli con quelli locali?\n\nI progetti verranno uniti per ID (vince la versione più recente). Nessun progetto locale verrà cancellato.'
+    : 'Scaricare i dati da GitHub su questo browser?';
+  if (!confirm(msg)) return;
+  setSyncStatus('🔄 Caricamento da GitHub…');
+  $('btnPullGh').disabled = true;
+  try {
+    const r = await fetch(ghUrl(), { headers: ghHdr() });
+    if (r.status === 404) { setSyncStatus('Nessun dato remoto trovato.'); return; }
+    if (!r.ok) throw new Error('read '+r.status);
+    const j = await r.json();
+    ghSha(j.sha);
+    const remote = JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\n/g,'')))));
+    const remoteProjects = Array.isArray(remote.projects) ? remote.projects : Array.isArray(remote) ? remote : [];
+    // merge: vince updatedAt più recente; a parità vince il LOCALE
+    const byId = new Map(STATE.projects.filter(p=>p?.id).map(p=>[p.id,p]));
+    for (const rp of remoteProjects) {
+      if (!rp?.id || typeof rp.name !== 'string') continue;
+      const lp = byId.get(rp.id);
+      if (!lp || (rp.updatedAt||'') > (lp.updatedAt||'')) byId.set(rp.id, rp);
+    }
+    STATE.projects = [...byId.values()];
+    persist();
+    STATE.dirty = false;
+    setSyncStatus(`✓ Caricato da GitHub ${new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})}`);
+    renderList(); renderDetail(); refreshSyncBadge();
+  } catch (e) {
+    setSyncStatus('⚠ Errore caricamento da GitHub');
+    alert('Non sono riuscito a caricare da GitHub. I dati locali sono intatti.');
+  } finally {
+    $('btnPullGh').disabled = false;
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
 // HELPERS
-// ════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
 const STATUS_LBL = { idea:'💡 Idea', attivo:'🟢 Attivo', pausa:'⏸ In pausa', completato:'✅ Completato', archiviato:'📦 Archiviato' };
 const STATUS_ORD = ['attivo','idea','pausa','completato','archiviato'];
-const proj  = id => S.projects.find(p=>p.id===id);
-const phase = fid => proj(S.sel)?.phases?.find(f=>f.id===fid);
+const proj  = id => STATE.projects.find(p=>p.id===id);
+const phase = fid => proj(STATE.sel)?.phases?.find(f=>f.id===fid);
 const task  = (fid,tid) => phase(fid)?.tasks?.find(t=>t.id===tid);
 
-// ════════════════════════════════════════════
-// RENDER LISTA — legge sempre da S.projects
-// ════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
+// RENDER LISTA
+// ════════════════════════════════════════════════════════════════════
 function renderList() {
-  let list = S.projects.filter(p=>p?.id&&p?.name);
-  if (S.filter !== 'all') list = list.filter(p=>p.status===S.filter);
-  if (S.search) list = list.filter(p=>
-    (p.name||'').toLowerCase().includes(S.search) ||
-    (p.owner||'').toLowerCase().includes(S.search) ||
-    (p.notes||'').toLowerCase().includes(S.search)
+  let list = STATE.projects.filter(p=>p?.id&&p?.name);
+  if (STATE.filter !== 'all') list = list.filter(p=>p.status===STATE.filter);
+  if (STATE.search) list = list.filter(p=>
+    (p.name||'').toLowerCase().includes(STATE.search) ||
+    (p.owner||'').toLowerCase().includes(STATE.search) ||
+    (p.notes||'').toLowerCase().includes(STATE.search)
   );
   list.sort((a,b)=>STATUS_ORD.indexOf(a.status)-STATUS_ORD.indexOf(b.status));
 
@@ -458,7 +494,7 @@ function renderList() {
     const tasks = (p.phases||[]).flatMap(f=>f.tasks||[]);
     const done = tasks.filter(t=>t.done).length, tot = tasks.length;
     const over = tasks.filter(t=>!t.done&&t.date&&t.date<today()).length;
-    const sel = p.id===S.sel ? ' sel' : '';
+    const sel = p.id===STATE.sel ? ' sel' : '';
     return `<div class="proj-card${sel}" data-id="${p.id}">
       <div class="proj-card-name">${esc(p.name)}</div>
       <div class="proj-card-meta">${esc(p.owner||'')}${p.keyEventDate?` · 🎯 ${fmt(p.keyEventDate)}`:''}</div>
@@ -471,23 +507,23 @@ function renderList() {
 
   el.querySelectorAll('.proj-card').forEach(c => {
     c.addEventListener('click', () => {
-      S.sel = c.dataset.id;
-      renderList();   // aggiorna solo il bordo di selezione
-      renderDetail(); // mostra il dettaglio
+      STATE.sel = c.dataset.id;
+      renderList();
+      renderDetail();
     });
   });
 }
 
-// ════════════════════════════════════════════
-// RENDER DETTAGLIO — legge da S.projects[S.sel]
-// ════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
+// RENDER DETTAGLIO
+// ════════════════════════════════════════════════════════════════════
 function renderDetail() {
   const panel = $('mainPanel');
-  if (!S.sel) {
+  if (!STATE.sel) {
     panel.innerHTML = '<div class="detail-empty"><div class="icon">◈</div><p>Seleziona un progetto o creane uno nuovo.</p></div>';
     return;
   }
-  const p = proj(S.sel);
+  const p = proj(STATE.sel);
   if (!p) {
     panel.innerHTML = '<div class="detail-empty"><div class="icon">◈</div><p>Progetto non trovato.</p></div>';
     return;
@@ -544,8 +580,8 @@ function renderDetail() {
   </div>`;
 
   // ── listener ──
-  $('btnEdit').onclick   = () => openProjModal(p.id);
-  $('btnReport').onclick = () => openReport(p.id);
+  $('btnEdit').onclick    = () => openProjModal(p.id);
+  $('btnReport').onclick  = () => openReport(p.id);
   $('btnAddFase').onclick = () => openFaseModal(null);
   $('btnAddLog').onclick  = () => { $('fLogAuthor').value=''; $('fLogText').value=''; $('mLog').classList.remove('h'); setTimeout(()=>$('fLogText').focus(),50); };
 
@@ -553,7 +589,7 @@ function renderDetail() {
     h.addEventListener('click', e => {
       if (e.target.closest('button')) return;
       const f = phase(h.dataset.fid);
-      if (f) { f.collapsed = !f.collapsed; saveAndRender(); }
+      if (f) { f.collapsed = !f.collapsed; commit(); }
     });
   });
   panel.querySelectorAll('.btn-ef').forEach(b => b.onclick = e => { e.stopPropagation(); openFaseModal(b.dataset.fid); });
@@ -561,14 +597,14 @@ function renderDetail() {
   panel.querySelectorAll('.chk').forEach(c => {
     c.addEventListener('click', () => {
       const t = task(c.dataset.fid, c.dataset.tid);
-      if (t) { t.done = !t.done; t.updatedAt = iso(); proj(S.sel).updatedAt = iso(); saveAndRender(); }
+      if (t) { t.done = !t.done; t.updatedAt = iso(); proj(STATE.sel).updatedAt = iso(); commit(); }
     });
   });
   panel.querySelectorAll('.btn-et').forEach(b => b.onclick = () => openTaskModal(b.dataset.fid, b.dataset.tid));
   panel.querySelectorAll('.btn-dt').forEach(b => b.onclick = () => {
     if (!confirm('Eliminare questa attività?')) return;
     const f = phase(b.dataset.fid);
-    if (f) { f.tasks = f.tasks.filter(t=>t.id!==b.dataset.tid); proj(S.sel).updatedAt = iso(); saveAndRender(); }
+    if (f) { f.tasks = f.tasks.filter(t=>t.id!==b.dataset.tid); proj(STATE.sel).updatedAt = iso(); commit(); }
   });
   panel.querySelectorAll('.qa-btn').forEach(btn => btn.onclick = () => doQuickAdd(btn.dataset.fid));
   panel.querySelectorAll('.qa-txt').forEach(inp => inp.addEventListener('keydown', e => { if(e.key==='Enter') doQuickAdd(inp.dataset.fid); }));
@@ -629,16 +665,17 @@ function doQuickAdd(fid) {
   const o = document.querySelector(`.qa-own[data-fid="${fid}"]`)?.value.trim()||'';
   const d = document.querySelector(`.qa-dt[data-fid="${fid}"]`)?.value||'';
   const f = phase(fid); if (!f) return;
+  if (!Array.isArray(f.tasks)) f.tasks = [];
   f.tasks.push({ id:uid(), text:t, owner:o, date:d, week:'', done:false, createdAt:iso() });
-  proj(S.sel).updatedAt = iso();
-  saveAndRender();
+  proj(STATE.sel).updatedAt = iso();
+  commit();
 }
 
-// ════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
 // MODAL PROGETTO
-// ════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
 function openProjModal(id) {
-  S.editProjId = id||null; S.tempParts = [];
+  STATE.editProjId = id||null; STATE.tempParts = [];
   const p = id ? proj(id) : null;
   $('mProjTitle').textContent = id ? 'Modifica progetto' : 'Nuovo progetto';
   $('mProjDel').style.display = id ? '' : 'none';
@@ -646,61 +683,61 @@ function openProjModal(id) {
   $('fPOwner').value  = p?.owner||'';   $('fPStart').value  = p?.startDate||'';
   $('fPEnd').value    = p?.endDate||''; $('fPKeyEv').value  = p?.keyEvent||'';
   $('fPKeyDt').value  = p?.keyEventDate||''; $('fPNotes').value = p?.notes||'';
-  S.tempParts = [...(p?.participants||[])];
+  STATE.tempParts = [...(p?.participants||[])];
   renderParts();
   $('mProj').classList.remove('h');
   setTimeout(() => $('fPName').focus(), 50);
 }
 
 function renderParts() {
-  $('fPParts').innerHTML = S.tempParts.map((n,i) =>
+  $('fPParts').innerHTML = STATE.tempParts.map((n,i) =>
     `<span class="pill">${esc(n)}<span class="rm" data-i="${i}"> ✕</span></span>`
   ).join('');
-  $('fPParts').querySelectorAll('.rm').forEach(r => r.onclick = () => { S.tempParts.splice(Number(r.dataset.i),1); renderParts(); });
+  $('fPParts').querySelectorAll('.rm').forEach(r => r.onclick = () => { STATE.tempParts.splice(Number(r.dataset.i),1); renderParts(); });
 }
 
 $('btnAddPart').onclick = () => {
   const v = $('fPPartInp').value.trim();
-  if (v && !S.tempParts.includes(v)) { S.tempParts.push(v); $('fPPartInp').value=''; renderParts(); }
+  if (v && !STATE.tempParts.includes(v)) { STATE.tempParts.push(v); $('fPPartInp').value=''; renderParts(); }
 };
 $('fPPartInp').onkeydown = e => { if(e.key==='Enter'){e.preventDefault();$('btnAddPart').click();} };
 
 $('mProjSave').onclick = () => {
   const name = $('fPName').value.trim();
   if (!name) { alert('Inserisci il nome del progetto.'); return; }
-  if (S.editProjId) {
-    const p = proj(S.editProjId);
+  if (STATE.editProjId) {
+    const p = proj(STATE.editProjId);
     if (p) Object.assign(p, { name, status:$('fPStatus').value, owner:$('fPOwner').value.trim(),
       startDate:$('fPStart').value, endDate:$('fPEnd').value,
       keyEvent:$('fPKeyEv').value.trim(), keyEventDate:$('fPKeyDt').value,
-      notes:$('fPNotes').value.trim(), participants:[...S.tempParts], updatedAt:iso() });
+      notes:$('fPNotes').value.trim(), participants:[...STATE.tempParts], updatedAt:iso() });
   } else {
     const p = { id:uid(), name, status:$('fPStatus').value, owner:$('fPOwner').value.trim(),
       startDate:$('fPStart').value, endDate:$('fPEnd').value,
       keyEvent:$('fPKeyEv').value.trim(), keyEventDate:$('fPKeyDt').value,
-      notes:$('fPNotes').value.trim(), participants:[...S.tempParts],
+      notes:$('fPNotes').value.trim(), participants:[...STATE.tempParts],
       phases:[], log:[], createdAt:today(), updatedAt:iso() };
-    S.projects.push(p);
-    S.sel = p.id; // seleziona subito il nuovo progetto
+    STATE.projects.push(p);
+    STATE.sel = p.id;
   }
   $('mProj').classList.add('h');
-  saveAndRender();
+  commit();
 };
 
 $('mProjDel').onclick = () => {
   if (!confirm('Eliminare definitivamente questo progetto?')) return;
-  S.projects = S.projects.filter(p=>p.id!==S.editProjId);
-  if (S.sel===S.editProjId) S.sel=null;
+  STATE.projects = STATE.projects.filter(p=>p.id!==STATE.editProjId);
+  if (STATE.sel===STATE.editProjId) STATE.sel=null;
   $('mProj').classList.add('h');
-  saveAndRender();
+  commit();
 };
 $('mProjClose').onclick = () => $('mProj').classList.add('h');
 
-// ════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
 // MODAL FASE
-// ════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
 function openFaseModal(fid) {
-  S.editFaseId = fid||null;
+  STATE.editFaseId = fid||null;
   const f = fid ? phase(fid) : null;
   $('mFaseTitle').textContent = fid ? 'Modifica fase' : 'Nuova fase';
   $('mFaseDel').style.display = fid ? '' : 'none';
@@ -714,34 +751,34 @@ function openFaseModal(fid) {
 $('mFaseSave').onclick = () => {
   const name = $('fFName').value.trim();
   if (!name) { alert('Inserisci il nome della fase.'); return; }
-  const p = proj(S.sel); if (!p) return;
-  if (S.editFaseId) {
-    const f = phase(S.editFaseId);
+  const p = proj(STATE.sel); if (!p) return;
+  if (!Array.isArray(p.phases)) p.phases=[];
+  if (STATE.editFaseId) {
+    const f = phase(STATE.editFaseId);
     if (f) { f.name=name; f.startDate=$('fFStart').value; f.endDate=$('fFEnd').value; }
   } else {
-    if (!Array.isArray(p.phases)) p.phases=[];
     p.phases.push({ id:uid(), name, startDate:$('fFStart').value, endDate:$('fFEnd').value, tasks:[], collapsed:false });
   }
   p.updatedAt = iso();
   $('mFase').classList.add('h');
-  saveAndRender();
+  commit();
 };
 
 $('mFaseDel').onclick = () => {
   if (!confirm('Eliminare questa fase e tutte le sue attività?')) return;
-  const p = proj(S.sel); if (!p) return;
-  p.phases = p.phases.filter(f=>f.id!==S.editFaseId);
+  const p = proj(STATE.sel); if (!p) return;
+  p.phases = (p.phases||[]).filter(f=>f.id!==STATE.editFaseId);
   p.updatedAt = iso();
   $('mFase').classList.add('h');
-  saveAndRender();
+  commit();
 };
 $('mFaseClose').onclick = () => $('mFase').classList.add('h');
 
-// ════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
 // MODAL TASK
-// ════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
 function openTaskModal(fid, tid) {
-  S.editTaskFid = fid; S.editTaskId = tid||null;
+  STATE.editTaskFid = fid; STATE.editTaskId = tid||null;
   const t = tid ? task(fid,tid) : null;
   $('mTaskTitle').textContent = tid ? 'Modifica attività' : 'Nuova attività';
   $('fTTxt').value   = t?.text||'';   $('fTOwner').value = t?.owner||'';
@@ -754,9 +791,10 @@ function openTaskModal(fid, tid) {
 $('mTaskSave').onclick = () => {
   const txt = $('fTTxt').value.trim();
   if (!txt) { alert('Inserisci la descrizione.'); return; }
-  const f = phase(S.editTaskFid); if (!f) return;
-  if (S.editTaskId) {
-    const t = task(S.editTaskFid, S.editTaskId);
+  const f = phase(STATE.editTaskFid); if (!f) return;
+  if (!Array.isArray(f.tasks)) f.tasks = [];
+  if (STATE.editTaskId) {
+    const t = task(STATE.editTaskFid, STATE.editTaskId);
     if (t) Object.assign(t, { text:txt, owner:$('fTOwner').value.trim(),
       date:$('fTDate').value, week:$('fTWeek').value.trim(),
       done:$('fTDone').value==='1', updatedAt:iso() });
@@ -765,30 +803,30 @@ $('mTaskSave').onclick = () => {
       date:$('fTDate').value, week:$('fTWeek').value.trim(),
       done:$('fTDone').value==='1', createdAt:iso() });
   }
-  proj(S.sel).updatedAt = iso();
+  proj(STATE.sel).updatedAt = iso();
   $('mTask').classList.add('h');
-  saveAndRender();
+  commit();
 };
 $('mTaskClose').onclick = () => $('mTask').classList.add('h');
 
-// ════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
 // MODAL LOG
-// ════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
 $('mLogSave').onclick = () => {
   const txt = $('fLogText').value.trim();
   if (!txt) { alert('Inserisci il testo della nota.'); return; }
-  const p = proj(S.sel); if (!p) return;
+  const p = proj(STATE.sel); if (!p) return;
   if (!Array.isArray(p.log)) p.log=[];
   p.log.push({ id:uid(), text:txt, author:$('fLogAuthor').value.trim(), date:today(), createdAt:iso() });
   p.updatedAt = iso();
   $('mLog').classList.add('h');
-  saveAndRender();
+  commit();
 };
 $('mLogClose').onclick = () => $('mLog').classList.add('h');
 
-// ════════════════════════════════════════════
-// REPORT PDF
-// ════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
+// REPORT
+// ════════════════════════════════════════════════════════════════════
 function openReport(id) {
   const p = proj(id); if (!p) return;
   const win = window.open('','_blank');
@@ -894,9 +932,9 @@ function buildReport(p) {
   </body></html>`;
 }
 
-// ════════════════════════════════════════════
-// MODAL GITHUB
-// ════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
+// MODAL GITHUB CONFIG
+// ════════════════════════════════════════════════════════════════════
 function openGhModal() {
   const c = ghCfg();
   $('fGhTok').value  = c?.tok||'';  $('fGhOwn').value  = c?.own||'';
@@ -904,79 +942,92 @@ function openGhModal() {
   $('ghMsg').textContent = ''; $('mGh').classList.remove('h');
 }
 
-$('btnSync').onclick = () => { if (ghOk()) ghPull(); else openGhModal(); };
-
 $('mGhSave').onclick = () => {
   const c = { tok:$('fGhTok').value.trim(), own:$('fGhOwn').value.trim(),
     repo:$('fGhRepo').value.trim(), path:$('fGhPath').value.trim()||'data/project-vault.json' };
   if (!c.tok||!c.own||!c.repo) { alert('Compila tutti i campi.'); return; }
   localStorage.setItem(GH_KEY, JSON.stringify(c));
-  $('ghMsg').textContent = '✓ Configurazione salvata. Sincronizzazione in corso…';
+  ghSha(''); // reset sha: verrà ripreso fresco al primo salva/carica
+  $('ghMsg').textContent = '✓ Configurazione salvata. Usa "⬇ Carica da GitHub" per scaricare i dati esistenti.';
   $('ghMsg').style.color = 'var(--green)';
-  setTimeout(() => { $('mGh').classList.add('h'); ghPull(); }, 800);
+  refreshSyncBadge();
+  setSyncStatus('☁ GitHub configurato');
+  setTimeout(() => $('mGh').classList.add('h'), 1400);
 };
 
 $('mGhClear').onclick = () => {
-  if (!confirm('Rimuovere configurazione GitHub?')) return;
+  if (!confirm('Rimuovere la configurazione GitHub? I dati locali restano intatti.')) return;
   localStorage.removeItem(GH_KEY); localStorage.removeItem(SHA_KEY);
-  setSyncStatus('GitHub Sync non configurato');
+  setSyncStatus('GitHub non configurato');
+  refreshSyncBadge();
   $('mGh').classList.add('h');
 };
 $('mGhClose').onclick = () => $('mGh').classList.add('h');
 
-// ════════════════════════════════════════════
-// FILTRI
-// ════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
+// BACKUP / IMPORT su file locale
+// ════════════════════════════════════════════════════════════════════
+$('btnBackup').onclick = () => {
+  const blob = new Blob([JSON.stringify({ projects: STATE.projects, savedAt: iso() }, null, 2)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `project-vault-backup-${today()}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+};
+$('btnImport').onclick = () => $('importFile').click();
+$('importFile').onchange = e => {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const d = JSON.parse(reader.result);
+      const imported = Array.isArray(d) ? d : Array.isArray(d.projects) ? d.projects : [];
+      if (!imported.length) { alert('Nessun progetto trovato nel file.'); return; }
+      if (!confirm(`Importare ${imported.length} progetti e fonderli con quelli attuali?`)) return;
+      const byId = new Map(STATE.projects.filter(p=>p?.id).map(p=>[p.id,p]));
+      for (const ip of imported) { if (ip?.id && typeof ip.name==='string') byId.set(ip.id, ip); }
+      STATE.projects = [...byId.values()];
+      commit();
+      alert('Import completato.');
+    } catch { alert('File non valido.'); }
+    $('importFile').value = '';
+  };
+  reader.readAsText(file);
+};
+
+// ════════════════════════════════════════════════════════════════════
+// FILTRI E PULSANTI HEADER
+// ════════════════════════════════════════════════════════════════════
 $('btnNewProj').onclick = () => openProjModal(null);
-$('searchQ').oninput = e => { S.search = e.target.value.toLowerCase().trim(); renderList(); };
+$('btnSaveGh').onclick  = () => ghSave();
+$('btnPullGh').onclick  = () => ghPullConfirm();
+$('btnGhCfg').onclick   = () => openGhModal();
+$('searchQ').oninput = e => { STATE.search = e.target.value.toLowerCase().trim(); renderList(); };
 document.querySelectorAll('.f-btn').forEach(b => {
   b.onclick = () => {
     document.querySelectorAll('.f-btn').forEach(x=>x.classList.remove('on'));
-    b.classList.add('on'); S.filter = b.dataset.f; renderList();
+    b.classList.add('on'); STATE.filter = b.dataset.f; renderList();
   };
 });
 ['mProj','mFase','mTask','mLog','mGh'].forEach(id => {
   $(id).addEventListener('click', e => { if(e.target===e.currentTarget) $(id).classList.add('h'); });
 });
 
-// ════════════════════════════════════════════
-// AVVIO
-// ════════════════════════════════════════════
-// Regola anti-perdita-dati:
-// - Se localStorage HA già progetti → è la fonte di verità, niente pull
-//   automatico (evita la race condition che resettava S.sel).
-// - Se localStorage è VUOTO ma GitHub è configurato → è un dispositivo/browser
-//   nuovo: scarica una volta dal cloud PRIMA che l'utente possa salvare, così
-//   non rischia di sovrascrivere il file remoto con un elenco vuoto.
+// Avviso se chiudi con modifiche non salvate su GitHub (i dati sono comunque salvati in locale)
+window.addEventListener('beforeunload', e => {
+  if (STATE.dirty) { e.preventDefault(); e.returnValue = ''; }
+});
+
+// ════════════════════════════════════════════════════════════════════
+// AVVIO — SOLO localStorage. Nessuna rete. Nessuna sorpresa.
+// ════════════════════════════════════════════════════════════════════
 load();
 renderList();
 renderDetail();
-
-async function boot() {
-  if (!ghOk()) {
-    setSyncStatus('GitHub Sync non configurato — clicca ☁️ Sync');
-    return;
-  }
-  if (S.projects.length > 0) {
-    // localStorage popolato: fonte di verità. Nessun pull automatico.
-    setSyncStatus('☁ GitHub configurato — clicca Sync per aggiornare');
-    return;
-  }
-  // localStorage vuoto → bootstrap dal cloud (una sola volta, non tocca S.sel)
-  setSyncStatus('🔄 Primo caricamento dal cloud…');
-  try {
-    const remote = await ghFetchRemote();
-    if (remote.missing) { setSyncStatus('✓ Pronto (nessun dato remoto)'); return; }
-    mergeRemote(remote.projects);
-    ghSha(remote.sha || '');
-    save();
-    renderList(); renderDetail();
-    setSyncStatus(`✓ Dati caricati dal cloud ${new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})}`);
-  } catch {
-    setSyncStatus('⚠ Impossibile caricare dal cloud — clicca ☁️ Sync');
-  }
-}
-boot();
+refreshSyncBadge();
+if (ghOk()) setSyncStatus('☁ GitHub configurato — usa ⬇ per caricare, ☁️ per salvare');
+else setSyncStatus('GitHub non configurato — clicca ⚙ per impostarlo');
 </script>
 </body>
 </html>
