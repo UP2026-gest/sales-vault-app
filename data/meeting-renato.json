@@ -422,7 +422,33 @@
       "actions": [],
       "createdAt": "2026-07-03T08:28:54.576Z",
       "updatedAt": "2026-07-03T08:31:32.524Z"
+    },
+    {
+      "id": "mrelvc9fhu9hmj",
+      "code": "26-008",
+      "title": "incontro per mkt palestra",
+      "date": "2026-07-10",
+      "timeStart": "10:30",
+      "timeEnd": "11:30",
+      "client": "Fit Factory",
+      "topics": [
+        "commerciale",
+        "mkt"
+      ],
+      "participants": [
+        "Fabio Zubani"
+      ],
+      "agenda": [
+        {
+          "text": "UP è nata nel 2015, i nostri servizi sono corsi di lingua, formazione business e traduzioni",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-07-10T07:19:53.811Z",
+      "updatedAt": "2026-07-10T07:19:53.811Z"
     }
   ],
-  "updatedAt": "2026-07-03T08:45:09.224Z"
+  "updatedAt": "2026-07-10T07:19:53.811Z"
 }
