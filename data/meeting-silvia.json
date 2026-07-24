@@ -224,15 +224,16 @@
         {
           "id": "mrypbzgsrz25ov",
           "text": "chiedere a Giorgia Riuzzi contatto con Zooprofilattico Brescia",
-          "who": "",
+          "who": "Silvia",
           "date": "",
           "done": false,
-          "createdAt": "2026-07-24T08:52:12.748Z"
+          "createdAt": "2026-07-24T08:52:12.748Z",
+          "updatedAt": "2026-07-24T08:52:20.524Z"
         }
       ],
       "createdAt": "2026-07-24T08:42:52.550Z",
-      "updatedAt": "2026-07-24T08:52:12.748Z"
+      "updatedAt": "2026-07-24T08:52:20.524Z"
     }
   ],
-  "updatedAt": "2026-07-24T08:52:12.748Z"
+  "updatedAt": "2026-07-24T08:52:20.524Z"
 }
