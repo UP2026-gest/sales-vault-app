@@ -229,11 +229,19 @@
           "done": false,
           "createdAt": "2026-07-24T08:52:12.748Z",
           "updatedAt": "2026-07-24T08:52:20.524Z"
+        },
+        {
+          "id": "mrypp343x2alsf",
+          "text": "evento network prima settimana di ottobre",
+          "who": "",
+          "date": "",
+          "done": false,
+          "createdAt": "2026-07-24T09:02:24.003Z"
         }
       ],
       "createdAt": "2026-07-24T08:42:52.550Z",
-      "updatedAt": "2026-07-24T08:52:20.524Z"
+      "updatedAt": "2026-07-24T09:02:24.003Z"
     }
   ],
-  "updatedAt": "2026-07-24T08:52:20.524Z"
+  "updatedAt": "2026-07-24T09:02:24.003Z"
 }
