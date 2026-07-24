@@ -211,10 +211,19 @@
       "participants": [],
       "agenda": [],
       "notes": "",
-      "actions": [],
+      "actions": [
+        {
+          "id": "mryp3wqsev3fd0",
+          "text": "Gruppo Whatsapp per Network",
+          "who": "",
+          "date": "",
+          "done": false,
+          "createdAt": "2026-07-24T08:45:55.972Z"
+        }
+      ],
       "createdAt": "2026-07-24T08:42:52.550Z",
-      "updatedAt": "2026-07-24T08:42:52.550Z"
+      "updatedAt": "2026-07-24T08:45:55.972Z"
     }
   ],
-  "updatedAt": "2026-07-24T08:42:52.550Z"
+  "updatedAt": "2026-07-24T08:45:55.972Z"
 }
