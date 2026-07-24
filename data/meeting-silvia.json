@@ -198,7 +198,23 @@
       "actions": [],
       "createdAt": "2026-07-03T09:09:41.075Z",
       "updatedAt": "2026-07-03T09:25:46.874Z"
+    },
+    {
+      "id": "mryozz7qcjqfdo",
+      "code": "26-007",
+      "title": "Riunione 24/07",
+      "date": "2026-07-24",
+      "timeStart": "10:30",
+      "timeEnd": "",
+      "client": "",
+      "topics": [],
+      "participants": [],
+      "agenda": [],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-07-24T08:42:52.550Z",
+      "updatedAt": "2026-07-24T08:42:52.550Z"
     }
   ],
-  "updatedAt": "2026-07-03T09:25:46.874Z"
+  "updatedAt": "2026-07-24T08:42:52.550Z"
 }
