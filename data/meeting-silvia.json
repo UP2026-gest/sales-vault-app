@@ -217,9 +217,9 @@
           "text": "Gruppo Whatsapp per Network\nmandare mail agli iscritti",
           "who": "Silvia",
           "date": "2026-07-31",
-          "done": false,
+          "done": true,
           "createdAt": "2026-07-24T08:45:55.972Z",
-          "updatedAt": "2026-07-30T07:59:47.516Z"
+          "updatedAt": "2026-07-30T09:29:02.266Z"
         },
         {
           "id": "mrypbzgsrz25ov",
@@ -243,5 +243,5 @@
       "updatedAt": "2026-07-30T07:59:47.516Z"
     }
   ],
-  "updatedAt": "2026-07-30T07:59:47.516Z"
+  "updatedAt": "2026-07-30T09:29:02.266Z"
 }
