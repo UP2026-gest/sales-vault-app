@@ -241,7 +241,28 @@
       ],
       "createdAt": "2026-07-24T08:42:52.550Z",
       "updatedAt": "2026-07-30T07:59:47.516Z"
+    },
+    {
+      "id": "ms7bc056ga2c7w",
+      "code": "26-008",
+      "title": "Riunione 31/07",
+      "date": "2026-07-30",
+      "timeStart": "",
+      "timeEnd": "",
+      "client": "",
+      "topics": [],
+      "participants": [],
+      "agenda": [
+        {
+          "text": "network UP - aggiornamento Materzanini + codice etico + primo messaggio WA?",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-07-30T09:30:14.586Z",
+      "updatedAt": "2026-07-30T09:30:14.586Z"
     }
   ],
-  "updatedAt": "2026-07-30T09:29:02.266Z"
+  "updatedAt": "2026-07-30T09:30:14.586Z"
 }
