@@ -259,10 +259,19 @@
         }
       ],
       "notes": "",
-      "actions": [],
+      "actions": [
+        {
+          "id": "ms8qlucy411o1t",
+          "text": "inserisci Alessandro Bruni nelle mail newsletter",
+          "who": "Silvia",
+          "date": "2026-08-03",
+          "done": false,
+          "createdAt": "2026-07-31T09:25:34.066Z"
+        }
+      ],
       "createdAt": "2026-07-30T09:30:14.586Z",
-      "updatedAt": "2026-07-30T09:30:14.586Z"
+      "updatedAt": "2026-07-31T09:25:34.066Z"
     }
   ],
-  "updatedAt": "2026-07-30T09:30:14.586Z"
+  "updatedAt": "2026-07-31T09:25:34.066Z"
 }
