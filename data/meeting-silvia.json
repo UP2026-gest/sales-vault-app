@@ -273,13 +273,14 @@
           "text": "cineforum in inglese questo autunno",
           "who": "Silvia",
           "date": "2026-08-03",
-          "done": false,
-          "createdAt": "2026-07-31T09:40:15.059Z"
+          "done": true,
+          "createdAt": "2026-07-31T09:40:15.059Z",
+          "updatedAt": "2026-08-04T08:26:40.679Z"
         }
       ],
       "createdAt": "2026-07-30T09:30:14.586Z",
-      "updatedAt": "2026-07-31T09:40:15.059Z"
+      "updatedAt": "2026-08-04T08:26:40.679Z"
     }
   ],
-  "updatedAt": "2026-07-31T09:40:15.059Z"
+  "updatedAt": "2026-08-04T08:26:40.679Z"
 }
