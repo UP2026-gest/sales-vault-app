@@ -280,7 +280,36 @@
       ],
       "createdAt": "2026-07-30T09:30:14.586Z",
       "updatedAt": "2026-08-04T08:26:40.679Z"
+    },
+    {
+      "id": "msiqd15st00208",
+      "code": "26-009",
+      "title": "Riunione 07/08",
+      "date": "2026-08-07",
+      "timeStart": "",
+      "timeEnd": "",
+      "client": "",
+      "topics": [],
+      "participants": [],
+      "agenda": [
+        {
+          "text": "accordo con Fabio palestra",
+          "notes": ""
+        },
+        {
+          "text": "gruppo WA network",
+          "notes": ""
+        },
+        {
+          "text": "autunno",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-08-07T09:16:24.736Z",
+      "updatedAt": "2026-08-07T09:16:24.736Z"
     }
   ],
-  "updatedAt": "2026-08-04T08:26:40.679Z"
+  "updatedAt": "2026-08-07T09:16:24.736Z"
 }
