@@ -557,7 +557,47 @@
       "actions": [],
       "createdAt": "2026-07-31T08:38:30.879Z",
       "updatedAt": "2026-07-31T09:13:57.758Z"
+    },
+    {
+      "id": "mtbnaezvdhdp5x",
+      "code": "26-011",
+      "title": "Silvia",
+      "date": "2026-08-27",
+      "timeStart": "10:45",
+      "timeEnd": "11:45",
+      "client": "",
+      "topics": [
+        "commerciale",
+        "didattica"
+      ],
+      "participants": [],
+      "agenda": [
+        {
+          "text": "scuole e bandi",
+          "notes": ""
+        },
+        {
+          "text": "accreditamento presso Ministero Istruzione e Merito (MIM)",
+          "notes": ""
+        },
+        {
+          "text": "Accreditamento MSF",
+          "notes": ""
+        },
+        {
+          "text": "Coinvolgimento Erroi, Nicolis, Bruni",
+          "notes": ""
+        },
+        {
+          "text": "Anna Pea e moglie del Dorna per contatti",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-08-27T14:55:42.956Z",
+      "updatedAt": "2026-08-27T14:55:42.956Z"
     }
   ],
-  "updatedAt": "2026-08-27T14:53:14.194Z"
+  "updatedAt": "2026-08-27T14:55:42.956Z"
 }
