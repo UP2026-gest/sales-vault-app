@@ -994,18 +994,27 @@ function newOpp(){
 function totalIssued(o){ return (o.invoices||[]).filter(x=>x.status==="emessa").reduce((s,x)=>s+toNum(x.amount),0); }
 function totalPlanned(o){ return (o.invoices||[]).filter(x=>x.status==="pianificata").reduce((s,x)=>s+toNum(x.plannedAmount),0); }
 
+// Base di importo per il MOL di UNA opportunità, a cascata:
+//   emesso (se > 0) → pianificato (se > 0) → valore previsto.
+// Ritorna { base, label } dove label = "emesso" | "pianificato" | "valore previsto".
+function molBaseFor(o){
+  const issued = totalIssued(o), planned = totalPlanned(o), expected = toNum(o.valueExpected);
+  if(issued > 0)  return { base: issued,   label: "emesso" };
+  if(planned > 0) return { base: planned,  label: "pianificato" };
+  return { base: expected, label: "valore previsto" };
+}
+
 function renderCalcBox(o){
   const issued = totalIssued(o), planned = totalPlanned(o), cost = toNum(o.serviceCost);
   const expected = toNum(o.valueExpected);
 
-  // Base di calcolo del MOL, a cascata:
+  // Base di calcolo del MOL, a cascata (usa l'helper condiviso):
   //   1) fatturato EMESSO se presente  → MOL effettivo
-  //   2) altrimenti PIANIFICATO se presente → MOL previsto (su pianificato)
+  //   2) altrimenti PIANIFICATO se presente → MOL previsto
   //   3) altrimenti "Valore previsto €" → MOL stimato
-  let base, baseLabel, molKind;
-  if(issued > 0){       base = issued;   baseLabel = "fatturato emesso"; molKind = "effettivo"; }
-  else if(planned > 0){ base = planned;  baseLabel = "fatture pianificate"; molKind = "previsto"; }
-  else {                base = expected; baseLabel = "valore previsto"; molKind = "stimato"; }
+  const bd = molBaseFor(o);
+  const base = bd.base, baseLabel = bd.label;
+  const molKind = bd.label === "emesso" ? "effettivo" : bd.label === "pianificato" ? "previsto" : "stimato";
 
   const mol = base - cost;
   const molPct = base > 0 ? (mol/base)*100 : 0;
@@ -1430,9 +1439,14 @@ function renderKpi(){
   const eurNotInvoiced = wonNotInvoiced.reduce((s,o)=>s+totalPlanned(o),0);
   const eurInvoiced    = wonInvoiced.reduce((s,o)=>s+totalIssued(o),0);
   const eurTotal = eurInvoiced + eurNotInvoiced;
-  const costWon  = won.reduce((s,o)=>s+toNum(o.serviceCost),0);
-  const molWon   = eurTotal - costWon;
-  const molPct   = eurTotal > 0 ? (molWon/eurTotal)*100 : 0;
+
+  // MOL del cruscotto: calcolato su TUTTE le opportunità filtrate, usando per
+  // ognuna la base a cascata (emesso → pianificato → valore previsto).
+  // Così il margine ha senso anche quando le opportunità non sono ancora fatturate.
+  const molBaseTotal = all.reduce((s,o)=>s+molBaseFor(o).base,0);
+  const molCostTotal = all.reduce((s,o)=>s+toNum(o.serviceCost),0);
+  const molWon   = molBaseTotal - molCostTotal;
+  const molPct   = molBaseTotal > 0 ? (molWon/molBaseTotal)*100 : 0;
 
   ui.kpiBox.innerHTML =
     filterNote +
@@ -1443,7 +1457,12 @@ function renderKpi(){
     `<div><b>Chiuse vinte non fatturate</b>: ${wonNotInvoiced.length} (€ ${eurNotInvoiced.toFixed(2)})</div>` +
     `<div><b>Chiuse vinte fatturate</b>: ${wonInvoiced.length} (€ ${eurInvoiced.toFixed(2)})</div>` +
     `<div><b>€ totale chiuse vinte</b>: € ${eurTotal.toFixed(2)}</div>` +
-    `<div><b>MOL (chiuse vinte)</b>: € ${molWon.toFixed(2)} — ${molPct.toFixed(1)}%</div>` +
+    `<div style="margin-top:6px;padding-top:6px;border-top:1px solid #e5e8f0;">` +
+      `<b>Valore totale (base MOL)</b>: € ${molBaseTotal.toFixed(2)}` +
+    `</div>` +
+    `<div><b>Costo erogazione totale</b>: € ${molCostTotal.toFixed(2)}</div>` +
+    `<div><b>MOL (opportunità filtrate)</b>: € ${molWon.toFixed(2)} — ${molPct.toFixed(1)}%</div>` +
+    `<div class="muted" style="font-size:11px;margin-top:2px;">MOL su ${all.length} opp. filtrate, base a cascata: emesso → pianificato → valore previsto</div>` +
     renderOwnerStats(all);
 }
 
