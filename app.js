@@ -302,6 +302,21 @@ function normalizeOpp(o){
   // Il fallback scatta SOLO se il campo è vuoto. Un owner rimosso dall'elenco resta valido
   // sull'opportunità finché non viene modificato manualmente dall'utente.
   const safeOwner = rawOwner || defaultOwner;
+
+  // Coerenza stato ↔ fase per le opportunità PERSE.
+  // Se lo stato è "chiusa persa"/"abbandonata", la fase deve essere "persa",
+  // e se la fase è "persa" lo stato deve essere uno stato di perdita.
+  // Questo garantisce la coerenza anche sui dati caricati da GitHub o importati.
+  let _status = o.status || "aperta";
+  let _phase  = o.phase  || "contatto iniziale";
+  const _lostStatuses = ["chiusa persa", "abbandonata"];
+  if(_lostStatuses.includes(_status)){
+    _phase = "persa";
+  } else if(_phase === "persa"){
+    // fase persa ma stato non-perso: allinea lo stato
+    _status = "chiusa persa";
+  }
+
   return {
     id:             o.id || uid(),
     oppSeq:         o.oppSeq || 0,
@@ -310,8 +325,8 @@ function normalizeOpp(o){
     createdAt:      o.createdAt || todayStr(),
     owner:          safeOwner,
     name:           o.name || "",
-    status:         o.status || "aperta",
-    phase:          o.phase || "contatto iniziale",
+    status:         _status,
+    phase:          _phase,
     product:        o.product || "da definire",
     valueExpected:  toNum(o.valueExpected),
     probability:    o.probability || "50%",
@@ -1713,6 +1728,43 @@ ui.invPlannedFilter.addEventListener("change", renderAll);
 ui.invIssuedFilter?.addEventListener("change", renderAll);
 ui.oppForm?.addEventListener("input", updateDirtyHint);
 ui.oppForm?.addEventListener("change", updateDirtyHint);
+
+// ═══════════════════════════════════════════════════════════════
+// SINCRONIZZAZIONE STATO ↔ FASE per opportunità PERSE
+// Se lo stato diventa "chiusa persa" o "abbandonata" → la fase diventa "persa".
+// Se la fase diventa "persa" → lo stato diventa "chiusa persa".
+// Così stato e fase non restano mai incoerenti.
+// ═══════════════════════════════════════════════════════════════
+const LOST_STATUSES = ["chiusa persa", "abbandonata"];
+ui.oppStatus?.addEventListener("change", () => {
+  if(LOST_STATUSES.includes(ui.oppStatus.value)){
+    if(ui.oppPhase && ui.oppPhase.value !== "persa"){
+      ui.oppPhase.value = "persa";
+      updateDirtyHint();
+    }
+  } else {
+    // Se si esce da uno stato "perso" ma la fase è ancora "persa",
+    // riportala a un valore neutro coerente per non lasciarla bloccata.
+    if(ui.oppPhase && ui.oppPhase.value === "persa"){
+      ui.oppPhase.value = "contatto iniziale";
+      updateDirtyHint();
+    }
+  }
+});
+ui.oppPhase?.addEventListener("change", () => {
+  if(ui.oppPhase.value === "persa"){
+    if(ui.oppStatus && !LOST_STATUSES.includes(ui.oppStatus.value)){
+      ui.oppStatus.value = "chiusa persa";
+      updateDirtyHint();
+    }
+  } else {
+    // Fase diversa da "persa" ma stato ancora "perso": riallinea lo stato ad "aperta".
+    if(ui.oppStatus && LOST_STATUSES.includes(ui.oppStatus.value)){
+      ui.oppStatus.value = "aperta";
+      updateDirtyHint();
+    }
+  }
+});
 
 ui.manageOwnersBtn?.addEventListener("click", handleManageOwners);
 

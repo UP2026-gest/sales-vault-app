@@ -144,6 +144,12 @@ a.nav-link:hover{background:rgba(255,255,255,.2);color:#fff;}
 .meta-cell .val{font-size:13px;font-weight:500;}
 
 /* ── AGENDA / NOTE ── */
+.notes-savebar{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:var(--amber);border:1px solid #d99a10;border-radius:var(--r8);padding:8px 13px;margin-bottom:12px;
+  box-shadow:0 2px 6px rgba(0,0,0,.12);}
+.notes-savebar.hidden{display:none;}
+.notes-savebar-txt{font-size:12.5px;font-weight:600;color:var(--navy);display:flex;align-items:center;gap:6px;}
+.notes-savebar-btns{display:flex;gap:6px;}
 .agenda-list{display:flex;flex-direction:column;gap:8px;}
 .agenda-item{border:1px solid var(--border);border-radius:var(--r8);background:var(--bg);overflow:hidden;}
 .agenda-item-hdr{display:flex;gap:8px;align-items:flex-start;padding:9px 11px;}
@@ -323,8 +329,8 @@ hr{border:0;border-top:1px solid var(--border);margin:12px 0;}
   </div>
   <div style="display:flex;flex-direction:column;align-items:flex-end;">
     <div class="bar-right">
-      <a href="index.html" class="nav-link">◆ Sales Vault</a>
-    <a href="project-vault.html" class="nav-link">◈ Project Vault</a>
+      <a href="index.html" class="nav-link" id="navSales">◆ Sales Vault</a>
+    <a href="project-vault.html" class="nav-link" id="navProject">◈ Project Vault</a>
       <button class="btn-amber" id="btnNewMeet">+ Nuova riunione</button>
       <button class="btn-ghost" id="btnGhSync">☁️ Sync</button>
       <button class="bell-btn" id="bellBtn" title="Azioni scadute">
@@ -578,6 +584,17 @@ let _tempParts   = [];
 let _tempAgenda  = [];
 let _ghPushing   = false;
 let _filterAction = 'all'; // 'all' | 'open' | 'overdue'
+let _notesDirty  = false;  // ci sono note (riunione o agenda) modificate ma non salvate?
+
+// Se ci sono note non salvate, chiede conferma prima di cambiare riunione/schermata.
+// Ritorna true se si può procedere (nessuna modifica, oppure l'utente ha scelto di
+// scartarle), false se l'utente vuole restare per salvare.
+function confirmIfNotesDirty(){
+  if(!_notesDirty) return true;
+  const ok = confirm('Hai delle note non salvate.\n\nPremi "Annulla" per tornare indietro e salvarle con "💾 Salva note",\noppure "OK" per continuare SENZA salvare (le modifiche andranno perse).');
+  if(ok) _notesDirty = false; // l'utente ha scelto di scartare
+  return ok;
+}
 
 // Genera codice riunione YY-NNN
 function nextMeetCode(){
@@ -823,7 +840,11 @@ function renderList(){
     </div>`;
   }).join('');
   el.querySelectorAll('.meet-card').forEach(c=>{
-    c.addEventListener('click',()=>{ _selId=c.dataset.id; renderList(); renderDetail(); });
+    c.addEventListener('click',()=>{
+      if(c.dataset.id===_selId) return; // stessa riunione, nessun cambio
+      if(!confirmIfNotesDirty()) return; // note non salvate: chiedi conferma
+      _selId=c.dataset.id; renderList(); renderDetail();
+    });
   });
 }
 
@@ -878,6 +899,12 @@ function renderDetail(){
   }).join('');
 
   panel.innerHTML=`
+  <div class="notes-savebar hidden" id="notesSaveBar">
+    <span class="notes-savebar-txt">✏️ Hai modifiche alle note non ancora salvate</span>
+    <div class="notes-savebar-btns">
+      <button class="btn-navy btn-sm" id="btnSaveNotesTop">💾 Salva note</button>
+    </div>
+  </div>
   <div class="card">
     <div class="meet-header">
       <div>
@@ -937,9 +964,10 @@ function renderDetail(){
   $('btnEdit').onclick = ()=>openMeetModal(m.id);
   $('btnPdf').onclick  = ()=>openPdf(m.id);
   $('btnDuplica').onclick = ()=>duplicateMeet(m.id);
-  $('btnSaveNotes').onclick = ()=>{
+
+  // Salvataggio note condiviso (usato dal pulsante in alto e da quello in basso)
+  function saveNotesNow(){
     m.notes=$('notesArea').value;
-    // Salva note agenda
     const agItems=(m.agenda||[]).map(a=>typeof a==='string'?{text:a,notes:''}:a);
     document.querySelectorAll('.agenda-notes-area').forEach(ta=>{
       const i=Number(ta.dataset.ai);
@@ -947,9 +975,27 @@ function renderDetail(){
     });
     m.agenda=agItems;
     m.updatedAt=nowIso(); dbSave();
-    $('btnSaveNotes').textContent='✓ Salvato';
-    setTimeout(()=>{ $('btnSaveNotes').textContent='💾 Salva note'; },1500);
-  };
+    _notesDirty=false;
+    updateNotesBar();
+    ['btnSaveNotes','btnSaveNotesTop'].forEach(id=>{
+      const b=$(id); if(b){ b.textContent='✓ Salvato'; setTimeout(()=>{ if($(id)) $(id).textContent='💾 Salva note'; },1500); }
+    });
+  }
+  // Mostra/nasconde la barra sticky in base allo stato "dirty"
+  function updateNotesBar(){
+    const bar=$('notesSaveBar');
+    if(bar) bar.classList.toggle('hidden', !_notesDirty);
+  }
+  window._mvUpdateNotesBar = updateNotesBar; // esposto per sicurezza
+
+  $('btnSaveNotes').onclick = saveNotesNow;
+  const topBtn=$('btnSaveNotesTop'); if(topBtn) topBtn.onclick = saveNotesNow;
+
+  // Rileva modifiche nelle note (riunione + agenda) → attiva la barra
+  const markDirty=()=>{ if(!_notesDirty){ _notesDirty=true; updateNotesBar(); } };
+  $('notesArea')?.addEventListener('input', markDirty);
+  document.querySelectorAll('.agenda-notes-area').forEach(ta=>ta.addEventListener('input', markDirty));
+  updateNotesBar();
   $('btnAddAction').onclick = ()=>openActionModal(null);
   $('btnQaAction').onclick  = doQuickAction;
   $('qaActionTxt').onkeydown = e=>{ if(e.key==='Enter') doQuickAction(); };
@@ -1366,6 +1412,29 @@ function showOverduePopup(){
 
 $('bellBtn').onclick=showOverduePopup;
 $('mOverdueClose').onclick=()=>$('mOverdue').classList.add('h');
+
+// ══════════════════════════════════════════
+// PROTEZIONE NOTE NON SALVATE su navigazione/chiusura
+// ══════════════════════════════════════════
+// Link verso Sales / Project: se ci sono note non salvate, chiedi conferma
+['navSales','navProject'].forEach(id=>{
+  const a=$(id);
+  if(a) a.addEventListener('click', e=>{
+    if(!confirmIfNotesDirty()){ e.preventDefault(); }
+  });
+});
+// Chiusura o ricaricamento della pagina con note non salvate
+window.addEventListener('beforeunload', e=>{
+  if(_notesDirty){ e.preventDefault(); e.returnValue=''; }
+});
+// Logout con note non salvate: chiedi conferma (il tasto Esci è già gestito, aggiungiamo il guard)
+(function(){
+  const lb=$('btnLogout');
+  if(lb){
+    const orig=lb.onclick;
+    lb.onclick=(ev)=>{ if(!confirmIfNotesDirty()){ return; } if(orig) orig.call(lb,ev); };
+  }
+})();
 
 // ══════════════════════════════════════════
 // AVVIO
