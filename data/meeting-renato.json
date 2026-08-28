@@ -615,14 +615,14 @@
       "agenda": [
         {
           "text": "situazione bilancio e previsione",
-          "notes": "spese previste 2026 € 35000 (17k silvia, 12k io con spese, 6k tra inps banca ammortamenti mutuo\nFatturato attuale € 34,3k di cui circa 3,4k trad con MOL 0,9k e 30,9k corsi con MOL 19,2k - TOTALE MOL 20,1K\nmancano quindi 15k di MOL"
+          "notes": "spese previste 2026 € 35000 (17k silvia, 12k io con spese, 6k tra inps banca ammortamenti mutuo\nFatturato attuale € 34,3k di cui circa 3,4k trad con MOL 0,9k e 30,9k corsi con MOL 19,2k - TOTALE MOL 20,1K\nmancano quindi 15k di MOL, di cui:\n- 6,2k di MOL arriveranno dai 8,4K conseguiti e non fatturati\n- 5k di MOL dovrebbero arrivare da 8-10K informalmente accettati\nMANCANO QUINDI 4K DI MOL CHE POSSONO ARRIVARE DA:\n- circa 8k di proposte inviated, cui non abbiamo ancora risposta\n- altre entrate nell'anno, al momento non note"
         }
       ],
       "notes": "",
       "actions": [],
       "createdAt": "2026-08-28T13:55:00.841Z",
-      "updatedAt": "2026-08-28T13:58:39.917Z"
+      "updatedAt": "2026-08-28T14:01:26.474Z"
     }
   ],
-  "updatedAt": "2026-08-28T13:58:39.917Z"
+  "updatedAt": "2026-08-28T14:01:26.474Z"
 }
