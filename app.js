@@ -1756,12 +1756,12 @@ function showFiscalReminder(force){
 
     // Costruisci il contenuto del modal
     const rows = candidates.map(o=>`
-      <label class="rowline" style="display:flex;gap:8px;align-items:flex-start;cursor:pointer;">
-        <input type="checkbox" class="fiscalChk" data-id="${escapeHtml(o.id)}" checked style="margin-top:3px;flex-shrink:0;"/>
-        <span>
+      <label class="fiscalRow" style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;padding:9px 11px;border:1px solid var(--border);border-radius:8px;margin-bottom:7px;background:var(--surface);">
+        <input type="checkbox" class="fiscalChk" data-id="${escapeHtml(o.id)}" checked style="width:18px;min-width:18px;max-width:18px;height:18px;margin:2px 0 0 0;flex:0 0 auto;"/>
+        <span style="flex:1 1 auto;min-width:0;font-size:13px;">
           <b>${escapeHtml(o.lead||"(lead)")}</b> — ${escapeHtml(o.name||"(opportunità)")}
           <span class="oppid-badge">${escapeHtml(o.oppId||"")}</span>
-          <div class="muted">Stato: ${escapeHtml(o.status)} • Valore previsto: € ${toNum(o.valueExpected).toFixed(2)}</div>
+          <div class="muted" style="margin-top:2px;">Stato: ${escapeHtml(o.status)} • Valore previsto: € ${toNum(o.valueExpected).toFixed(2)}</div>
         </span>
       </label>`).join("");
 
@@ -1770,13 +1770,13 @@ function showFiscalReminder(force){
         Ci sono <b>${candidates.length}</b> opportunità con competenza <b>${targetYear}</b> ancora aperte/sospese e senza fattura.
         Probabilmente il corso è slittato: vuoi spostare la loro competenza al <b>${targetYear+1}</b>?
       </div>
-      <div style="max-height:280px;overflow:auto;border:1px solid #e5e8f0;border-radius:8px;padding:8px;margin-bottom:12px;">
+      <div style="max-height:280px;overflow-y:auto;overflow-x:hidden;border:1px solid var(--border);border-radius:8px;padding:8px;margin-bottom:12px;">
         ${rows}
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;">
-        <button id="fiscalMoveAll" type="button" class="primary">📅 Sposta TUTTE al ${targetYear+1}</button>
-        <button id="fiscalMoveSel" type="button">Sposta solo le selezionate</button>
-        <button id="fiscalIgnoreMonth" type="button">Ignora per questo mese</button>
+        <button id="fiscalMoveAll" type="button" class="primary" style="width:auto;">📅 Sposta TUTTE al ${targetYear+1}</button>
+        <button id="fiscalMoveSel" type="button" style="width:auto;">Sposta solo le selezionate</button>
+        <button id="fiscalIgnoreMonth" type="button" style="width:auto;">Ignora per questo mese</button>
       </div>
       <div style="margin-top:8px;font-size:11.5px;color:#888;">
         Suggerimento: togli la spunta a un'opportunità e usa "Sposta solo le selezionate"
