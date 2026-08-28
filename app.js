@@ -996,14 +996,42 @@ function totalPlanned(o){ return (o.invoices||[]).filter(x=>x.status==="pianific
 
 function renderCalcBox(o){
   const issued = totalIssued(o), planned = totalPlanned(o), cost = toNum(o.serviceCost);
-  const mol = issued - cost, molPct = issued > 0 ? (mol/issued)*100 : 0;
+  const expected = toNum(o.valueExpected);
+
+  // Base di calcolo del MOL, a cascata:
+  //   1) fatturato EMESSO se presente  → MOL effettivo
+  //   2) altrimenti PIANIFICATO se presente → MOL previsto (su pianificato)
+  //   3) altrimenti "Valore previsto €" → MOL stimato
+  let base, baseLabel, molKind;
+  if(issued > 0){       base = issued;   baseLabel = "fatturato emesso"; molKind = "effettivo"; }
+  else if(planned > 0){ base = planned;  baseLabel = "fatture pianificate"; molKind = "previsto"; }
+  else {                base = expected; baseLabel = "valore previsto"; molKind = "stimato"; }
+
+  const mol = base - cost;
+  const molPct = base > 0 ? (mol/base)*100 : 0;
+
+  // Rilevamento discrepanza: se c'è una fattura (emessa o pianificata) il cui
+  // totale differisce dal "Valore previsto", segnalo la cosa.
+  const invoiceBase = issued > 0 ? issued : planned; // il totale fatture rilevante
+  const hasInvoice = (issued > 0 || planned > 0);
+  const discrepancy = hasInvoice && expected > 0 && Math.abs(invoiceBase - expected) > 0.005;
+
   ui.calcBox.innerHTML =
     `<div><b>Fatturata (emessa)?</b> ${issued>0?"SÌ":"NO"}</div>` +
     `<div><b>Fatturato emesso</b>: € ${issued.toFixed(2)}</div>` +
     `<div><b>Fatture pianificate</b>: € ${planned.toFixed(2)}</div>` +
+    `<div><b>Valore previsto</b>: € ${expected.toFixed(2)}</div>` +
     `<div><b>Costo servizio</b>: € ${cost.toFixed(2)}</div>` +
-    `<div><b>MOL (su emesso)</b>: € ${mol.toFixed(2)}</div>` +
-    `<div><b>% MOL su emesso</b>: ${molPct.toFixed(1)}%</div>`;
+    `<div style="margin-top:6px;padding-top:6px;border-top:1px solid #e5e8f0;">` +
+      `<b>MOL (${molKind})</b>: € ${mol.toFixed(2)} — ${molPct.toFixed(1)}%` +
+      `<div class="muted" style="font-size:11px;margin-top:2px;">Calcolato su ${baseLabel}: € ${base.toFixed(2)}</div>` +
+    `</div>` +
+    (discrepancy
+      ? `<div style="margin-top:8px;padding:8px 10px;background:#fff4ec;border:1px solid #f0c89a;border-radius:8px;color:#c75a00;font-size:12px;">` +
+        `⚠ <b>Discrepanza importi</b>: il totale ${issued>0?"emesso":"pianificato"} (€ ${invoiceBase.toFixed(2)}) è diverso dal Valore previsto (€ ${expected.toFixed(2)}). ` +
+        `Differenza: € ${(invoiceBase-expected).toFixed(2)}. Verifica e allinea i due valori.` +
+        `</div>`
+      : "");
 }
 
 function invoiceSortKey(inv){ return (inv.status==="pianificata" ? inv.plannedDate : inv.date) || inv.createdAt || ""; }
@@ -1121,6 +1149,23 @@ function addInvoice(){
   renderAll();
   const fresh = db.opportunities.find(x => x.id === currentOppId);
   if(fresh) renderCalcBox(normalizeOpp(fresh));
+
+  // Alert discrepanza: se il totale fatture (emesso o, in mancanza, pianificato)
+  // differisce dal "Valore previsto", segnalalo così l'utente può allineare i valori.
+  if(fresh){
+    const iss = totalIssued(fresh), pln = totalPlanned(fresh), exp = toNum(fresh.valueExpected);
+    const invBase = iss > 0 ? iss : pln;
+    if(exp > 0 && (iss > 0 || pln > 0) && Math.abs(invBase - exp) > 0.005){
+      const diff = invBase - exp;
+      alert(
+        `⚠ Discrepanza importi\n\n` +
+        `Totale ${iss>0?"emesso":"pianificato"}: € ${invBase.toFixed(2)}\n` +
+        `Valore previsto: € ${exp.toFixed(2)}\n` +
+        `Differenza: € ${diff.toFixed(2)}\n\n` +
+        `Verifica e allinea il "Valore previsto €" all'importo della fattura, oppure correggi la fattura.`
+      );
+    }
+  }
 }
 
 function deleteInvoice(invId){
@@ -1536,11 +1581,16 @@ function downloadText(filename, text, mime="text/plain"){
 
 function exportCsv(){
   const ops = db.opportunities.map(normalizeOpp);
-  const oppHeader = ["OppID","Lead","DataCreazione","NomeOpportunita","Stato","Fase","Prodotto","ValorePrevisto","Probabilita","ProssimaAzione","DataProssimaAzione","CostoErogazione","EmessoTotale","PianificatoTotale","MOL_su_emesso","MOL_percento_su_emesso"].join(";");
+  const oppHeader = ["OppID","Lead","DataCreazione","NomeOpportunita","Stato","Fase","Prodotto","ValorePrevisto","Probabilita","ProssimaAzione","DataProssimaAzione","CostoErogazione","EmessoTotale","PianificatoTotale","BaseMOL","MOL","MOL_percento"].join(";");
   const oppRows = ops.map(o=>{
-    const issued=totalIssued(o), planned=totalPlanned(o), cost=toNum(o.serviceCost);
-    const mol=issued-cost, molPct=issued>0?(mol/issued)*100:0;
-    return [o.oppId||o.id,o.lead,o.createdAt,o.name,o.status,o.phase,o.product,o.valueExpected,o.probability,o.nextAction,o.nextActionDate,cost.toFixed(2),issued.toFixed(2),planned.toFixed(2),mol.toFixed(2),molPct.toFixed(1)].map(csvEscape).join(";");
+    const issued=totalIssued(o), planned=totalPlanned(o), cost=toNum(o.serviceCost), expected=toNum(o.valueExpected);
+    // Stessa cascata usata a schermo: emesso → pianificato → valore previsto
+    let base, baseLabel;
+    if(issued>0){ base=issued; baseLabel="emesso"; }
+    else if(planned>0){ base=planned; baseLabel="pianificato"; }
+    else { base=expected; baseLabel="valore previsto"; }
+    const mol=base-cost, molPct=base>0?(mol/base)*100:0;
+    return [o.oppId||o.id,o.lead,o.createdAt,o.name,o.status,o.phase,o.product,o.valueExpected,o.probability,o.nextAction,o.nextActionDate,cost.toFixed(2),issued.toFixed(2),planned.toFixed(2),baseLabel,mol.toFixed(2),molPct.toFixed(1)].map(csvEscape).join(";");
   });
   downloadText(`salesvault_opportunita_${todayStr()}.csv`, [oppHeader,...oppRows].join("\n"), "text/csv;charset=utf-8");
 
