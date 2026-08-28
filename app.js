@@ -194,7 +194,7 @@ function defaultDb(){
     opportunities: [],
     leads: [],
     salespeople: ["Renato", "Clizia", "Jelena"],
-    meta: { lastBackupExportedAt: "" },
+    meta: { lastBackupExportedAt: "", fiscalYearMigrated2026: false, fiscalReminderLastShown: "", fiscalReminderIgnored: {} },
   };
 }
 
@@ -215,6 +215,13 @@ function yearCode(dateStr){
 /** Costruisce oppId leggibile dal codice anno e numero progressivo */
 function buildOppId(yy, seq){ return `OPP-${yy}-${pad3(seq)}`; }
 
+/** Anno di competenza EFFETTIVO di un'opportunità (4 cifre):
+ *  usa fiscalYear se impostato, altrimenti l'anno di creazione. */
+function fiscalYearOf(o){
+  if(o && o.fiscalYear && /^\d{4}$/.test(String(o.fiscalYear))) return String(o.fiscalYear);
+  return (o && o.createdAt ? String(o.createdAt).slice(0,4) : String(new Date().getFullYear()));
+}
+
 /**
  * Migrazione automatica + riassegnazione progressivi.
  * - Ordina le opportunità per createdAt (poi createdAtTs come spareggio)
@@ -232,6 +239,21 @@ function migrateDb(d){
   if(!d.meta || typeof d.meta !== "object") d.meta = defaultDb().meta;
   if(typeof d.meta.lastBackupExportedAt !== "string") d.meta.lastBackupExportedAt = "";
   d.version = DB_VERSION;
+
+  // ── Migrazione una-tantum: anno di competenza sulle opportunità 2026 ──
+  // Le opportunità già esistenti create nel 2026 e senza "anno competenza"
+  // esplicito vengono marcate come competenza "2026" (una volta sola).
+  // Serve a distinguere "confermato 2026" da "mai impostato" per il reminder
+  // di fine anno.
+  if(!d.meta.fiscalYearMigrated2026){
+    (d.opportunities||[]).forEach(o=>{
+      const created = (o.createdAt||"").slice(0,4);
+      if(created === "2026" && (!o.fiscalYear || !/^\d{4}$/.test(String(o.fiscalYear)))){
+        o.fiscalYear = "2026";
+      }
+    });
+    d.meta.fiscalYearMigrated2026 = true;
+  }
 
   // Normalizza nextOppSeqByYear (può arrivare come nextOppSeq numerico da versioni vecchie)
   if(!d.nextOppSeqByYear || typeof d.nextOppSeqByYear !== "object" || Array.isArray(d.nextOppSeqByYear)){
@@ -334,6 +356,9 @@ function normalizeOpp(o){
     nextActionDate: o.nextActionDate || "",
     notes:          o.notes || "",
     serviceCost:    toNum(o.serviceCost),
+    // Anno di competenza della fattura (es. corso 2027 inserito nel 2026).
+    // Se vuoto, si assume l'anno di creazione dell'opportunità.
+    fiscalYear:     (o.fiscalYear && /^\d{4}$/.test(String(o.fiscalYear))) ? String(o.fiscalYear) : "",
     invoices:       inv.map(normalizeInvoice),
     createdAtTs:    o.createdAtTs || nowIso(),
     updatedAt:      o.updatedAt || nowIso(),
@@ -601,6 +626,8 @@ const ui = {
   manageOwnersBtn:  document.getElementById("manageOwnersBtn"),
   dueFilter:        document.getElementById("dueFilter"),
   yearFilter:       document.getElementById("yearFilter"),
+  fiscalYearFilter: document.getElementById("fiscalYearFilter"),
+  oppFiscalYear:    document.getElementById("oppFiscalYear"),
   invPlannedFilter: document.getElementById("invPlannedFilter"),
   invIssuedFilter:  document.getElementById("invIssuedFilter"),
 
@@ -676,6 +703,7 @@ function getFormState(){
     product:        ui.product?.value||"",
     probability:    ui.probability?.value||"",
     valueExpected:  ui.valueExpected?.value||"",
+    fiscalYear:     ui.oppFiscalYear?.value||"",
     serviceCost:    ui.serviceCost?.value||"",
     nextAction:     ui.nextAction?.value||"",
     nextActionDate: ui.nextActionDate?.value||"",
@@ -887,6 +915,47 @@ function refreshYearFilter(){
   // ripristina selezione precedente se ancora valida
   if(years.includes(current)) ui.yearFilter.value = current;
 }
+
+/** Elenco anni da mostrare nei menu competenza: da 2025 all'anno corrente+2,
+ *  più eventuali anni già presenti nei dati (creazione o competenza). */
+function relevantYears(){
+  const set = new Set();
+  const nowY = new Date().getFullYear();
+  for(let y = 2025; y <= nowY + 2; y++) set.add(String(y));
+  (db.opportunities||[]).forEach(o=>{
+    const cy = (o.createdAt||"").slice(0,4); if(/^\d{4}$/.test(cy)) set.add(cy);
+    if(o.fiscalYear && /^\d{4}$/.test(String(o.fiscalYear))) set.add(String(o.fiscalYear));
+  });
+  return [...set].sort((a,b)=>b.localeCompare(a)); // più recente prima
+}
+
+/** Popola il filtro "Anno competenza fattura". */
+function refreshFiscalYearFilter(){
+  if(!ui.fiscalYearFilter) return;
+  const current = ui.fiscalYearFilter.value;
+  const years = relevantYears();
+  ui.fiscalYearFilter.innerHTML = `<option value="all">(tutti gli anni)</option>`;
+  for(const y of years){
+    const opt = document.createElement("option");
+    opt.value = y; opt.textContent = y;
+    ui.fiscalYearFilter.appendChild(opt);
+  }
+  if(current && (years.includes(current) || current === "all")) ui.fiscalYearFilter.value = current;
+}
+
+/** Popola il menu "Anno competenza fattura" nel form opportunità. */
+function refreshOppFiscalYearSelect(){
+  if(!ui.oppFiscalYear) return;
+  const current = ui.oppFiscalYear.value;
+  const years = relevantYears();
+  ui.oppFiscalYear.innerHTML = `<option value="">(anno di creazione)</option>`;
+  for(const y of years){
+    const opt = document.createElement("option");
+    opt.value = y; opt.textContent = y;
+    ui.oppFiscalYear.appendChild(opt);
+  }
+  if(current) ui.oppFiscalYear.value = current;
+}
 // ═══════════════════════════════════════════════════════════════
 
 function oppToForm(o){
@@ -902,6 +971,8 @@ function oppToForm(o){
   ui.oppPhase.value       = o.phase;
   ui.product.value        = o.product;
   ui.valueExpected.value  = o.valueExpected || "";
+  refreshOppFiscalYearSelect();
+  if(ui.oppFiscalYear) ui.oppFiscalYear.value = o.fiscalYear || "";
   ui.probability.value    = o.probability;
   ui.nextAction.value     = o.nextAction;
   ui.nextActionDate.value = o.nextActionDate || "";
@@ -943,6 +1014,7 @@ function formToOpp(){
     phase:          ui.oppPhase.value,
     product:        ui.product.value,
     valueExpected:  ui.valueExpected.value,
+    fiscalYear:     ui.oppFiscalYear?.value||"",
     probability:    ui.probability.value,
     nextAction:     ui.nextAction.value.trim(),
     nextActionDate: ui.nextActionDate.value,
@@ -973,6 +1045,8 @@ function newOpp(){
   ui.oppPhase.value     = "contatto iniziale";
   ui.product.value      = "da definire";
   ui.probability.value  = "50%";
+  refreshOppFiscalYearSelect();
+  if(ui.oppFiscalYear) ui.oppFiscalYear.value = "";
   ui.deleteBtn.disabled = true;
   if(ui.archivedBanner) ui.archivedBanner.style.display = "none";
   if(ui.archiveBtn)     ui.archiveBtn.style.display = "";
@@ -1350,6 +1424,7 @@ function matchesFilters(o){
   const prf = ui.productFilter.value;
   const of  = ui.ownerFilter?.value||"";
   const yf  = ui.yearFilter?.value||"all";
+  const fyf = ui.fiscalYearFilter?.value||"all";
   const af  = ui.archiveFilter?.value||"active";
 
   // Filtro archivio — default: mostra solo attive
@@ -1362,6 +1437,7 @@ function matchesFilters(o){
   if(prf && o.product !== prf) return false;
   if(of && o.owner !== of)     return false;
   if(yf !== "all" && (o.createdAt||"").slice(0,4) !== yf) return false;
+  if(fyf !== "all" && fiscalYearOf(o) !== fyf) return false;
   if(!matchesDueFilter(o))            return false;
   if(!matchesPlannedInvoiceFilter(o)) return false;
   if(!matchesIssuedInvoiceFilter(o))  return false;
@@ -1407,6 +1483,7 @@ function renderKpi(){
   // Etichetta filtri attivi
   const filterLabels = [];
   const yf  = ui.yearFilter?.value||"all";
+  const fyf = ui.fiscalYearFilter?.value||"all";
   const sf  = ui.statusFilter?.value||"";
   const of  = ui.ownerFilter?.value||"";
   const pf  = ui.phaseFilter?.value||"";
@@ -1414,7 +1491,8 @@ function renderKpi(){
   const iif = ui.invIssuedFilter?.value||"all";
   const ipf = ui.invPlannedFilter?.value||"all";
   const af  = ui.archiveFilter?.value||"active";
-  if(yf !== "all") filterLabels.push(`Anno: ${yf}`);
+  if(yf !== "all") filterLabels.push(`Anno creazione: ${yf}`);
+  if(fyf !== "all") filterLabels.push(`Anno competenza: ${fyf}`);
   if(sf)  filterLabels.push(`Stato: ${sf}`);
   if(of)  filterLabels.push(`Commerciale: ${of}`);
   if(pf)  filterLabels.push(`Fase: ${pf}`);
@@ -1521,6 +1599,7 @@ function renderOppList(){
 
 function renderAll(){
   refreshYearFilter();
+  refreshFiscalYearFilter();
   renderKpi();
   renderOppList();
   if(currentOppId){
@@ -1537,6 +1616,7 @@ function renderAll(){
  */
 function renderAllSafe(){
   refreshYearFilter();
+  refreshFiscalYearFilter();
   renderKpi();
   renderOppList();
   if(currentOppId){
@@ -1600,7 +1680,7 @@ function downloadText(filename, text, mime="text/plain"){
 
 function exportCsv(){
   const ops = db.opportunities.map(normalizeOpp);
-  const oppHeader = ["OppID","Lead","DataCreazione","NomeOpportunita","Stato","Fase","Prodotto","ValorePrevisto","Probabilita","ProssimaAzione","DataProssimaAzione","CostoErogazione","EmessoTotale","PianificatoTotale","BaseMOL","MOL","MOL_percento"].join(";");
+  const oppHeader = ["OppID","Lead","DataCreazione","AnnoCompetenza","NomeOpportunita","Stato","Fase","Prodotto","ValorePrevisto","Probabilita","ProssimaAzione","DataProssimaAzione","CostoErogazione","EmessoTotale","PianificatoTotale","BaseMOL","MOL","MOL_percento"].join(";");
   const oppRows = ops.map(o=>{
     const issued=totalIssued(o), planned=totalPlanned(o), cost=toNum(o.serviceCost), expected=toNum(o.valueExpected);
     // Stessa cascata usata a schermo: emesso → pianificato → valore previsto
@@ -1609,7 +1689,7 @@ function exportCsv(){
     else if(planned>0){ base=planned; baseLabel="pianificato"; }
     else { base=expected; baseLabel="valore previsto"; }
     const mol=base-cost, molPct=base>0?(mol/base)*100:0;
-    return [o.oppId||o.id,o.lead,o.createdAt,o.name,o.status,o.phase,o.product,o.valueExpected,o.probability,o.nextAction,o.nextActionDate,cost.toFixed(2),issued.toFixed(2),planned.toFixed(2),baseLabel,mol.toFixed(2),molPct.toFixed(1)].map(csvEscape).join(";");
+    return [o.oppId||o.id,o.lead,o.createdAt,fiscalYearOf(o),o.name,o.status,o.phase,o.product,o.valueExpected,o.probability,o.nextAction,o.nextActionDate,cost.toFixed(2),issued.toFixed(2),planned.toFixed(2),baseLabel,mol.toFixed(2),molPct.toFixed(1)].map(csvEscape).join(";");
   });
   downloadText(`salesvault_opportunita_${todayStr()}.csv`, [oppHeader,...oppRows].join("\n"), "text/csv;charset=utf-8");
 
@@ -1631,6 +1711,123 @@ function exportCsv(){
 // ═══════════════════════════════════════════════════════════════
 
 function closeModal(){ ui.modal.classList.add("hidden"); }
+
+// ═══════════════════════════════════════════════════════════════
+// REMINDER ANNO DI COMPETENZA (fine anno)
+// A ogni primo accesso del mese (da gennaio in poi) segnala le opportunità
+// dell'anno appena concluso che sono rimaste aperte/sospese, senza fattura e
+// non chiuse: probabilmente il corso è slittato e la competenza va spostata
+// all'anno successivo. Si ripete ogni anno (usa "anno corrente − 1").
+// ═══════════════════════════════════════════════════════════════
+
+// Opportunità candidate allo spostamento per un dato anno target.
+function fiscalReminderCandidates(targetYear){
+  const ignored = (db.meta && db.meta.fiscalReminderIgnored && db.meta.fiscalReminderIgnored[targetYear]) || [];
+  return db.opportunities.map(normalizeOpp).filter(o=>{
+    if(!["aperta","sospesa"].includes(o.status)) return false;   // solo aperte/sospese
+    if(fiscalYearOf(o) !== String(targetYear)) return false;      // competenza = anno target
+    if(totalIssued(o) > 0 || totalPlanned(o) > 0) return false;    // nessuna fattura
+    if(ignored.includes(o.id)) return false;                      // ignorata per quest'anno
+    return true;
+  });
+}
+
+// Chiave "anno-mese" corrente, es. "2027-01"
+function currentYearMonth(){
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+}
+
+function showFiscalReminder(force){
+  try{
+    const now = new Date();
+    const targetYear = now.getFullYear() - 1; // anno appena concluso
+    // Solo da gennaio in poi (il mese 0 = gennaio è già >= 0, quindi sempre valido
+    // nell'anno solare successivo). Non mostrare a dicembre dell'anno target.
+    const candidates = fiscalReminderCandidates(targetYear);
+    if(candidates.length === 0) return;
+
+    // Cadenza mensile: se già mostrato questo mese e non è forzato, esci.
+    const ym = currentYearMonth();
+    if(!force){
+      const lastShown = db.meta?.fiscalReminderLastShown || "";
+      if(lastShown === ym) return;
+    }
+
+    // Costruisci il contenuto del modal
+    const rows = candidates.map(o=>`
+      <label class="rowline" style="display:flex;gap:8px;align-items:flex-start;cursor:pointer;">
+        <input type="checkbox" class="fiscalChk" data-id="${escapeHtml(o.id)}" checked style="margin-top:3px;flex-shrink:0;"/>
+        <span>
+          <b>${escapeHtml(o.lead||"(lead)")}</b> — ${escapeHtml(o.name||"(opportunità)")}
+          <span class="oppid-badge">${escapeHtml(o.oppId||"")}</span>
+          <div class="muted">Stato: ${escapeHtml(o.status)} • Valore previsto: € ${toNum(o.valueExpected).toFixed(2)}</div>
+        </span>
+      </label>`).join("");
+
+    const html = `
+      <div style="margin-bottom:10px;font-size:13px;">
+        Ci sono <b>${candidates.length}</b> opportunità con competenza <b>${targetYear}</b> ancora aperte/sospese e senza fattura.
+        Probabilmente il corso è slittato: vuoi spostare la loro competenza al <b>${targetYear+1}</b>?
+      </div>
+      <div style="max-height:280px;overflow:auto;border:1px solid #e5e8f0;border-radius:8px;padding:8px;margin-bottom:12px;">
+        ${rows}
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <button id="fiscalMoveAll" type="button" class="primary">📅 Sposta TUTTE al ${targetYear+1}</button>
+        <button id="fiscalMoveSel" type="button">Sposta solo le selezionate</button>
+        <button id="fiscalIgnoreMonth" type="button">Ignora per questo mese</button>
+      </div>
+      <div style="margin-top:8px;font-size:11.5px;color:#888;">
+        Suggerimento: togli la spunta a un'opportunità e usa "Sposta solo le selezionate"
+        per lasciarne alcune al ${targetYear}. Il promemoria tornerà il mese prossimo per quelle rimaste.
+      </div>`;
+
+    if(ui.modalTitle) ui.modalTitle.textContent = `Competenza ${targetYear} — opportunità da rivedere`;
+    ui.modalBody.innerHTML = html;
+    ui.modal.classList.remove("hidden");
+
+    // Registra che è stato mostrato questo mese
+    if(!db.meta) db.meta = {};
+    db.meta.fiscalReminderLastShown = ym;
+    saveDbLocal();
+
+    // Sposta un insieme di id al targetYear+1
+    const moveIds = (ids) => {
+      const set = new Set(ids);
+      let moved = 0;
+      db.opportunities.forEach(o=>{
+        if(set.has(o.id)){ o.fiscalYear = String(targetYear+1); o.updatedAt = nowIso(); moved++; }
+      });
+      if(moved>0){ saveDb(); renderAll(); }
+      closeModal();
+      if(moved>0) alert(`${moved} opportunità spostate alla competenza ${targetYear+1}.`);
+    };
+
+    const btnAll = document.getElementById("fiscalMoveAll");
+    if(btnAll) btnAll.onclick = () => moveIds(candidates.map(o=>o.id));
+
+    const btnSel = document.getElementById("fiscalMoveSel");
+    if(btnSel) btnSel.onclick = () => {
+      const ids = Array.from(document.querySelectorAll(".fiscalChk:checked")).map(c=>c.dataset.id);
+      if(ids.length === 0){ alert("Non hai selezionato nessuna opportunità."); return; }
+      // Le NON selezionate restano; per non riproporle subito, le ignoro per quest'anno
+      const selected = new Set(ids);
+      const notSelected = candidates.filter(o=>!selected.has(o.id)).map(o=>o.id);
+      if(notSelected.length > 0){
+        if(!db.meta.fiscalReminderIgnored) db.meta.fiscalReminderIgnored = {};
+        const arr = db.meta.fiscalReminderIgnored[targetYear] || [];
+        db.meta.fiscalReminderIgnored[targetYear] = [...new Set([...arr, ...notSelected])];
+        saveDbLocal();
+      }
+      moveIds(ids);
+    };
+
+    const btnIgn = document.getElementById("fiscalIgnoreMonth");
+    if(btnIgn) btnIgn.onclick = () => { closeModal(); }; // lastShown è già impostato: torna il mese prossimo
+
+  } catch(e){ console.warn("showFiscalReminder:", e); }
+}
 
 function showModalOverdue(){
   try{
@@ -1792,6 +1989,7 @@ ui.productFilter.addEventListener("change", renderAll);
 ui.ownerFilter?.addEventListener("change", renderAll);
 ui.archiveFilter?.addEventListener("change", renderAll);
 ui.yearFilter?.addEventListener("change", renderAll);
+ui.fiscalYearFilter?.addEventListener("change", renderAll);
 ui.dueFilter.addEventListener("change", renderAll);
 ui.invPlannedFilter.addEventListener("change", renderAll);
 ui.invIssuedFilter?.addEventListener("change", renderAll);
@@ -1861,6 +2059,28 @@ window.addEventListener("beforeunload", (e) => {
 
 initSelects();
 refreshLeadDatalist();
+
+// DEFAULT ALL'AVVIO: attivo solo il filtro "Anno competenza fattura" sull'anno
+// corrente; tutti gli altri filtri partono neutri. Popolo prima i menu anni.
+refreshFiscalYearFilter();
+(function setStartupDefaults(){
+  const cy = String(new Date().getFullYear());
+  if(ui.fiscalYearFilter){
+    // se l'anno corrente è tra le opzioni lo seleziono, altrimenti "all"
+    const hasCy = Array.from(ui.fiscalYearFilter.options).some(o=>o.value===cy);
+    ui.fiscalYearFilter.value = hasCy ? cy : "all";
+  }
+  if(ui.yearFilter)        ui.yearFilter.value = "all";
+  if(ui.statusFilter)      ui.statusFilter.value = "";
+  if(ui.phaseFilter)       ui.phaseFilter.value = "";
+  if(ui.productFilter)     ui.productFilter.value = "";
+  if(ui.ownerFilter)       ui.ownerFilter.value = "";
+  if(ui.dueFilter)         ui.dueFilter.value = "all";
+  if(ui.invPlannedFilter)  ui.invPlannedFilter.value = "all";
+  if(ui.invIssuedFilter)   ui.invIssuedFilter.value = "all";
+  if(ui.archiveFilter)     ui.archiveFilter.value = "active";
+})();
+
 renderAll();
 newOpp();
 
@@ -1875,6 +2095,11 @@ if(GH.isConfigured()){
 // Promemoria azioni scadute: all'avvio + ogni 15 minuti
 setTimeout(showModalOverdue, 1000);
 setInterval(showModalOverdue, 15 * 60 * 1000);
+
+// Promemoria competenza fine anno: all'avvio (dopo l'eventuale sync).
+// Compare una volta al mese, da gennaio in poi, finché non sistemate/ignorate.
+// Ritardo maggiore così non si sovrappone al promemoria azioni scadute.
+setTimeout(() => { try { showFiscalReminder(false); } catch(e){} }, 2500);
 
 // ═══════════════════════════════════════════════════════════════
 // REPORT MENSILE
