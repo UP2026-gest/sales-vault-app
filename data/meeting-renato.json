@@ -597,7 +597,32 @@
       "actions": [],
       "createdAt": "2026-08-27T14:55:42.956Z",
       "updatedAt": "2026-08-27T15:00:22.085Z"
+    },
+    {
+      "id": "mtd0k7e1gr8e2e",
+      "code": "26-012",
+      "title": "situazione del fatturato e bilancio al 31/08/2026 - giorni e orari fittizi",
+      "date": "2026-08-31",
+      "timeStart": "16:00",
+      "timeEnd": "17:00",
+      "client": "",
+      "topics": [
+        "gestionale"
+      ],
+      "participants": [
+        "Stefania"
+      ],
+      "agenda": [
+        {
+          "text": "situazione bilancio e previsione",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-08-28T13:55:00.841Z",
+      "updatedAt": "2026-08-28T13:55:00.841Z"
     }
   ],
-  "updatedAt": "2026-08-27T15:00:22.085Z"
+  "updatedAt": "2026-08-28T13:55:00.841Z"
 }
