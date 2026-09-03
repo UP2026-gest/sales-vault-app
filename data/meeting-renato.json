@@ -673,8 +673,8 @@
     {
       "id": "mtlpg4vysvuuyo",
       "code": "26-014",
-      "title": "(Copia) Meeting UP MSF Piazza",
-      "date": "2026-09-03",
+      "title": "Meeting UP MSF Piazza",
+      "date": "2026-09-04",
       "timeStart": "12:00",
       "timeEnd": "12:30",
       "client": "",
@@ -687,27 +687,27 @@
       ],
       "agenda": [
         {
-          "text": "landing page vietnamiti, attesa approvazione",
-          "notes": "ha girato il testo un paio di giorni fa, restiamo in attesa. PARTIAMO COMUNQUE CON L'INGLESE, POI INSERIREMO IL VIETNAMITA"
-        },
-        {
-          "text": "network docenti UP, 15 luglio limite",
-          "notes": "GLI AVVOCATI DOVREBBERO AVER CONFERMATO MA SIAMO IN ATTESA DI EMAIL"
-        },
-        {
-          "text": "Globalan, coaching piÃ¹ italiano e tedesco",
+          "text": "accordo fit factory + proposta Regesta",
           "notes": ""
         },
         {
-          "text": "Globalan, incontro del 30/06 con Linda e Barbara, molto bene, ci risentiamo quando hanno la prima richiesta",
+          "text": "il 8/10 parteciperò a evento networking tem plus",
+          "notes": ""
+        },
+        {
+          "text": "erroi + nicolis",
+          "notes": ""
+        },
+        {
+          "text": "aggiornamento situazione fatturato/margine",
           "notes": ""
         }
       ],
       "notes": "",
       "actions": [],
       "createdAt": "2026-09-03T15:53:50.782Z",
-      "updatedAt": "2026-09-03T15:53:50.782Z"
+      "updatedAt": "2026-09-03T15:55:07.775Z"
     }
   ],
-  "updatedAt": "2026-09-03T15:53:50.782Z"
+  "updatedAt": "2026-09-03T15:55:07.775Z"
 }
