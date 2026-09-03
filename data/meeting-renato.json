@@ -666,13 +666,13 @@
         },
         {
           "text": "fatture in cloud, ho bisogno che tutte le spese abbiano una categoria",
-          "notes": ""
+          "notes": "mi serve per calcolare le voci di spesa"
         }
       ],
       "notes": "",
       "actions": [],
       "createdAt": "2026-09-03T15:47:12.533Z",
-      "updatedAt": "2026-09-03T15:56:58.983Z"
+      "updatedAt": "2026-09-03T15:57:10.779Z"
     },
     {
       "id": "mtlpg4vysvuuyo",
@@ -713,5 +713,5 @@
       "updatedAt": "2026-09-03T15:55:07.775Z"
     }
   ],
-  "updatedAt": "2026-09-03T15:56:58.983Z"
+  "updatedAt": "2026-09-03T15:57:10.779Z"
 }
