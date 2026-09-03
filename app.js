@@ -27,6 +27,19 @@ function todayStr(){
 }
 function uid(){ return `${Date.now()}_${Math.random().toString(16).slice(2)}`; }
 function toNum(v){ const n = Number(v); return Number.isFinite(n) ? n : 0; }
+
+// Formatta un numero come importo in euro con separatore migliaia (punto) e
+// decimali (virgola), in modo deterministico. Es. 9375 → "9.375,00".
+// Non usa toLocaleString perché in alcuni ambienti non raggruppa le migliaia
+// per i numeri sotto le 5 cifre, generando output incoerenti.
+function eur(v){
+  const num = toNum(v);
+  const neg = num < 0;
+  const fixed = Math.abs(num).toFixed(2);
+  const [intPart, decPart] = fixed.split(".");
+  const withSep = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return `${neg ? "-" : ""}${withSep},${decPart}`;
+}
 function escapeHtml(s){
   return String(s ?? "")
     .replaceAll("&","&amp;").replaceAll("<","&lt;")
@@ -1146,18 +1159,18 @@ function renderCalcBox(o){
 
   ui.calcBox.innerHTML =
     `<div><b>Fatturata (emessa)?</b> ${issued>0?"SÌ":"NO"}</div>` +
-    `<div><b>Fatturato emesso</b>: € ${issued.toFixed(2)}</div>` +
-    `<div><b>Fatture pianificate</b>: € ${planned.toFixed(2)}</div>` +
-    `<div><b>Valore previsto</b>: € ${expected.toFixed(2)}</div>` +
-    `<div><b>Costo servizio</b>: € ${cost.toFixed(2)}</div>` +
+    `<div><b>Fatturato emesso</b>: € ${eur(issued)}</div>` +
+    `<div><b>Fatture pianificate</b>: € ${eur(planned)}</div>` +
+    `<div><b>Valore previsto</b>: € ${eur(expected)}</div>` +
+    `<div><b>Costo servizio</b>: € ${eur(cost)}</div>` +
     `<div style="margin-top:6px;padding-top:6px;border-top:1px solid #e5e8f0;">` +
-      `<b>MOL (${molKind})</b>: € ${mol.toFixed(2)} — ${molPct.toFixed(1)}%` +
-      `<div class="muted" style="font-size:11px;margin-top:2px;">Calcolato su ${baseLabel}: € ${base.toFixed(2)}</div>` +
+      `<b>MOL (${molKind})</b>: € ${eur(mol)} — ${molPct.toFixed(1)}%` +
+      `<div class="muted" style="font-size:11px;margin-top:2px;">Calcolato su ${baseLabel}: € ${eur(base)}</div>` +
     `</div>` +
     (discrepancy
       ? `<div style="margin-top:8px;padding:8px 10px;background:#fff4ec;border:1px solid #f0c89a;border-radius:8px;color:#c75a00;font-size:12px;">` +
-        `⚠ <b>Discrepanza importi</b>: il totale ${issued>0?"emesso":"pianificato"} (€ ${invoiceBase.toFixed(2)}) è diverso dal Valore previsto (€ ${expected.toFixed(2)}). ` +
-        `Differenza: € ${(invoiceBase-expected).toFixed(2)}. Verifica e allinea i due valori.` +
+        `⚠ <b>Discrepanza importi</b>: il totale ${issued>0?"emesso":"pianificato"} (€ ${eur(invoiceBase)}) è diverso dal Valore previsto (€ ${eur(expected)}). ` +
+        `Differenza: € ${eur(invoiceBase-expected)}. Verifica e allinea i due valori.` +
         `</div>`
       : "");
 }
@@ -1287,9 +1300,9 @@ function addInvoice(){
       const diff = invBase - exp;
       alert(
         `⚠ Discrepanza importi\n\n` +
-        `Totale ${iss>0?"emesso":"pianificato"}: € ${invBase.toFixed(2)}\n` +
-        `Valore previsto: € ${exp.toFixed(2)}\n` +
-        `Differenza: € ${diff.toFixed(2)}\n\n` +
+        `Totale ${iss>0?"emesso":"pianificato"}: € ${eur(invBase)}\n` +
+        `Valore previsto: € ${eur(exp)}\n` +
+        `Differenza: € ${eur(diff)}\n\n` +
         `Verifica e allinea il "Valore previsto €" all'importo della fattura, oppure correggi la fattura.`
       );
     }
@@ -1531,15 +1544,25 @@ function renderOwnerStats(all){
     const pipeW= mine.filter(o=>["aperta","sospesa"].includes(o.status)).reduce((s,o)=>s+toNum(o.valueExpected)*(toNum(String(o.probability||"0").replace("%",""))/100),0);
     const issued  = mine.reduce((s,o)=>s+totalIssued(o),0);
     const planned = mine.reduce((s,o)=>s+totalPlanned(o),0);
-    return { owner, open, susp, won, lost, pipe, pipeW, issued, planned };
+    // Valore base MOL per commerciale (stessa cascata del totale): così la
+    // somma della colonna quadra col "Valore totale (base MOL)" del riepilogo.
+    const molBase = mine.reduce((s,o)=>s+molBaseFor(o).base,0);
+    return { owner, open, susp, won, lost, pipe, pipeW, issued, planned, molBase };
   });
+  // Riga totale
+  const T = rows.reduce((t,r)=>({
+    open:t.open+r.open, susp:t.susp+r.susp, won:t.won+r.won, lost:t.lost+r.lost,
+    pipe:t.pipe+r.pipe, pipeW:t.pipeW+r.pipeW, issued:t.issued+r.issued,
+    planned:t.planned+r.planned, molBase:t.molBase+r.molBase
+  }), {open:0,susp:0,won:0,lost:0,pipe:0,pipeW:0,issued:0,planned:0,molBase:0});
   return `<div style="margin-top:10px;"><b>Statistiche per commerciale</b></div>
     <div style="overflow:auto; margin-top:6px;">
     <table class="miniTable"><thead><tr>
       <th>Commerciale</th><th>Aperte</th><th>Sospese</th><th>Vinte</th><th>Perse</th>
-      <th>Pipe €</th><th>Pipe pond. €</th><th>Emesso €</th><th>Pianificato €</th>
+      <th>Pipe €</th><th>Pipe pond. €</th><th>Emesso €</th><th>Pianificato €</th><th>Valore base MOL €</th>
     </tr></thead><tbody>
-    ${rows.map(r=>`<tr><td>${escapeHtml(r.owner)}</td><td>${r.open}</td><td>${r.susp}</td><td>${r.won}</td><td>${r.lost}</td><td>€ ${r.pipe.toFixed(2)}</td><td>€ ${r.pipeW.toFixed(2)}</td><td>€ ${r.issued.toFixed(2)}</td><td>€ ${r.planned.toFixed(2)}</td></tr>`).join("")}
+    ${rows.map(r=>`<tr><td>${escapeHtml(r.owner)}</td><td>${r.open}</td><td>${r.susp}</td><td>${r.won}</td><td>${r.lost}</td><td>€ ${eur(r.pipe)}</td><td>€ ${eur(r.pipeW)}</td><td>€ ${eur(r.issued)}</td><td>€ ${eur(r.planned)}</td><td>€ ${eur(r.molBase)}</td></tr>`).join("")}
+    <tr style="font-weight:700;border-top:2px solid #c8cfe0;"><td>Totale</td><td>${T.open}</td><td>${T.susp}</td><td>${T.won}</td><td>${T.lost}</td><td>€ ${eur(T.pipe)}</td><td>€ ${eur(T.pipeW)}</td><td>€ ${eur(T.issued)}</td><td>€ ${eur(T.planned)}</td><td>€ ${eur(T.molBase)}</td></tr>
     </tbody></table></div>`;
 }
 
@@ -1598,16 +1621,16 @@ function renderKpi(){
     filterNote +
     `<div><b>Opportunità aperte</b>: ${open} • <b>Sospese</b>: ${susp}</div>` +
     `<div><b>Azioni commerciali scadute</b>: ${overdue}</div>` +
-    `<div><b>Pipeline (valore previsto)</b>: € ${totalPipe.toFixed(2)}</div>` +
-    `<div><b>Pipeline ponderato</b>: € ${weightedPipe.toFixed(2)}</div>` +
-    `<div><b>Chiuse vinte non fatturate</b>: ${wonNotInvoiced.length} (€ ${eurNotInvoiced.toFixed(2)})</div>` +
-    `<div><b>Chiuse vinte fatturate</b>: ${wonInvoiced.length} (€ ${eurInvoiced.toFixed(2)})</div>` +
-    `<div><b>€ totale chiuse vinte</b>: € ${eurTotal.toFixed(2)}</div>` +
+    `<div><b>Pipeline (valore previsto)</b>: € ${eur(totalPipe)}</div>` +
+    `<div><b>Pipeline ponderato</b>: € ${eur(weightedPipe)}</div>` +
+    `<div><b>Chiuse vinte non fatturate</b>: ${wonNotInvoiced.length} (€ ${eur(eurNotInvoiced)})</div>` +
+    `<div><b>Chiuse vinte fatturate</b>: ${wonInvoiced.length} (€ ${eur(eurInvoiced)})</div>` +
+    `<div><b>€ totale chiuse vinte</b>: € ${eur(eurTotal)}</div>` +
     `<div style="margin-top:6px;padding-top:6px;border-top:1px solid #e5e8f0;">` +
-      `<b>Valore totale (base MOL)</b>: € ${molBaseTotal.toFixed(2)}` +
+      `<b>Valore totale (base MOL)</b>: € ${eur(molBaseTotal)}` +
     `</div>` +
-    `<div><b>Costo erogazione totale</b>: € ${molCostTotal.toFixed(2)}</div>` +
-    `<div><b>MOL (opportunità filtrate)</b>: € ${molWon.toFixed(2)} — ${molPct.toFixed(1)}%</div>` +
+    `<div><b>Costo erogazione totale</b>: € ${eur(molCostTotal)}</div>` +
+    `<div><b>MOL (opportunità filtrate)</b>: € ${eur(molWon)} — ${molPct.toFixed(1)}%</div>` +
     `<div class="muted" style="font-size:11px;margin-top:2px;">MOL su ${all.length} opp. filtrate, base a cascata: emesso → pianificato → valore previsto</div>` +
     renderOwnerStats(all);
 }
@@ -2209,7 +2232,15 @@ function generateReport() {
   // sempre-vera per non alterare la struttura interna delle sezioni.
   function inPeriod(dateStr) { return true; }
   function fmtEur(n) {
-    return n.toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
+    // Formattazione deterministica (non dipende da toLocaleString, che in
+    // alcuni ambienti non applica il separatore delle migliaia sotto le 5 cifre):
+    // separatore migliaia = punto, decimali = virgola. Es. 9375 → "9.375,00 €"
+    const num = toNum(n);
+    const neg = num < 0;
+    const fixed = Math.abs(num).toFixed(2);      // "9375.00"
+    const [intPart, decPart] = fixed.split(".");
+    const withSep = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, "."); // "9.375"
+    return `${neg ? "-" : ""}${withSep},${decPart} €`;
   }
   function fmtDate(d) {
     if (!d) return "—";
@@ -2287,8 +2318,12 @@ function generateReport() {
       aperte:        mine.filter(o => !o.archived && o.status === "aperta").length,
       pipeline:      mine.filter(o => !o.archived && o.status === "aperta").reduce((s,o) => s+o.valueExpected, 0),
       vinte:         mine.filter(o => o.status === "chiusa vinta" && inPeriod(o.updatedAt?.slice(0,10))).length,
+      valoreVinte:   mine.filter(o => o.status === "chiusa vinta" && inPeriod(o.updatedAt?.slice(0,10))).reduce((s,o)=>s+toNum(o.valueExpected),0),
       perse:         mine.filter(o => (o.status==="chiusa persa"||o.status==="abbandonata") && inPeriod(o.updatedAt?.slice(0,10))).length,
       fatturato:     mine.flatMap(o=>o.invoices).filter(i=>i.status==="emessa"&&inPeriod(i.date)).reduce((s,i)=>s+i.amount, 0),
+      // Valore base MOL per commerciale: pipeline + vinte con cascata. La somma
+      // di questa colonna quadra col "Valore totale (base MOL)" del riepilogo.
+      molBase:       mine.reduce((s,o)=>s+molBaseFor(o).base,0),
       scadute:       mine.filter(o=>!o.archived&&o.nextActionDate&&o.nextActionDate<today&&["aperta","sospesa"].includes(o.status)).length,
     };
   }
@@ -2381,8 +2416,10 @@ function generateReport() {
   // Sezione vinte/perse
   function oppTableHtml(list, label) {
     if (list.length === 0) return `<p class="muted">Nessuna opportunità ${label} nel periodo.</p>`;
+    let tot = 0;
     let h = `<table><thead><tr><th>Opportunità</th><th>Cliente</th><th>Commerciale</th><th class="right">Valore previsto</th></tr></thead><tbody>`;
     for (const o of list) {
+      tot += toNum(o.valueExpected);
       h += `<tr>
         <td><span class="badge blue mono">${escapeHtml(o.oppId)}</span>${escapeHtml(o.name)}</td>
         <td>${escapeHtml(o.lead)}</td>
@@ -2390,6 +2427,7 @@ function generateReport() {
         <td class="right mono">${fmtEur(o.valueExpected)}</td>
       </tr>`;
     }
+    h += `<tr class="total-row"><td colspan="3">Totale</td><td class="right mono">${fmtEur(tot)}</td></tr>`;
     h += `</tbody></table>`;
     return h;
   }
@@ -2437,20 +2475,36 @@ function generateReport() {
   // Sezione per commerciale
   let ownerHtml = `<table><thead><tr>
     <th>Commerciale</th><th class="right">Opp. aperte</th><th class="right">Pipeline</th>
-    <th class="right">Vinte periodo</th><th class="right">Perse periodo</th>
-    <th class="right">Fatturato periodo</th><th class="right">Azioni scadute</th>
+    <th class="right">Vinte periodo</th><th class="right">Valore vinte</th><th class="right">Perse periodo</th>
+    <th class="right">Fatturato periodo</th><th class="right">Valore base MOL</th><th class="right">Azioni scadute</th>
   </tr></thead><tbody>`;
+  const OT = { aperte:0, pipeline:0, vinte:0, valoreVinte:0, perse:0, fatturato:0, molBase:0, scadute:0 };
   for (const [name, d] of Object.entries(byOwner)) {
+    OT.aperte+=d.aperte; OT.pipeline+=d.pipeline; OT.vinte+=d.vinte; OT.valoreVinte+=d.valoreVinte;
+    OT.perse+=d.perse; OT.fatturato+=d.fatturato; OT.molBase+=d.molBase; OT.scadute+=d.scadute;
     ownerHtml += `<tr>
       <td><strong>${escapeHtml(name)}</strong></td>
       <td class="right">${d.aperte}</td>
       <td class="right mono">${fmtEur(d.pipeline)}</td>
       <td class="right">${d.vinte}</td>
+      <td class="right mono">${fmtEur(d.valoreVinte)}</td>
       <td class="right">${d.perse}</td>
       <td class="right mono">${fmtEur(d.fatturato)}</td>
+      <td class="right mono">${fmtEur(d.molBase)}</td>
       <td class="right ${d.scadute > 0 ? "warn" : ""}">${d.scadute}</td>
     </tr>`;
   }
+  ownerHtml += `<tr class="total-row">
+      <td>Totale</td>
+      <td class="right">${OT.aperte}</td>
+      <td class="right mono">${fmtEur(OT.pipeline)}</td>
+      <td class="right">${OT.vinte}</td>
+      <td class="right mono">${fmtEur(OT.valoreVinte)}</td>
+      <td class="right">${OT.perse}</td>
+      <td class="right mono">${fmtEur(OT.fatturato)}</td>
+      <td class="right mono">${fmtEur(OT.molBase)}</td>
+      <td class="right">${OT.scadute}</td>
+    </tr>`;
   ownerHtml += `</tbody></table>`;
 
   return `<!doctype html><html lang="it"><head>
