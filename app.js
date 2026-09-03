@@ -2252,6 +2252,12 @@ function generateReport() {
   const pipelineOpps = opps.filter(o => !o.archived && o.status === "aperta");
   const pipelineVal  = pipelineOpps.reduce((s, o) => s + o.valueExpected, 0);
   const pipelinePond = pipelineOpps.reduce((s, o) => s + o.valueExpected * (parseFloat(o.probability) / 100 || 0), 0);
+  // Elenco dettagliato delle opportunità aperte (per la sezione
+  // "Opportunità aperte / pipeline" del report). Le sospese sono escluse,
+  // coerentemente col riquadro "Pipeline aperta" e col fatto che di norma
+  // non rientrano più nel processo commerciale.
+  const pipelineDetailOpps = opps.filter(o => !o.archived && o.status === "aperta")
+    .sort((a,b)=>toNum(b.valueExpected)-toNum(a.valueExpected));
 
   // ── 4. Opportunità vinte/perse nel periodo ───────────────────
   const vinteOpps = opps.filter(o => o.status === "chiusa vinta" && inPeriod(o.updatedAt?.slice(0,10)));
@@ -2388,6 +2394,27 @@ function generateReport() {
     return h;
   }
 
+  // Come oppTableHtml, ma con colonna Fase e riga totale — usata per la
+  // pipeline aperta, dove serve distinguere le fasi (es. attesa CTR / mandare CTR).
+  function oppTableHtmlWithPhase(list, label) {
+    if (list.length === 0) return `<p class="muted">Nessuna opportunità ${label}.</p>`;
+    let tot = 0;
+    let h = `<table><thead><tr><th>Opportunità</th><th>Cliente</th><th>Commerciale</th><th>Fase</th><th class="right">Valore previsto</th></tr></thead><tbody>`;
+    for (const o of list) {
+      tot += toNum(o.valueExpected);
+      h += `<tr>
+        <td><span class="badge blue mono">${escapeHtml(o.oppId)}</span>${escapeHtml(o.name)}</td>
+        <td>${escapeHtml(o.lead)}</td>
+        <td>${escapeHtml(o.owner)}</td>
+        <td>${escapeHtml(o.phase)}</td>
+        <td class="right mono">${fmtEur(o.valueExpected)}</td>
+      </tr>`;
+    }
+    h += `<tr class="total-row"><td colspan="4">Totale pipeline</td><td class="right mono">${fmtEur(tot)}</td></tr>`;
+    h += `</tbody></table>`;
+    return h;
+  }
+
   // Sezione azioni scadute
   let scaduteHtml = `<table><thead><tr>
     <th>Opportunità</th><th>Cliente</th><th>Commerciale</th><th>Scaduta il</th><th>Azione</th>
@@ -2470,6 +2497,11 @@ function generateReport() {
     <div class="section">
       <div class="section-title">Fatture pianificate in arrivo</div>
       ${pianHtml}
+    </div>
+
+    <div class="section">
+      <div class="section-title">Opportunità aperte / pipeline (${pipelineDetailOpps.length})</div>
+      ${oppTableHtmlWithPhase(pipelineDetailOpps, "aperta in pipeline")}
     </div>
 
     <div class="section">
