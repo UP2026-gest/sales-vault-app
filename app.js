@@ -356,6 +356,10 @@ function normalizeOpp(o){
     nextActionDate: o.nextActionDate || "",
     notes:          o.notes || "",
     serviceCost:    toNum(o.serviceCost),
+    // Incarico "splittato": cliente paga separatamente UP e il docente.
+    // In questi casi il costo di erogazione di UP può legittimamente essere 0
+    // (o solo il materiale didattico), quindi NON va segnalato come mancante.
+    split:          o.split === true,
     // Anno di competenza della fattura (es. corso 2027 inserito nel 2026).
     // Se vuoto, si assume l'anno di creazione dell'opportunità.
     fiscalYear:     (o.fiscalYear && /^\d{4}$/.test(String(o.fiscalYear))) ? String(o.fiscalYear) : "",
@@ -653,6 +657,7 @@ const ui = {
   probability:      document.getElementById("probability"),
   valueExpected:    document.getElementById("valueExpected"),
   serviceCost:      document.getElementById("serviceCost"),
+  oppSplit:         document.getElementById("oppSplit"),
   nextAction:       document.getElementById("nextAction"),
   nextActionDate:   document.getElementById("nextActionDate"),
   notes:            document.getElementById("notes"),
@@ -708,6 +713,7 @@ function getFormState(){
     valueExpected:  ui.valueExpected?.value||"",
     fiscalYear:     ui.oppFiscalYear?.value||"",
     serviceCost:    ui.serviceCost?.value||"",
+    split:          !!(ui.oppSplit && ui.oppSplit.checked),
     nextAction:     ui.nextAction?.value||"",
     nextActionDate: ui.nextActionDate?.value||"",
     notes:          ui.notes?.value||"",
@@ -1014,6 +1020,7 @@ function oppToForm(o){
   ui.nextActionDate.value = o.nextActionDate || "";
   ui.notes.value          = o.notes;
   ui.serviceCost.value    = o.serviceCost || "";
+  if(ui.oppSplit) ui.oppSplit.checked = (o.split === true);
 
   renderInvoices(o.invoices);
   renderCalcBox(o);
@@ -1056,6 +1063,7 @@ function formToOpp(){
     nextActionDate: ui.nextActionDate.value,
     notes:          ui.notes.value.trim(),
     serviceCost:    ui.serviceCost.value,
+    split:          !!(ui.oppSplit && ui.oppSplit.checked),
     contractNumber: (document.getElementById("contractNumber")?.value || "").trim(),
     invoices:       inv,
     createdAtTs:    existing?.createdAtTs || nowIso(),
@@ -1083,6 +1091,7 @@ function newOpp(){
   ui.probability.value  = "50%";
   refreshOppFiscalYearSelect();
   if(ui.oppFiscalYear) ui.oppFiscalYear.value = "";
+  if(ui.oppSplit) ui.oppSplit.checked = false;
   ui.deleteBtn.disabled = true;
   if(ui.archivedBanner) ui.archivedBanner.style.display = "none";
   if(ui.archiveBtn)     ui.archiveBtn.style.display = "";
@@ -1633,13 +1642,18 @@ function renderOppList(){
     const issued  = totalIssued(o), planned = totalPlanned(o);
     const cost    = toNum(o.serviceCost);
     const overdue = o.nextActionDate && o.nextActionDate < todayStr() ? "⚠️ azione scaduta" : "";
-    // Il costo previsto è mostrato in anteprima per individuare subito le
-    // opportunità in cui manca (costo = 0). Uso innerHTML così il warning
-    // "costo mancante" può essere evidenziato in rosso.
+    // Il costo è mostrato in anteprima. L'avviso "costo mancante" compare solo
+    // se l'incarico NON è splittato e il costo è 0 (perché per gli splittati il
+    // costo 0 è legittimo: il cliente paga il docente separatamente).
     const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-    const costHtml = cost > 0
-      ? `Costo: € ${cost.toFixed(2)}`
-      : `<span class="cost-missing">⚠ costo mancante</span>`;
+    let costHtml;
+    if(cost > 0){
+      costHtml = `Costo: € ${cost.toFixed(2)}` + (o.split ? ` <span class="split-badge">splittato</span>` : "");
+    } else if(o.split){
+      costHtml = `Costo: € 0.00 <span class="split-badge">splittato</span>`;
+    } else {
+      costHtml = `<span class="cost-missing">⚠ costo mancante</span>`;
+    }
     meta.innerHTML =
       `Creata: ${esc(o.createdAt)} • ${esc(o.owner||"-")} • ${esc(o.status)} • ${esc(o.phase)} • ${esc(o.product)}` +
       ` • Prev.: € ${toNum(o.valueExpected).toFixed(2)}` +
@@ -1748,7 +1762,7 @@ function downloadText(filename, text, mime="text/plain"){
 
 function exportCsv(){
   const ops = db.opportunities.map(normalizeOpp);
-  const oppHeader = ["OppID","Lead","DataCreazione","AnnoCompetenza","NomeOpportunita","Stato","Fase","Prodotto","ValorePrevisto","Probabilita","ProssimaAzione","DataProssimaAzione","CostoErogazione","EmessoTotale","PianificatoTotale","BaseMOL","MOL","MOL_percento"].join(";");
+  const oppHeader = ["OppID","Lead","DataCreazione","AnnoCompetenza","NomeOpportunita","Stato","Fase","Prodotto","ValorePrevisto","Probabilita","ProssimaAzione","DataProssimaAzione","CostoErogazione","Splittato","EmessoTotale","PianificatoTotale","BaseMOL","MOL","MOL_percento"].join(";");
   const oppRows = ops.map(o=>{
     const issued=totalIssued(o), planned=totalPlanned(o), cost=toNum(o.serviceCost), expected=toNum(o.valueExpected);
     // Stessa cascata usata a schermo: emesso → pianificato → valore previsto
@@ -1757,7 +1771,7 @@ function exportCsv(){
     else if(planned>0){ base=planned; baseLabel="pianificato"; }
     else { base=expected; baseLabel="valore previsto"; }
     const mol=base-cost, molPct=base>0?(mol/base)*100:0;
-    return [o.oppId||o.id,o.lead,o.createdAt,fiscalYearOf(o),o.name,o.status,o.phase,o.product,o.valueExpected,o.probability,o.nextAction,o.nextActionDate,cost.toFixed(2),issued.toFixed(2),planned.toFixed(2),baseLabel,mol.toFixed(2),molPct.toFixed(1)].map(csvEscape).join(";");
+    return [o.oppId||o.id,o.lead,o.createdAt,fiscalYearOf(o),o.name,o.status,o.phase,o.product,o.valueExpected,o.probability,o.nextAction,o.nextActionDate,cost.toFixed(2),(o.split?"sì":"no"),issued.toFixed(2),planned.toFixed(2),baseLabel,mol.toFixed(2),molPct.toFixed(1)].map(csvEscape).join(";");
   });
   downloadText(`salesvault_opportunita_${todayStr()}.csv`, [oppHeader,...oppRows].join("\n"), "text/csv;charset=utf-8");
 
@@ -2251,6 +2265,14 @@ function generateReport() {
     ["aperta", "sospesa"].includes(o.status)
   ).sort((a, b) => a.nextActionDate.localeCompare(b.nextActionDate));
 
+  // ── 5-bis. Totali MOL (STESSA logica del cruscotto) ──────────
+  // Base a cascata per ogni opportunità filtrata: emesso → pianificato →
+  // valore previsto. Garantisce che il report quadri col cruscotto.
+  const molBaseTotal = opps.reduce((s,o)=>s+molBaseFor(o).base,0);
+  const molCostTotal = opps.reduce((s,o)=>s+toNum(o.serviceCost),0);
+  const molValue     = molBaseTotal - molCostTotal;
+  const molPct       = molBaseTotal > 0 ? (molValue/molBaseTotal)*100 : 0;
+
   // ── 6. Dettaglio per commerciale ────────────────────────────
   const byOwner = {};
   for (const name of owners) {
@@ -2428,6 +2450,15 @@ function generateReport() {
         <div class="kpi green"><div class="val">${vinteOpps.length}</div><div class="lbl">Opportunità vinte · ${fmtEur(valoreVinte)}</div></div>
         <div class="kpi red"><div class="val">${perseOpps.length}</div><div class="lbl">Opportunità perse / abbandonate</div></div>
         <div class="kpi red"><div class="val">${scaduteOpps.length}</div><div class="lbl">Azioni commerciali scadute</div></div>
+      </div>
+      <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-top:10px;">
+        <div class="kpi"><div class="val mono">${fmtEur(molBaseTotal)}</div><div class="lbl">Valore totale (base MOL)</div></div>
+        <div class="kpi"><div class="val mono">${fmtEur(molCostTotal)}</div><div class="lbl">Costo erogazione totale</div></div>
+        <div class="kpi ${molValue>=0?'green':'red'}"><div class="val mono">${fmtEur(molValue)} — ${molPct.toFixed(1)}%</div><div class="lbl">MOL (opportunità filtrate)</div></div>
+      </div>
+      <div style="font-size:11px;color:#7a85a0;margin-top:6px;">
+        MOL su ${opps.length} opportunità filtrate · base a cascata: fatturato emesso → fatture pianificate → valore previsto.
+        Coincide con i valori del cruscotto per gli stessi filtri.
       </div>
     </div>
 
