@@ -666,13 +666,13 @@
         },
         {
           "text": "fatture in cloud, ho bisogno che tutte le spese abbiano una categoria",
-          "notes": "mi serve per calcolare le voci di spesa; inoltre ho visto che ci sono spese con categorie sbagliate, occorre correggerle, per esempio docenti segnati con categoria \"collaboratori\", in altre spese ci sono alcune spese mie, di Silvia e Allinea, etc. vanno cambiati"
+          "notes": "mi serve per calcolare le voci di spesa; inoltre ho visto che ci sono spese con categorie sbagliate, occorre correggerle, per esempio docenti segnati con categoria \"collaboratori\", in altre spese ci sono alcune spese mie, di Silvia e Allinea, etc., oppure spese senza categoria, vanno sistemate"
         }
       ],
       "notes": "",
       "actions": [],
       "createdAt": "2026-09-03T15:47:12.533Z",
-      "updatedAt": "2026-09-03T15:59:48.765Z"
+      "updatedAt": "2026-09-03T16:00:20.045Z"
     },
     {
       "id": "mtlpg4vysvuuyo",
@@ -713,5 +713,5 @@
       "updatedAt": "2026-09-03T15:55:07.775Z"
     }
   ],
-  "updatedAt": "2026-09-03T15:59:48.765Z"
+  "updatedAt": "2026-09-03T16:00:20.045Z"
 }
