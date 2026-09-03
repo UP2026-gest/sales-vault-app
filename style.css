@@ -294,7 +294,7 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 
 .grid {
   display: grid;
-  grid-template-columns: 270px minmax(0, 1fr) minmax(0, 1.5fr);
+  grid-template-columns: 320px minmax(0, 1fr) minmax(0, 1.15fr);
   gap: 14px;
   padding: 14px;
   align-items: start;
@@ -706,7 +706,7 @@ hr {
 
 @media (max-width: 1100px) {
   .grid {
-    grid-template-columns: 240px minmax(0,1fr) minmax(0,1.3fr);
+    grid-template-columns: 290px minmax(0,1fr) minmax(0,1.1fr);
   }
 }
 @media (max-width: 860px) {
@@ -718,8 +718,15 @@ hr {
 /* ══════════════════════════════════════════════
    FILTRI A CASELLE MULTIPLE (Fase, Prodotto)
    ══════════════════════════════════════════════ */
-.row.check-row { align-items: flex-start; }
-.row.check-row > span { margin-top: 4px; }
+.row.check-row {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 5px;
+}
+.row.check-row > span {
+  width: auto;
+  margin-top: 0;
+}
 .checkFilter {
   flex: 1 1 auto;
   min-width: 0;
@@ -791,4 +798,10 @@ hr {
   background: var(--amber, #e8a020);
   border-color: var(--amber, #e8a020);
   color: #1a2744;
+}
+
+/* Evidenzia il costo mancante nell'anteprima opportunità */
+.cost-missing {
+  color: var(--red, #b52a2a);
+  font-weight: 700;
 }

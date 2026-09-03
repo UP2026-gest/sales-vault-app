@@ -1631,13 +1631,22 @@ function renderOppList(){
 
     const meta  = document.createElement("div"); meta.className = "meta";
     const issued  = totalIssued(o), planned = totalPlanned(o);
+    const cost    = toNum(o.serviceCost);
     const overdue = o.nextActionDate && o.nextActionDate < todayStr() ? "⚠️ azione scaduta" : "";
-    meta.textContent =
-      `Creata: ${o.createdAt} • ${o.owner||"-"} • ${o.status} • ${o.phase} • ${o.product}` +
+    // Il costo previsto è mostrato in anteprima per individuare subito le
+    // opportunità in cui manca (costo = 0). Uso innerHTML così il warning
+    // "costo mancante" può essere evidenziato in rosso.
+    const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    const costHtml = cost > 0
+      ? `Costo: € ${cost.toFixed(2)}`
+      : `<span class="cost-missing">⚠ costo mancante</span>`;
+    meta.innerHTML =
+      `Creata: ${esc(o.createdAt)} • ${esc(o.owner||"-")} • ${esc(o.status)} • ${esc(o.phase)} • ${esc(o.product)}` +
       ` • Prev.: € ${toNum(o.valueExpected).toFixed(2)}` +
+      ` • ${costHtml}` +
       ` • Emesso: € ${issued.toFixed(2)}` +
       ` • Pianif.: € ${planned.toFixed(2)}` +
-      (overdue ? ` • ${overdue}` : "");
+      (overdue ? ` • ${esc(overdue)}` : "");
 
     left.appendChild(title); left.appendChild(meta);
 
