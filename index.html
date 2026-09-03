@@ -36,6 +36,8 @@
     <section class="card">
       <h2>Filtri</h2>
 
+      <button id="clearFiltersBtn" type="button" class="clear-filters-btn">↺ Pulisci filtri</button>
+
       <label class="row">
         <span>Ricerca</span>
         <input id="q" placeholder="cliente, opportunità, note…" />
@@ -56,13 +58,13 @@
         <span>Stato</span>
         <select id="statusFilter"></select>
       </label>
-      <label class="row">
+      <label class="row check-row">
         <span>Fase</span>
-        <select id="phaseFilter"></select>
+        <div id="phaseFilterBox" class="checkFilter"></div>
       </label>
-      <label class="row">
+      <label class="row check-row">
         <span>Prodotto</span>
-        <select id="productFilter"></select>
+        <div id="productFilterBox" class="checkFilter"></div>
       </label>
       <label class="row">
         <span>Commerciale</span>

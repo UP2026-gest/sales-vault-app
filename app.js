@@ -622,6 +622,9 @@ const ui = {
   statusFilter:     document.getElementById("statusFilter"),
   phaseFilter:      document.getElementById("phaseFilter"),
   productFilter:    document.getElementById("productFilter"),
+  phaseFilterBox:   document.getElementById("phaseFilterBox"),
+  productFilterBox: document.getElementById("productFilterBox"),
+  clearFiltersBtn:  document.getElementById("clearFiltersBtn"),
   ownerFilter:      document.getElementById("ownerFilter"),
   manageOwnersBtn:  document.getElementById("manageOwnersBtn"),
   dueFilter:        document.getElementById("dueFilter"),
@@ -775,6 +778,39 @@ function setSelectOptions(el, arr){
   }
 }
 
+// ═══════════════════════════════════════════════════════════════
+// FILTRI A CASELLE MULTIPLE (Fase, Prodotto)
+// Permettono di selezionare più voci insieme (es. "docente presenza" +
+// "docente online" per vedere tutti i corsi con docenza). Nessuna casella
+// spuntata = nessun filtro (mostra tutte le voci).
+// ═══════════════════════════════════════════════════════════════
+function buildCheckFilter(boxEl, values, onChange){
+  if(!boxEl) return;
+  const actions = `<div class="check-actions">
+    <button type="button" data-act="all">Tutte</button>
+    <button type="button" data-act="none">Nessuna</button>
+  </div>`;
+  const rows = values.map(v=>`
+    <label><input type="checkbox" value="${escapeHtml(v)}"/> ${escapeHtml(v)}</label>
+  `).join("");
+  boxEl.innerHTML = actions + rows;
+  boxEl.querySelectorAll('input[type="checkbox"]').forEach(chk=>{
+    chk.addEventListener("change", onChange);
+  });
+  boxEl.querySelector('[data-act="all"]').addEventListener("click", ()=>{
+    boxEl.querySelectorAll('input[type="checkbox"]').forEach(c=>c.checked=true); onChange();
+  });
+  boxEl.querySelector('[data-act="none"]').addEventListener("click", ()=>{
+    boxEl.querySelectorAll('input[type="checkbox"]').forEach(c=>c.checked=false); onChange();
+  });
+}
+
+// Ritorna l'array dei valori spuntati in un box checkbox.
+function getCheckedValues(boxEl){
+  if(!boxEl) return [];
+  return Array.from(boxEl.querySelectorAll('input[type="checkbox"]:checked')).map(c=>c.value);
+}
+
 function refreshOwnerSelects(){
   const owners = normalizeSalespeopleList(db.salespeople);
   db.salespeople = owners;
@@ -826,8 +862,8 @@ function refreshLeadDatalist(){
 
 function initSelects(){
   setSelectOptions(ui.statusFilter,  ENUM.status);
-  setSelectOptions(ui.phaseFilter,   ENUM.phase);
-  setSelectOptions(ui.productFilter, ENUM.product);
+  buildCheckFilter(ui.phaseFilterBox,   ENUM.phaseValues,   renderAll);
+  buildCheckFilter(ui.productFilterBox, ENUM.productValues, renderAll);
   refreshOwnerSelects();
 
   [
@@ -1417,11 +1453,32 @@ function matchesIssuedInvoiceFilter(o){
   return true;
 }
 
+// Riepilogo testuale dei filtri attivi (usato nell'intestazione del report).
+function activeFilterSummary(){
+  const parts = [];
+  const yf  = ui.yearFilter?.value||"all";
+  const fyf = ui.fiscalYearFilter?.value||"all";
+  const sf  = ui.statusFilter?.value||"";
+  const of  = ui.ownerFilter?.value||"";
+  const phases   = getCheckedValues(ui.phaseFilterBox);
+  const products = getCheckedValues(ui.productFilterBox);
+  const af  = ui.archiveFilter?.value||"active";
+  if(yf !== "all")  parts.push(`Anno creazione ${yf}`);
+  if(fyf !== "all") parts.push(`Competenza ${fyf}`);
+  if(sf)  parts.push(`Stato: ${sf}`);
+  if(of)  parts.push(`Commerciale: ${of}`);
+  if(phases.length)   parts.push(`Fase: ${phases.length===1?phases[0]:phases.length+" voci"}`);
+  if(products.length) parts.push(`Prodotto: ${products.length===1?products[0]:products.length+" voci"}`);
+  if(af === "archived") parts.push("Archiviate");
+  if(af === "all")      parts.push("Archiviate incluse");
+  return parts.join(" · ");
+}
+
 function matchesFilters(o){
   const q   = ui.q.value.trim().toLowerCase();
   const sf  = ui.statusFilter.value;
-  const pf  = ui.phaseFilter.value;
-  const prf = ui.productFilter.value;
+  const phases   = getCheckedValues(ui.phaseFilterBox);   // array di fasi spuntate
+  const products = getCheckedValues(ui.productFilterBox); // array di prodotti spuntati
   const of  = ui.ownerFilter?.value||"";
   const yf  = ui.yearFilter?.value||"all";
   const fyf = ui.fiscalYearFilter?.value||"all";
@@ -1433,8 +1490,10 @@ function matchesFilters(o){
   // af === "all": mostra tutto
 
   if(sf && o.status !== sf)    return false;
-  if(pf && o.phase !== pf)     return false;
-  if(prf && o.product !== prf) return false;
+  // Fase/Prodotto: se nessuna casella spuntata → nessun filtro; altrimenti
+  // l'opportunità deve rientrare tra le voci selezionate (logica OR).
+  if(phases.length   > 0 && !phases.includes(o.phase))     return false;
+  if(products.length > 0 && !products.includes(o.product)) return false;
   if(of && o.owner !== of)     return false;
   if(yf !== "all" && (o.createdAt||"").slice(0,4) !== yf) return false;
   if(fyf !== "all" && fiscalYearOf(o) !== fyf) return false;
@@ -1486,8 +1545,8 @@ function renderKpi(){
   const fyf = ui.fiscalYearFilter?.value||"all";
   const sf  = ui.statusFilter?.value||"";
   const of  = ui.ownerFilter?.value||"";
-  const pf  = ui.phaseFilter?.value||"";
-  const prf = ui.productFilter?.value||"";
+  const phases   = getCheckedValues(ui.phaseFilterBox);
+  const products = getCheckedValues(ui.productFilterBox);
   const iif = ui.invIssuedFilter?.value||"all";
   const ipf = ui.invPlannedFilter?.value||"all";
   const af  = ui.archiveFilter?.value||"active";
@@ -1495,8 +1554,8 @@ function renderKpi(){
   if(fyf !== "all") filterLabels.push(`Anno competenza: ${fyf}`);
   if(sf)  filterLabels.push(`Stato: ${sf}`);
   if(of)  filterLabels.push(`Commerciale: ${of}`);
-  if(pf)  filterLabels.push(`Fase: ${pf}`);
-  if(prf) filterLabels.push(`Prodotto: ${prf}`);
+  if(phases.length > 0)   filterLabels.push(`Fase: ${phases.length===1 ? phases[0] : phases.length+" selezionate"}`);
+  if(products.length > 0) filterLabels.push(`Prodotto: ${products.length===1 ? products[0] : products.length+" selezionati"}`);
   if(iif !== "all") filterLabels.push(`Fatture emesse: ${iif}`);
   if(ipf !== "all") filterLabels.push(`Fatture prog.: ${ipf}`);
   if(af === "archived") filterLabels.push("📦 Archiviate");
@@ -1983,9 +2042,10 @@ ui.addInvBtn.addEventListener("click", addInvoice);
 ui.lead.addEventListener("input", () => fillLeadContactFields(ui.lead.value));
 
 ui.q.addEventListener("input", renderAll);
+ui.clearFiltersBtn?.addEventListener("click", () => clearAllFilters(true));
 ui.statusFilter.addEventListener("change", renderAll);
-ui.phaseFilter.addEventListener("change", renderAll);
-ui.productFilter.addEventListener("change", renderAll);
+// Fase e Prodotto ora sono filtri a caselle multiple: i listener sono già
+// agganciati in buildCheckFilter(), non servono qui.
 ui.ownerFilter?.addEventListener("change", renderAll);
 ui.archiveFilter?.addEventListener("change", renderAll);
 ui.yearFilter?.addEventListener("change", renderAll);
@@ -2063,23 +2123,32 @@ refreshLeadDatalist();
 // DEFAULT ALL'AVVIO: attivo solo il filtro "Anno competenza fattura" sull'anno
 // corrente; tutti gli altri filtri partono neutri. Popolo prima i menu anni.
 refreshFiscalYearFilter();
-(function setStartupDefaults(){
+// Riporta TUTTI i filtri allo stato di default:
+// - Anno competenza fattura → anno corrente (se disponibile), altrimenti "tutti"
+// - Anno creazione, stato, commerciale, fatture, archivio → neutri
+// - Fase e Prodotto (caselle multiple) → nessuna spuntata
+// Usata sia all'avvio sia dal pulsante "Pulisci filtri".
+function clearAllFilters(rerender){
   const cy = String(new Date().getFullYear());
   if(ui.fiscalYearFilter){
-    // se l'anno corrente è tra le opzioni lo seleziono, altrimenti "all"
     const hasCy = Array.from(ui.fiscalYearFilter.options).some(o=>o.value===cy);
     ui.fiscalYearFilter.value = hasCy ? cy : "all";
   }
   if(ui.yearFilter)        ui.yearFilter.value = "all";
   if(ui.statusFilter)      ui.statusFilter.value = "";
-  if(ui.phaseFilter)       ui.phaseFilter.value = "";
-  if(ui.productFilter)     ui.productFilter.value = "";
+  if(ui.phaseFilterBox)    ui.phaseFilterBox.querySelectorAll('input[type="checkbox"]').forEach(c=>c.checked=false);
+  if(ui.productFilterBox)  ui.productFilterBox.querySelectorAll('input[type="checkbox"]').forEach(c=>c.checked=false);
   if(ui.ownerFilter)       ui.ownerFilter.value = "";
   if(ui.dueFilter)         ui.dueFilter.value = "all";
   if(ui.invPlannedFilter)  ui.invPlannedFilter.value = "all";
   if(ui.invIssuedFilter)   ui.invIssuedFilter.value = "all";
   if(ui.archiveFilter)     ui.archiveFilter.value = "active";
-})();
+  if(ui.q)                 ui.q.value = "";
+  if(rerender) renderAll();
+}
+
+// All'avvio: applica i default (senza re-render, che avviene subito dopo)
+clearAllFilters(false);
 
 renderAll();
 newOpp();
@@ -2105,15 +2174,17 @@ setTimeout(() => { try { showFiscalReminder(false); } catch(e){} }, 2500);
 // REPORT MENSILE
 // ═══════════════════════════════════════════════════════════════
 
-function generateReport(fromDate, toDate) {
-  const opps = db.opportunities.map(normalizeOpp);
+function generateReport() {
+  // Il report si basa sui FILTRI ATTIVI del cruscotto (non più su un intervallo
+  // di date). Considera solo le opportunità che passano matchesFilters, così
+  // rispetta anno di competenza, fase, prodotto, stato, commerciale, ecc.
+  const opps = db.opportunities.map(normalizeOpp).filter(matchesFilters);
   const owners = normalizeSalespeopleList(db.salespeople);
 
-  // Helper: data dentro il periodo
-  function inPeriod(dateStr) {
-    if (!dateStr) return false;
-    return dateStr >= fromDate && dateStr <= toDate;
-  }
+  // Con il report sui filtri attivi non c'è più un "periodo": ogni conteggio
+  // considera tutte le opportunità filtrate. inPeriod() resta definita come
+  // sempre-vera per non alterare la struttura interna delle sezioni.
+  function inPeriod(dateStr) { return true; }
   function fmtEur(n) {
     return n.toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
   }
@@ -2122,17 +2193,9 @@ function generateReport(fromDate, toDate) {
     const [y, m, dd] = d.split("-");
     return `${dd}/${m}/${y}`;
   }
+  // Etichetta descrittiva dei filtri attivi (sostituisce il periodo)
   function periodLabel() {
-    if (fromDate === toDate) return fmtDate(fromDate);
-    const sameYear = fromDate.slice(0, 4) === toDate.slice(0, 4);
-    const sameMonth = fromDate.slice(0, 7) === toDate.slice(0, 7);
-    if (sameMonth) {
-      const [y, m] = fromDate.split("-");
-      const months = ["","Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno",
-                      "Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
-      return `${months[parseInt(m)]} ${y}`;
-    }
-    return `${fmtDate(fromDate)} – ${fmtDate(toDate)}`;
+    return activeFilterSummary() || "Tutte le opportunità";
   }
 
   // ── 1. Fatturato emesso nel periodo ─────────────────────────
@@ -2392,66 +2455,32 @@ function generateReport(fromDate, toDate) {
 }
 
 function showReportModal() {
-  // Calcola default: mese corrente
-  const now = new Date();
-  const y = now.getFullYear();
-  const m = pad2(now.getMonth() + 1);
-  const firstDay = `${y}-${m}-01`;
-  const lastDay  = `${y}-${m}-${pad2(new Date(y, now.getMonth()+1, 0).getDate())}`;
-
   ui.modalTitle.textContent = "📊 Genera report";
+
+  // Il report si basa sui filtri attivi del cruscotto. Mostro un riepilogo
+  // di ciò che verrà incluso, così l'utente sa cosa sta per generare.
+  const summary = activeFilterSummary();
+  const count = db.opportunities.map(normalizeOpp).filter(matchesFilters).length;
+  const total = db.opportunities.length;
+
   ui.modalBody.innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
-      <label style="font-size:12px;font-weight:500;color:#4a5570;">
-        Dal
-        <input type="date" id="reportFrom" value="${firstDay}" style="margin-top:4px;width:100%;padding:7px 10px;border-radius:8px;border:1px solid #dde2ec;font-size:13px;" />
-      </label>
-      <label style="font-size:12px;font-weight:500;color:#4a5570;">
-        Al
-        <input type="date" id="reportTo" value="${lastDay}" style="margin-top:4px;width:100%;padding:7px 10px;border-radius:8px;border:1px solid #dde2ec;font-size:13px;" />
-      </label>
+    <div style="margin-bottom:14px;font-size:13px;line-height:1.6;">
+      Il report considera le <b>opportunità attualmente filtrate</b> nel cruscotto.
+      Per cambiare cosa includere, chiudi questa finestra e modifica i filtri
+      (Anno competenza, Fase, Prodotto, Stato, Commerciale…), poi riapri il report.
     </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
-      <button type="button" onclick="setReportPeriod('month',0)" style="padding:5px 12px;border-radius:8px;border:1px solid #dde2ec;background:#f2f4f8;font-size:12px;cursor:pointer;">Mese corrente</button>
-      <button type="button" onclick="setReportPeriod('month',-1)" style="padding:5px 12px;border-radius:8px;border:1px solid #dde2ec;background:#f2f4f8;font-size:12px;cursor:pointer;">Mese scorso</button>
-      <button type="button" onclick="setReportPeriod('quarter',0)" style="padding:5px 12px;border-radius:8px;border:1px solid #dde2ec;background:#f2f4f8;font-size:12px;cursor:pointer;">Trimestre corrente</button>
-      <button type="button" onclick="setReportPeriod('year',0)" style="padding:5px 12px;border-radius:8px;border:1px solid #dde2ec;background:#f2f4f8;font-size:12px;cursor:pointer;">Anno corrente</button>
+    <div style="background:#e8f0fe;border-radius:8px;padding:10px 12px;margin-bottom:16px;font-size:13px;color:#1a4a9a;">
+      🔍 <b>Filtri attivi:</b> ${summary ? escapeHtml(summary) : "nessuno (tutte le opportunità)"}
+      <div style="margin-top:4px;color:#555;font-size:12px;">${count} opportunità su ${total} verranno incluse nel report.</div>
     </div>
     <button type="button" onclick="openReport()" style="width:100%;padding:9px;background:#1a2744;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">📄 Genera e apri report</button>
   `;
   ui.modal.classList.remove("hidden");
 }
 
-function setReportPeriod(type, offset) {
-  const now = new Date();
-  let from, to;
-  if (type === "month") {
-    const d = new Date(now.getFullYear(), now.getMonth() + offset, 1);
-    from = `${d.getFullYear()}-${pad2(d.getMonth()+1)}-01`;
-    const last = new Date(d.getFullYear(), d.getMonth()+1, 0);
-    to   = `${last.getFullYear()}-${pad2(last.getMonth()+1)}-${pad2(last.getDate())}`;
-  } else if (type === "quarter") {
-    const q = Math.floor(now.getMonth() / 3);
-    const qStart = new Date(now.getFullYear(), q * 3, 1);
-    const qEnd   = new Date(now.getFullYear(), q * 3 + 3, 0);
-    from = `${qStart.getFullYear()}-${pad2(qStart.getMonth()+1)}-01`;
-    to   = `${qEnd.getFullYear()}-${pad2(qEnd.getMonth()+1)}-${pad2(qEnd.getDate())}`;
-  } else if (type === "year") {
-    from = `${now.getFullYear()}-01-01`;
-    to   = `${now.getFullYear()}-12-31`;
-  }
-  document.getElementById("reportFrom").value = from;
-  document.getElementById("reportTo").value   = to;
-}
 
 function openReport() {
-  const from = document.getElementById("reportFrom")?.value;
-  const to   = document.getElementById("reportTo")?.value;
-  if (!from || !to || from > to) {
-    alert("Seleziona un periodo valido.");
-    return;
-  }
-  const html = generateReport(from, to);
+  const html = generateReport();
   const win  = window.open("", "_blank");
   win.document.write(html);
   win.document.close();
