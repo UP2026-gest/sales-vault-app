@@ -622,7 +622,50 @@
       "actions": [],
       "createdAt": "2026-08-28T13:55:00.841Z",
       "updatedAt": "2026-08-28T14:05:50.742Z"
+    },
+    {
+      "id": "mtlp7llhk7nqmm",
+      "code": "26-013",
+      "title": "(Copia) meeting UP",
+      "date": "2026-09-03",
+      "timeStart": "11:00",
+      "timeEnd": "12:00",
+      "client": "",
+      "topics": [
+        "commerciale",
+        "didattica",
+        "amministrazione",
+        "mkt"
+      ],
+      "participants": [
+        "Stefania",
+        "Silvia",
+        "Valentina",
+        "Lucia"
+      ],
+      "agenda": [
+        {
+          "text": "Database, invio email, come sta andando?",
+          "notes": "LE HO CHIESTO DI FARMI AVERE ALLA FINE IL RIEPILOGO DI QUELLE CHE NON SONO STATE APERTE E UN FILE EXCEL CON IL RIEPILOGO DI TUTTO, COSÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¬ POSSO TELEFONARE. TERREMO COME PROMO SOLO IL TEST ONLINE AZIENDALE MA ANCHE PER TEDESCO OLTRE CHE SPAGNOLO E INGLESE."
+        },
+        {
+          "text": "landing page italiano su pagina FB vietnamiti, traduzione, ÃÂÃÂ¨ in fase di approvazione, news?",
+          "notes": "LA TRADUZIONE IN INGLESE ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¨ PRONTA, VALE SOLLECITA STEFANIA PER VIETNAMITA"
+        },
+        {
+          "text": "Network up, 8 iscritti + Jelena",
+          "notes": "email fatta, gadget ordinati, Jelena allertata, CONTRATTI SOLLECITARE STEFANIA, VALE CHIEDE A AI QUALE SIA LO STRUMENTO PER CANALE/COMMUNITY, WHATSAPP/TELEGRAM ETC."
+        },
+        {
+          "text": "Fit Factory + Valenti04",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-09-03T15:47:12.533Z",
+      "updatedAt": "2026-09-03T15:47:12.533Z"
     }
   ],
-  "updatedAt": "2026-08-28T14:05:50.742Z"
+  "updatedAt": "2026-09-03T15:47:12.533Z"
 }
