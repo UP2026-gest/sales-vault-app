@@ -704,14 +704,14 @@
         },
         {
           "text": "aggiornamento situazione fatturato/margine",
-          "notes": "basandomi sui precedenti bilanci, il nostro costo (escluso erogazione) dovrebbe essere intorno a € 36000 (18k silvia, 12k renato, 6k varie e ammortamenti). Al momento, abbiamo fatturato molto meno dello scorso anno ( 2025 63,3k con MOL 31,1k, 49%, contro € 34,3k con MOL 21,1k, 58,6%) quindi - 29k di fattuato ma, a causa di una margnalità molto più alta, la diminuzione di MOL è -10k. Negli ultimi 4 mesi del 2025 abbiamo fatturato 20,8k con MOL di 10.5k, per il 2026 al momento abbiamo 21k approvate con 12,4k di MOL (57%), quindi vuol dire che se entrasse tutto saremmo a 56,2k di fatturato e 32,6k di MOL, quindi ci mancano 4k di MOL al pareggio, corrispondenti a 8k di fatturato - facciamo 12k di fatturato nel caso dovessimo perdere qualcosa che ci è già stato confermato."
+          "notes": "basandomi sui precedenti bilanci, il nostro costo (escluso erogazione) dovrebbe essere intorno a € 36000 (18k silvia, 12k renato, 6k varie e ammortamenti). \nAl momento, abbiamo fatturato molto meno dello scorso anno ( 2025 63,3k con MOL 31,1k, 49%, contro € 34,3k con MOL 21,1k, 58,6%) quindi - 29k di fattuato ma, a causa di una margnalità molto più alta, la diminuzione di MOL è -10k. \nNegli ultimi 4 mesi del 2025 abbiamo fatturato 20,8k con MOL di 10.5k, per il 2026 al momento abbiamo 21k approvate con 12,4k di MOL (57%), quindi vuol dire che se entrasse tutto saremmo a 56,2k di fatturato e 32,6k di MOL, quindi ci mancano 4k di MOL al pareggio, corrispondenti a 8k di fatturato - facciamo 12k di fatturato nel caso dovessimo perdere qualcosa che ci è già stato confermato."
         }
       ],
       "notes": "",
       "actions": [],
       "createdAt": "2026-09-03T15:53:50.782Z",
-      "updatedAt": "2026-09-03T16:16:39.804Z"
+      "updatedAt": "2026-09-03T16:17:04.432Z"
     }
   ],
-  "updatedAt": "2026-09-03T16:16:39.804Z"
+  "updatedAt": "2026-09-03T16:17:04.432Z"
 }
