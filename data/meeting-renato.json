@@ -720,14 +720,21 @@
       "timeStart": "10:30",
       "timeEnd": "11:30",
       "client": "",
-      "topics": [],
-      "participants": [],
+      "topics": [
+        "commerciale",
+        "mkt"
+      ],
+      "participants": [
+        "Elena Erroi",
+        "Alessandro Nicolis",
+        "Silvia"
+      ],
       "agenda": [],
       "notes": "",
       "actions": [],
       "createdAt": "2026-09-04T08:35:29.701Z",
-      "updatedAt": "2026-09-04T08:35:29.701Z"
+      "updatedAt": "2026-09-04T08:36:10.616Z"
     }
   ],
-  "updatedAt": "2026-09-04T08:35:29.701Z"
+  "updatedAt": "2026-09-04T08:36:10.616Z"
 }
