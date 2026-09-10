@@ -756,10 +756,19 @@
       ],
       "agenda": [],
       "notes": "1 - Partenza dal concreto: \"Raccontaci una settimana tipo quando facevi l'agente per Colorcopy: quante telefonate/visite facevi, come trovavi i nomi da chiamare, come tenevi traccia di chi avevi sentito.\" — Qui capisci il metodo di lavoro reale, non quello dichiarato.\n2 - La domanda che conta di più per te: \"Se ti do un elenco di 50 aziende/scuole, cosa fai lunedì mattina? Come organizzi le prime chiamate, cosa dici, come segni i risultati?\" — Vedi sul momento se ha già in testa un metodo o se lo inventa lì, e come ragiona.\n3 - Motivazione onesta: \"Cosa ti manca di più del fare il commerciale puro rispetto al fare il formatore/coach oggi?\" — Se risponde con entusiasmo genuino su caccia/chiusura contratti, buon segno. Se minimizza e parla solo di formazione, è un campanello.\n4 - Rete personale: \"Hai contatti tuoi — ex clienti, conoscenze, aziende della zona — che potresti attivare per UP?\" Chiedi 2-3 esempi concreti, non in astratto. Chi ha 20+ anni di attività commerciale a Brescia di solito una rete ce l'ha, va solo verificata.\n5 - Disponibilità reale: chiedigli di dirti lui stesso quante ore/settimana pensa di riuscire a garantire con continuità (non \"quante ne vuole dare UP\"), e quali giorni/fasce orarie. Meglio un numero basso ma affidabile che uno alto e fragile.\n6 - Test pratico veloce (facoltativo ma utile): dategli un caso reale semplificato — es. \"una scuola ha fatto una procedura interna andata deserta, come la contatteresti e cosa le proporresti in prima battuta\" — per vedere sul posto come ragiona commercialmente, senza bisogno che conosca il settore PA.\n7 - Chiudi parlando di inquadramento: visto che ha già P.IVA come agente di commercio, potete essere diretti su come immaginate il compenso (fisso ore + provvigioni? solo provvigioni?) e vedere subito se le aspettative combaciano.\n\nNon serve altro: con questo profilo la domanda decisiva è la n.2 e la n.3 — lì capite se è un \"hunter\" vero o se cerca solo qualche ora comoda mentre fa altro.",
-      "actions": [],
+      "actions": [
+        {
+          "id": "mtvbrurmr3k9uj",
+          "text": "riscontro su interesse ed eventualmente incontro per progetto (ore/sett, provv, compenso, progetto)",
+          "who": "Alessandro Bruni",
+          "date": "2026-09-25",
+          "done": false,
+          "createdAt": "2026-09-10T09:28:44.674Z"
+        }
+      ],
       "createdAt": "2026-09-10T07:04:34.600Z",
-      "updatedAt": "2026-09-10T07:07:42.565Z"
+      "updatedAt": "2026-09-10T09:28:44.674Z"
     }
   ],
-  "updatedAt": "2026-09-10T07:07:42.565Z"
+  "updatedAt": "2026-09-10T09:28:44.675Z"
 }
