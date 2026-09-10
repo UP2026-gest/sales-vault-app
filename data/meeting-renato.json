@@ -738,7 +738,28 @@
       "actions": [],
       "createdAt": "2026-09-04T08:35:29.701Z",
       "updatedAt": "2026-09-04T09:34:47.628Z"
+    },
+    {
+      "id": "mtv6mgbs6hcqcb",
+      "code": "26-016",
+      "title": "Colloquio commerciale con Alessandro Bruni",
+      "date": "2026-09-10",
+      "timeStart": "09:30",
+      "timeEnd": "10:30",
+      "client": "",
+      "topics": [
+        "hr"
+      ],
+      "participants": [
+        "Stefania",
+        "Alessandro Bruni"
+      ],
+      "agenda": [],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-09-10T07:04:34.600Z",
+      "updatedAt": "2026-09-10T07:04:34.600Z"
     }
   ],
-  "updatedAt": "2026-09-04T09:56:20.240Z"
+  "updatedAt": "2026-09-10T07:04:34.600Z"
 }
