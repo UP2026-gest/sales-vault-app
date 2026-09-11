@@ -309,7 +309,23 @@
       "actions": [],
       "createdAt": "2026-08-07T09:16:24.736Z",
       "updatedAt": "2026-08-07T09:16:24.736Z"
+    },
+    {
+      "id": "mtwqg1olg4av67",
+      "code": "26-010",
+      "title": "Riunione 11/09",
+      "date": "2026-09-11",
+      "timeStart": "",
+      "timeEnd": "",
+      "client": "",
+      "topics": [],
+      "participants": [],
+      "agenda": [],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-09-11T09:07:14.181Z",
+      "updatedAt": "2026-09-11T09:07:14.181Z"
     }
   ],
-  "updatedAt": "2026-08-07T09:16:24.736Z"
+  "updatedAt": "2026-09-11T09:07:14.181Z"
 }
