@@ -325,7 +325,23 @@
       "actions": [],
       "createdAt": "2026-09-11T09:07:14.181Z",
       "updatedAt": "2026-09-11T09:28:14.260Z"
+    },
+    {
+      "id": "mu6pffrupd9444",
+      "code": "26-011",
+      "title": "Riunione del 18/09",
+      "date": "2026-09-18",
+      "timeStart": "",
+      "timeEnd": "",
+      "client": "",
+      "topics": [],
+      "participants": [],
+      "agenda": [],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-09-18T08:36:27.930Z",
+      "updatedAt": "2026-09-18T08:36:27.930Z"
     }
   ],
-  "updatedAt": "2026-09-11T09:28:14.260Z"
+  "updatedAt": "2026-09-18T08:36:27.930Z"
 }
