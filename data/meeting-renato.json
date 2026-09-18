@@ -768,7 +768,62 @@
       ],
       "createdAt": "2026-09-10T07:04:34.600Z",
       "updatedAt": "2026-09-10T09:28:44.674Z"
+    },
+    {
+      "id": "mu6mdacnvlidb5",
+      "code": "26-017",
+      "title": "(Copia) meeting UP",
+      "date": "2026-09-18",
+      "timeStart": "11:00",
+      "timeEnd": "12:00",
+      "client": "",
+      "topics": [
+        "commerciale",
+        "didattica",
+        "amministrazione",
+        "mkt"
+      ],
+      "participants": [
+        "Stefania",
+        "Silvia",
+        "Valentina",
+        "Lucia"
+      ],
+      "agenda": [
+        {
+          "text": "Database, invio email, Ã¨ pronto riepilogo excel?",
+          "notes": "LE HO CHIESTO DI FARMI AVERE ALLA FINE IL RIEPILOGO DI QUELLE CHE NON SONO STATE APERTE E UN FILE EXCEL CON IL RIEPILOGO DI TUTTO, COSi POSSO TELEFONARE. TERREMO COME PROMO SOLO IL TEST ONLINE AZIENDALE MA ANCHE PER TEDESCO OLTRE CHE SPAGNOLO E INGLESE."
+        },
+        {
+          "text": "Fit Factory",
+          "notes": "mandata bozza convenzione, oggi caffÃ¨, poi il 21/10 farÃ² GdT presso di loro, poi forse mi metterÃ  in contatto con Regesta, societÃ  di consulenza che fa scambio merci (propone i servizi di Fabio in cambio di formazione gratuita ai dipendenti, ha parlato di 1-2 volte l'anno online da 40 minuti)"
+        },
+        {
+          "text": "tem plus - partecipero ad attivita del 8/10 al MOCA",
+          "notes": "attivitÃ  di networking, poi sarÃ  da vedere se parteciperÃ² podcast"
+        },
+        {
+          "text": "1 e 8 ottobre corso GdT, come stanno andando iscrizioni?",
+          "notes": ""
+        },
+        {
+          "text": "Erroi-Nicolis",
+          "notes": ""
+        },
+        {
+          "text": "fatture in cloud, ho bisogno che tutte le spese abbiano una categoria",
+          "notes": "mi serve per calcolare le voci di spesa; inoltre ho visto che ci sono spese con categorie sbagliate, occorre correggerle, per esempio docenti segnati con categoria \"collaboratori\", in altre spese ci sono alcune spese mie, di Silvia e Allinea, etc., oppure spese senza categoria, vanno sistemate"
+        },
+        {
+          "text": "nuovo catalogo",
+          "notes": "si stanno sentendo Vale e Silvia"
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-09-18T07:10:48.743Z",
+      "updatedAt": "2026-09-18T07:10:48.743Z"
     }
   ],
-  "updatedAt": "2026-09-10T09:28:44.675Z"
+  "updatedAt": "2026-09-18T07:10:48.743Z"
 }
