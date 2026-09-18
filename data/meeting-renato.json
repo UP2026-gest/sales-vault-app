@@ -792,7 +792,7 @@
       "agenda": [
         {
           "text": "fatture in cloud, fattura 52 per pagamenti compensati da NdC1",
-          "notes": "mi serve per calcolare le voci di spesa; inoltre ho visto che ci sono spese con categorie sbagliate, occorre correggerle, per esempio docenti segnati con categoria \"collaboratori\", in altre spese ci sono alcune spese mie, di Silvia e Allinea, etc., oppure spese senza categoria, vanno sistemate"
+          "notes": ""
         },
         {
           "text": "nuovo catalogo",
@@ -818,8 +818,8 @@
       "notes": "",
       "actions": [],
       "createdAt": "2026-09-18T07:10:48.743Z",
-      "updatedAt": "2026-09-18T08:27:16.328Z"
+      "updatedAt": "2026-09-18T08:33:49.093Z"
     }
   ],
-  "updatedAt": "2026-09-18T08:27:16.328Z"
+  "updatedAt": "2026-09-18T08:33:49.093Z"
 }
