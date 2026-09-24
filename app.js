@@ -2295,6 +2295,25 @@ function generateReport() {
   const perseOpps = opps.filter(o => (o.status === "chiusa persa" || o.status === "abbandonata") && inPeriod(o.updatedAt?.slice(0,10)));
   const valoreVinte = vinteOpps.reduce((s, o) => s + o.valueExpected, 0);
 
+  // ── 4-bis. Riconciliazione Fatturato ↔ Vinte ─────────────────
+  // Fatturato − Valore vinte = A + B − C, dove:
+  //  A = fatture emesse su opportunità NON in stato "chiusa vinta"
+  //  B = vinte fatturate con importo emesso diverso dal valore previsto (emesso − previsto)
+  //  C = vinte non ancora fatturate (il loro valore previsto non è nel fatturato)
+  const recRows = [];
+  for (const o of opps) {
+    const iss = totalIssued(o);
+    const ve  = toNum(o.valueExpected);
+    if (o.status !== "chiusa vinta" && iss > 0) {
+      recRows.push({ o, tipo: `Fatturata ma stato "${o.status}"`, ve: 0, iss, diff: iss });
+    } else if (o.status === "chiusa vinta" && iss > 0 && Math.abs(iss - ve) > 0.005) {
+      recRows.push({ o, tipo: "Fatturato ≠ valore previsto", ve, iss, diff: iss - ve });
+    } else if (o.status === "chiusa vinta" && iss === 0 && ve > 0) {
+      recRows.push({ o, tipo: "Vinta non ancora fatturata", ve, iss: 0, diff: -ve });
+    }
+  }
+  const recDiff = fatturato - valoreVinte;
+
   // ── 5. Azioni scadute ────────────────────────────────────────
   const scaduteOpps = opps.filter(o =>
     !o.archived &&
@@ -2383,21 +2402,33 @@ function generateReport() {
 
   // Sezione fatturato
   let fattHtml = `<table><thead><tr>
-    <th>Opportunità</th><th>Cliente</th><th>N° Fattura</th><th>Data</th><th class="right">Importo</th>
+    <th>Opportunità</th><th>Cliente</th><th>N° Fattura</th><th>Data</th><th class="right">Importo</th><th class="right">MOL</th><th class="right">MOL %</th>
   </tr></thead><tbody>`;
   if (fattRows.length === 0) {
-    fattHtml += `<tr><td colspan="5" class="muted">Nessuna fattura emessa nel periodo.</td></tr>`;
+    fattHtml += `<tr><td colspan="7" class="muted">Nessuna fattura emessa nel periodo.</td></tr>`;
   } else {
+    // Il costo di erogazione è per opportunità: se ci sono più fatture lo
+    // ripartisco in proporzione all'importo di ciascuna, così la somma dei
+    // MOL delle fatture = fatturato − costo delle opportunità fatturate.
+    let totFattMol = 0;
     for (const { opp, inv } of fattRows) {
+      const oppIssued = totalIssued(opp);
+      const costShare = oppIssued > 0 ? toNum(opp.serviceCost) * (toNum(inv.amount) / oppIssued) : 0;
+      const invMol  = toNum(inv.amount) - costShare;
+      const invMolP = toNum(inv.amount) > 0 ? (invMol / toNum(inv.amount)) * 100 : 0;
+      totFattMol += invMol;
       fattHtml += `<tr>
         <td><span class="badge blue mono">${escapeHtml(opp.oppId)}</span>${escapeHtml(opp.name)}</td>
         <td>${escapeHtml(opp.lead)}</td>
         <td class="mono">${escapeHtml(inv.number||"—")}</td>
         <td>${fmtDate(inv.date)}</td>
         <td class="right mono">${fmtEur(inv.amount)}</td>
+        <td class="right mono">${fmtEur(invMol)}</td>
+        <td class="right mono">${invMolP.toFixed(1)}%</td>
       </tr>`;
     }
-    fattHtml += `<tr class="total-row"><td colspan="4">Totale fatturato</td><td class="right mono">${fmtEur(fatturato)}</td></tr>`;
+    const totFattMolP = fatturato > 0 ? (totFattMol / fatturato) * 100 : 0;
+    fattHtml += `<tr class="total-row"><td colspan="4">Totale fatturato</td><td class="right mono">${fmtEur(fatturato)}</td><td class="right mono">${fmtEur(totFattMol)}</td><td class="right mono">${totFattMolP.toFixed(1)}%</td></tr>`;
   }
   fattHtml += `</tbody></table>`;
 
@@ -2594,6 +2625,28 @@ function generateReport() {
     <div class="section">
       <div class="section-title">Opportunità vinte nel periodo</div>
       <div class="table-wrap">${oppTableHtml(vinteOpps, "vinte")}</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Riconciliazione fatturato ↔ opportunità vinte</div>
+      <div style="font-size:12.5px;margin-bottom:8px;">
+        Totale fatturato <b class="mono">${fmtEur(fatturato)}</b> − totale vinte (valore previsto) <b class="mono">${fmtEur(valoreVinte)}</b>
+        = differenza <b class="mono">${fmtEur(recDiff)}</b>.
+        ${recRows.length === 0 ? "I due totali coincidono." : "Ecco da quali opportunità nasce:"}
+      </div>
+      ${recRows.length === 0 ? "" : `<div class="table-wrap"><table><thead><tr>
+        <th>Opportunità</th><th>Cliente</th><th>Motivo</th><th class="right">Valore previsto</th><th class="right">Fatturato</th><th class="right">Effetto sulla differenza</th>
+      </tr></thead><tbody>
+        ${recRows.map(r => `<tr>
+          <td><span class="badge blue mono">${escapeHtml(r.o.oppId)}</span>${escapeHtml(r.o.name)}</td>
+          <td>${escapeHtml(r.o.lead)}</td>
+          <td>${escapeHtml(r.tipo)}</td>
+          <td class="right mono">${r.ve ? fmtEur(r.ve) : "—"}</td>
+          <td class="right mono">${r.iss ? fmtEur(r.iss) : "—"}</td>
+          <td class="right mono ${r.diff < 0 ? "warn" : ""}">${r.diff > 0 ? "+" : ""}${fmtEur(r.diff)}</td>
+        </tr>`).join("")}
+        <tr class="total-row"><td colspan="5">Totale differenza</td><td class="right mono">${fmtEur(recRows.reduce((s,r)=>s+r.diff,0))}</td></tr>
+      </tbody></table></div>`}
     </div>
 
     <div class="section">
