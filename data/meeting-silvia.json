@@ -265,8 +265,9 @@
           "text": "inserisci Alessandro Bruni nelle mail newsletter",
           "who": "Silvia",
           "date": "2026-08-03",
-          "done": false,
-          "createdAt": "2026-07-31T09:25:34.066Z"
+          "done": true,
+          "createdAt": "2026-07-31T09:25:34.066Z",
+          "updatedAt": "2026-09-24T07:50:53.207Z"
         },
         {
           "id": "ms8r4q4zqhhfmr",
@@ -343,5 +344,5 @@
       "updatedAt": "2026-09-18T09:18:17.927Z"
     }
   ],
-  "updatedAt": "2026-09-18T09:18:17.927Z"
+  "updatedAt": "2026-09-24T07:50:53.207Z"
 }
