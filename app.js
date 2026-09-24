@@ -2324,6 +2324,7 @@ function generateReport() {
       // Valore base MOL per commerciale: pipeline + vinte con cascata. La somma
       // di questa colonna quadra col "Valore totale (base MOL)" del riepilogo.
       molBase:       mine.reduce((s,o)=>s+molBaseFor(o).base,0),
+      molCost:       mine.reduce((s,o)=>s+toNum(o.serviceCost),0),
       scadute:       mine.filter(o=>!o.archived&&o.nextActionDate&&o.nextActionDate<today&&["aperta","sospesa"].includes(o.status)).length,
     };
   }
@@ -2362,8 +2363,14 @@ function generateReport() {
     .muted { color: #7a85a0; }
     .right { text-align: right; }
     .total-row td { font-weight: 700; background: #f8f9fb; }
+    /* Tabelle larghe (molte colonne): consenti scroll orizzontale a schermo */
+    .table-wrap { overflow-x: auto; }
+    .table-wrap table { min-width: 720px; }
     @media print {
       body { padding: 0; }
+      /* In stampa, orientamento orizzontale per far entrare tutte le colonne */
+      @page { size: landscape; margin: 12mm; }
+      .table-wrap { overflow: visible; }
       .no-print { display: none; }
       .section { break-inside: avoid; }
     }
@@ -2416,18 +2423,27 @@ function generateReport() {
   // Sezione vinte/perse
   function oppTableHtml(list, label) {
     if (list.length === 0) return `<p class="muted">Nessuna opportunità ${label} nel periodo.</p>`;
-    let tot = 0;
-    let h = `<table><thead><tr><th>Opportunità</th><th>Cliente</th><th>Commerciale</th><th class="right">Valore previsto</th></tr></thead><tbody>`;
+    let tot = 0, totBase = 0, totCost = 0;
+    let h = `<table><thead><tr><th>Opportunità</th><th>Cliente</th><th>Commerciale</th><th class="right">Valore previsto</th><th class="right">MOL</th><th class="right">MOL %</th></tr></thead><tbody>`;
     for (const o of list) {
       tot += toNum(o.valueExpected);
+      const base = molBaseFor(o).base;
+      const cost = toNum(o.serviceCost);
+      const mol  = base - cost;
+      const molP = base > 0 ? (mol/base)*100 : 0;
+      totBase += base; totCost += cost;
       h += `<tr>
         <td><span class="badge blue mono">${escapeHtml(o.oppId)}</span>${escapeHtml(o.name)}</td>
         <td>${escapeHtml(o.lead)}</td>
         <td>${escapeHtml(o.owner)}</td>
         <td class="right mono">${fmtEur(o.valueExpected)}</td>
+        <td class="right mono">${fmtEur(mol)}</td>
+        <td class="right mono">${molP.toFixed(1)}%</td>
       </tr>`;
     }
-    h += `<tr class="total-row"><td colspan="3">Totale</td><td class="right mono">${fmtEur(tot)}</td></tr>`;
+    const totMol = totBase - totCost;
+    const totMolP = totBase > 0 ? (totMol/totBase)*100 : 0;
+    h += `<tr class="total-row"><td colspan="3">Totale</td><td class="right mono">${fmtEur(tot)}</td><td class="right mono">${fmtEur(totMol)}</td><td class="right mono">${totMolP.toFixed(1)}%</td></tr>`;
     h += `</tbody></table>`;
     return h;
   }
@@ -2436,19 +2452,28 @@ function generateReport() {
   // pipeline aperta, dove serve distinguere le fasi (es. attesa CTR / mandare CTR).
   function oppTableHtmlWithPhase(list, label) {
     if (list.length === 0) return `<p class="muted">Nessuna opportunità ${label}.</p>`;
-    let tot = 0;
-    let h = `<table><thead><tr><th>Opportunità</th><th>Cliente</th><th>Commerciale</th><th>Fase</th><th class="right">Valore previsto</th></tr></thead><tbody>`;
+    let tot = 0, totBase = 0, totCost = 0;
+    let h = `<table><thead><tr><th>Opportunità</th><th>Cliente</th><th>Commerciale</th><th>Fase</th><th class="right">Valore previsto</th><th class="right">MOL</th><th class="right">MOL %</th></tr></thead><tbody>`;
     for (const o of list) {
       tot += toNum(o.valueExpected);
+      const base = molBaseFor(o).base;
+      const cost = toNum(o.serviceCost);
+      const mol  = base - cost;
+      const molP = base > 0 ? (mol/base)*100 : 0;
+      totBase += base; totCost += cost;
       h += `<tr>
         <td><span class="badge blue mono">${escapeHtml(o.oppId)}</span>${escapeHtml(o.name)}</td>
         <td>${escapeHtml(o.lead)}</td>
         <td>${escapeHtml(o.owner)}</td>
         <td>${escapeHtml(o.phase)}</td>
         <td class="right mono">${fmtEur(o.valueExpected)}</td>
+        <td class="right mono">${fmtEur(mol)}</td>
+        <td class="right mono">${molP.toFixed(1)}%</td>
       </tr>`;
     }
-    h += `<tr class="total-row"><td colspan="4">Totale pipeline</td><td class="right mono">${fmtEur(tot)}</td></tr>`;
+    const totMol = totBase - totCost;
+    const totMolP = totBase > 0 ? (totMol/totBase)*100 : 0;
+    h += `<tr class="total-row"><td colspan="4">Totale pipeline</td><td class="right mono">${fmtEur(tot)}</td><td class="right mono">${fmtEur(totMol)}</td><td class="right mono">${totMolP.toFixed(1)}%</td></tr>`;
     h += `</tbody></table>`;
     return h;
   }
@@ -2476,12 +2501,14 @@ function generateReport() {
   let ownerHtml = `<table><thead><tr>
     <th>Commerciale</th><th class="right">Opp. aperte</th><th class="right">Pipeline</th>
     <th class="right">Vinte periodo</th><th class="right">Valore vinte</th><th class="right">Perse periodo</th>
-    <th class="right">Fatturato periodo</th><th class="right">Valore base MOL</th><th class="right">Azioni scadute</th>
+    <th class="right">Fatturato periodo</th><th class="right">Valore base MOL</th><th class="right">MOL</th><th class="right">MOL %</th><th class="right">Azioni scadute</th>
   </tr></thead><tbody>`;
-  const OT = { aperte:0, pipeline:0, vinte:0, valoreVinte:0, perse:0, fatturato:0, molBase:0, scadute:0 };
+  const OT = { aperte:0, pipeline:0, vinte:0, valoreVinte:0, perse:0, fatturato:0, molBase:0, molCost:0, scadute:0 };
   for (const [name, d] of Object.entries(byOwner)) {
     OT.aperte+=d.aperte; OT.pipeline+=d.pipeline; OT.vinte+=d.vinte; OT.valoreVinte+=d.valoreVinte;
-    OT.perse+=d.perse; OT.fatturato+=d.fatturato; OT.molBase+=d.molBase; OT.scadute+=d.scadute;
+    OT.perse+=d.perse; OT.fatturato+=d.fatturato; OT.molBase+=d.molBase; OT.molCost+=d.molCost; OT.scadute+=d.scadute;
+    const dMol = d.molBase - d.molCost;
+    const dMolP = d.molBase > 0 ? (dMol/d.molBase)*100 : 0;
     ownerHtml += `<tr>
       <td><strong>${escapeHtml(name)}</strong></td>
       <td class="right">${d.aperte}</td>
@@ -2491,9 +2518,13 @@ function generateReport() {
       <td class="right">${d.perse}</td>
       <td class="right mono">${fmtEur(d.fatturato)}</td>
       <td class="right mono">${fmtEur(d.molBase)}</td>
+      <td class="right mono">${fmtEur(dMol)}</td>
+      <td class="right mono">${dMolP.toFixed(1)}%</td>
       <td class="right ${d.scadute > 0 ? "warn" : ""}">${d.scadute}</td>
     </tr>`;
   }
+  const OTMol = OT.molBase - OT.molCost;
+  const OTMolP = OT.molBase > 0 ? (OTMol/OT.molBase)*100 : 0;
   ownerHtml += `<tr class="total-row">
       <td>Totale</td>
       <td class="right">${OT.aperte}</td>
@@ -2503,6 +2534,8 @@ function generateReport() {
       <td class="right">${OT.perse}</td>
       <td class="right mono">${fmtEur(OT.fatturato)}</td>
       <td class="right mono">${fmtEur(OT.molBase)}</td>
+      <td class="right mono">${fmtEur(OTMol)}</td>
+      <td class="right mono">${OTMolP.toFixed(1)}%</td>
       <td class="right">${OT.scadute}</td>
     </tr>`;
   ownerHtml += `</tbody></table>`;
@@ -2555,17 +2588,17 @@ function generateReport() {
 
     <div class="section">
       <div class="section-title">Opportunità aperte / pipeline (${pipelineDetailOpps.length})</div>
-      ${oppTableHtmlWithPhase(pipelineDetailOpps, "aperta in pipeline")}
+      <div class="table-wrap">${oppTableHtmlWithPhase(pipelineDetailOpps, "aperta in pipeline")}</div>
     </div>
 
     <div class="section">
       <div class="section-title">Opportunità vinte nel periodo</div>
-      ${oppTableHtml(vinteOpps, "vinte")}
+      <div class="table-wrap">${oppTableHtml(vinteOpps, "vinte")}</div>
     </div>
 
     <div class="section">
       <div class="section-title">Opportunità perse / abbandonate nel periodo</div>
-      ${oppTableHtml(perseOpps, "perse o abbandonate")}
+      <div class="table-wrap">${oppTableHtml(perseOpps, "perse o abbandonate")}</div>
     </div>
 
     <div class="section">
@@ -2575,7 +2608,7 @@ function generateReport() {
 
     <div class="section">
       <div class="section-title">Dettaglio per commerciale</div>
-      ${ownerHtml}
+      <div class="table-wrap">${ownerHtml}</div>
     </div>
   </body></html>`;
 }
