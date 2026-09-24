@@ -342,7 +342,32 @@
       "actions": [],
       "createdAt": "2026-09-18T08:36:27.930Z",
       "updatedAt": "2026-09-18T09:18:17.927Z"
+    },
+    {
+      "id": "muf8gvr2m4zvpv",
+      "code": "26-012",
+      "title": "Riunione del 25 settembre",
+      "date": "2026-09-24",
+      "timeStart": "",
+      "timeEnd": "",
+      "client": "",
+      "topics": [],
+      "participants": [],
+      "agenda": [
+        {
+          "text": "pillola sito e newsletter",
+          "notes": ""
+        },
+        {
+          "text": "catalogo",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-09-24T07:51:37.407Z",
+      "updatedAt": "2026-09-24T07:51:37.407Z"
     }
   ],
-  "updatedAt": "2026-09-24T07:50:53.207Z"
+  "updatedAt": "2026-09-24T07:51:37.407Z"
 }
