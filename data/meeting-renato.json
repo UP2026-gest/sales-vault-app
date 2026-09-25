@@ -819,7 +819,58 @@
       "actions": [],
       "createdAt": "2026-09-18T07:10:48.743Z",
       "updatedAt": "2026-09-18T08:54:42.137Z"
+    },
+    {
+      "id": "mugpizytgqigdy",
+      "code": "26-018",
+      "title": "(Copia) meeting UP",
+      "date": "2026-09-25",
+      "timeStart": "11:00",
+      "timeEnd": "12:00",
+      "client": "",
+      "topics": [
+        "commerciale",
+        "didattica",
+        "amministrazione",
+        "mkt"
+      ],
+      "participants": [
+        "Stefania",
+        "Silvia",
+        "Valentina",
+        "Lucia"
+      ],
+      "agenda": [
+        {
+          "text": "fatture in cloud, fattura 52 per pagamenti compensati da NdC1",
+          "notes": "verifica Lucia e poi mi fa sapere"
+        },
+        {
+          "text": "nuovo catalogo",
+          "notes": "si stanno sentendo Vale e Silvia, stiamo aspettando Globalan per la sicurezza informatica"
+        },
+        {
+          "text": "scuola montichiari ok",
+          "notes": ""
+        },
+        {
+          "text": "assistenti sociali, hanno approvato nuovo regolamento quindi dobbiamo ricominciare da capo",
+          "notes": ""
+        },
+        {
+          "text": "aggiornamento network docenti?",
+          "notes": "link piattaforma incontro della AI inviato, Vale deve mandare comunicazione su whatsapp"
+        },
+        {
+          "text": "corsi msf di GdT e Excel, partono?",
+          "notes": "excel parte, GdT no"
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-09-25T08:36:55.829Z",
+      "updatedAt": "2026-09-25T08:36:55.829Z"
     }
   ],
-  "updatedAt": "2026-09-25T08:36:50.452Z"
+  "updatedAt": "2026-09-25T08:36:55.829Z"
 }
