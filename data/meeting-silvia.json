@@ -368,10 +368,19 @@
         }
       ],
       "notes": "",
-      "actions": [],
+      "actions": [
+        {
+          "id": "mugqs9n2mucyhf",
+          "text": "sondaggio per chi partecipa il 15 ottobre",
+          "who": "",
+          "date": "2026-10-02",
+          "done": false,
+          "createdAt": "2026-09-25T09:12:07.886Z"
+        }
+      ],
       "createdAt": "2026-09-24T07:51:37.407Z",
-      "updatedAt": "2026-09-24T08:59:42.840Z"
+      "updatedAt": "2026-09-25T09:12:07.886Z"
     }
   ],
-  "updatedAt": "2026-09-24T08:59:42.840Z"
+  "updatedAt": "2026-09-25T09:12:07.886Z"
 }
