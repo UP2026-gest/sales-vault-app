@@ -823,7 +823,7 @@
     {
       "id": "mugpizytgqigdy",
       "code": "26-018",
-      "title": "(Copia) meeting UP",
+      "title": "meeting UP",
       "date": "2026-09-25",
       "timeStart": "11:00",
       "timeEnd": "12:00",
@@ -842,35 +842,35 @@
       ],
       "agenda": [
         {
-          "text": "fatture in cloud, fattura 52 per pagamenti compensati da NdC1",
-          "notes": "verifica Lucia e poi mi fa sapere"
-        },
-        {
-          "text": "nuovo catalogo",
+          "text": "nuovo catalogo urgente",
           "notes": "si stanno sentendo Vale e Silvia, stiamo aspettando Globalan per la sicurezza informatica"
         },
         {
-          "text": "scuola montichiari ok",
-          "notes": ""
-        },
-        {
-          "text": "assistenti sociali, hanno approvato nuovo regolamento quindi dobbiamo ricominciare da capo",
-          "notes": ""
-        },
-        {
-          "text": "aggiornamento network docenti?",
+          "text": "network docenti, prima segnalazione ma privato",
           "notes": "link piattaforma incontro della AI inviato, Vale deve mandare comunicazione su whatsapp"
         },
         {
-          "text": "corsi msf di GdT e Excel, partono?",
-          "notes": "excel parte, GdT no"
+          "text": "inserire data 2015 e logo fit factory in catalogo UP",
+          "notes": ""
+        },
+        {
+          "text": "incontro network docenti, serve comunque iscrizione",
+          "notes": ""
+        },
+        {
+          "text": "newsletter, aggiornamenti? ho iscritto silvia cremaschini",
+          "notes": ""
+        },
+        {
+          "text": "fit factory mi vuole introdurre in Regesta, mercoledì o giovedì settimana prossima potrei avere appuntamento",
+          "notes": ""
         }
       ],
       "notes": "",
       "actions": [],
       "createdAt": "2026-09-25T08:36:55.829Z",
-      "updatedAt": "2026-09-25T08:36:55.829Z"
+      "updatedAt": "2026-09-25T08:39:03.764Z"
     }
   ],
-  "updatedAt": "2026-09-25T08:36:55.829Z"
+  "updatedAt": "2026-09-25T08:39:03.764Z"
 }
