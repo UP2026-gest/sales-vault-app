@@ -393,27 +393,19 @@
       "participants": [],
       "agenda": [
         {
-          "text": "corsi Montichiari",
+          "text": "aggiornamento didattica",
           "notes": ""
         },
         {
-          "text": "2 corso Excel",
-          "notes": ""
-        },
-        {
-          "text": "proposta corso hotellerie",
-          "notes": ""
-        },
-        {
-          "text": "appuntamenti con i clienti",
+          "text": "network",
           "notes": ""
         }
       ],
       "notes": "",
       "actions": [],
       "createdAt": "2026-10-09T08:53:04.184Z",
-      "updatedAt": "2026-10-09T08:53:04.184Z"
+      "updatedAt": "2026-10-09T08:53:42.216Z"
     }
   ],
-  "updatedAt": "2026-10-09T08:53:04.184Z"
+  "updatedAt": "2026-10-09T08:53:42.216Z"
 }
