@@ -380,7 +380,40 @@
       ],
       "createdAt": "2026-09-24T07:51:37.407Z",
       "updatedAt": "2026-09-25T09:38:16.891Z"
+    },
+    {
+      "id": "mv0q9ohk52783u",
+      "code": "26-013",
+      "title": "Riunione 9 ottobre",
+      "date": "2026-10-09",
+      "timeStart": "",
+      "timeEnd": "",
+      "client": "",
+      "topics": [],
+      "participants": [],
+      "agenda": [
+        {
+          "text": "corsi Montichiari",
+          "notes": ""
+        },
+        {
+          "text": "2 corso Excel",
+          "notes": ""
+        },
+        {
+          "text": "proposta corso hotellerie",
+          "notes": ""
+        },
+        {
+          "text": "appuntamenti con i clienti",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-10-09T08:53:04.184Z",
+      "updatedAt": "2026-10-09T08:53:04.184Z"
     }
   ],
-  "updatedAt": "2026-09-25T09:38:16.891Z"
+  "updatedAt": "2026-10-09T08:53:04.184Z"
 }
