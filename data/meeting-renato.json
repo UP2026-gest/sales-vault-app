@@ -927,7 +927,35 @@
       "actions": [],
       "createdAt": "2026-10-07T13:57:45.750Z",
       "updatedAt": "2026-10-07T13:58:06.581Z"
+    },
+    {
+      "id": "mv40c8f5ddudqk",
+      "code": "26-021",
+      "title": "Raffmetal",
+      "date": "2026-10-12",
+      "timeStart": "15:30",
+      "timeEnd": "16:00",
+      "client": "Raffmetal",
+      "topics": [],
+      "participants": [
+        "Silvia",
+        "Raffaella Bruni"
+      ],
+      "agenda": [
+        {
+          "text": "nuovi corsi 2027",
+          "notes": ""
+        },
+        {
+          "text": "adeguamento prezzi",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-10-11T15:58:18.017Z",
+      "updatedAt": "2026-10-11T15:58:18.017Z"
     }
   ],
-  "updatedAt": "2026-10-07T13:58:06.581Z"
+  "updatedAt": "2026-10-11T15:58:18.017Z"
 }
