@@ -968,12 +968,45 @@
       "participants": [
         "Micol Vezzoli"
       ],
-      "agenda": [],
+      "agenda": [
+        {
+          "text": "chi è il pubblico?",
+          "notes": ""
+        },
+        {
+          "text": "Cosa vorresti che si portassero a casa",
+          "notes": ""
+        },
+        {
+          "text": "hai qualche consiglio su temi che sai che la community ha?",
+          "notes": ""
+        },
+        {
+          "text": "quando e con che domande vuoi intervenire? Faccio io delle proposte?",
+          "notes": ""
+        },
+        {
+          "text": "c'è qualche tema da evitare?",
+          "notes": ""
+        },
+        {
+          "text": "Chiusiamo con promo commerciale per il pubblico, offerta da UP e templus insieme?",
+          "notes": ""
+        },
+        {
+          "text": "Se sì, cosa potrebbe funzionare? Sconto? Minipercorso?",
+          "notes": ""
+        },
+        {
+          "text": "C'è un modo per avere i loro contatti? Potrei inviare loro le slide utilizzate",
+          "notes": ""
+        }
+      ],
       "notes": "",
       "actions": [],
       "createdAt": "2026-10-13T13:16:20.711Z",
-      "updatedAt": "2026-10-13T13:16:20.711Z"
+      "updatedAt": "2026-10-13T13:22:40.399Z"
     }
   ],
-  "updatedAt": "2026-10-13T13:16:20.711Z"
+  "updatedAt": "2026-10-13T13:22:40.399Z"
 }
