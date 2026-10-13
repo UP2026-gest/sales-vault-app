@@ -955,7 +955,25 @@
       "actions": [],
       "createdAt": "2026-10-11T15:58:18.017Z",
       "updatedAt": "2026-10-12T13:23:17.541Z"
+    },
+    {
+      "id": "mv6pfntzgbqlxz",
+      "code": "26-022",
+      "title": "TEMplus preparazione per evento 29 ottobre",
+      "date": "2026-10-13",
+      "timeStart": "15:30",
+      "timeEnd": "16:30",
+      "client": "TEMplus",
+      "topics": [],
+      "participants": [
+        "Micol Vezzoli"
+      ],
+      "agenda": [],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-10-13T13:16:20.711Z",
+      "updatedAt": "2026-10-13T13:16:20.711Z"
     }
   ],
-  "updatedAt": "2026-10-12T13:23:17.541Z"
+  "updatedAt": "2026-10-13T13:16:20.711Z"
 }
