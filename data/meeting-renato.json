@@ -1028,7 +1028,26 @@
       "actions": [],
       "createdAt": "2026-10-16T06:06:34.158Z",
       "updatedAt": "2026-10-16T06:07:12.120Z"
+    },
+    {
+      "id": "mvakgedxvwy1ph",
+      "code": "26-024",
+      "title": "Regesta Group",
+      "date": "2026-10-14",
+      "timeStart": "14:30",
+      "timeEnd": "15:00",
+      "client": "Regesta Group",
+      "topics": [],
+      "participants": [
+        "Fabio Zubani",
+        "Silvia Cerri"
+      ],
+      "agenda": [],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-10-16T06:08:01.749Z",
+      "updatedAt": "2026-10-16T06:08:01.749Z"
     }
   ],
-  "updatedAt": "2026-10-16T06:07:12.120Z"
+  "updatedAt": "2026-10-16T06:08:01.749Z"
 }
