@@ -1047,7 +1047,58 @@
       "actions": [],
       "createdAt": "2026-10-16T06:08:01.749Z",
       "updatedAt": "2026-10-16T06:08:24.231Z"
+    },
+    {
+      "id": "mvakh3p56im8yg",
+      "code": "26-025",
+      "title": "(Copia) meeting UP",
+      "date": "2026-10-16",
+      "timeStart": "11:00",
+      "timeEnd": "12:00",
+      "client": "",
+      "topics": [
+        "commerciale",
+        "didattica",
+        "amministrazione",
+        "mkt"
+      ],
+      "participants": [
+        "Stefania",
+        "Silvia",
+        "Valentina",
+        "Lucia"
+      ],
+      "agenda": [
+        {
+          "text": "nuovo catalogo urgente",
+          "notes": "si stanno sentendo Vale e Silvia, stiamo aspettando Globalan per la sicurezza informatica"
+        },
+        {
+          "text": "network docenti, prima segnalazione ma privato",
+          "notes": "link piattaforma incontro della AI inviato, Vale deve mandare comunicazione su whatsapp"
+        },
+        {
+          "text": "inserire data 2015 e logo fit factory in catalogo UP",
+          "notes": ""
+        },
+        {
+          "text": "incontro network docenti, serve comunque iscrizione",
+          "notes": ""
+        },
+        {
+          "text": "newsletter, aggiornamenti? ho iscritto silvia cremaschini",
+          "notes": ""
+        },
+        {
+          "text": "fit factory mi vuole introdurre in Regesta, mercoledÃ¬ o giovedÃ¬ settimana prossima potrei avere appuntamento",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-10-16T06:08:34.553Z",
+      "updatedAt": "2026-10-16T06:08:34.553Z"
     }
   ],
-  "updatedAt": "2026-10-16T06:08:24.231Z"
+  "updatedAt": "2026-10-16T06:08:34.553Z"
 }
