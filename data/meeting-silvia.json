@@ -406,7 +406,23 @@
       "actions": [],
       "createdAt": "2026-10-09T08:53:04.184Z",
       "updatedAt": "2026-10-09T10:00:26.652Z"
+    },
+    {
+      "id": "mvar8tv104to1q",
+      "code": "26-014",
+      "title": "Riunione 16 ottobre",
+      "date": "2026-10-16",
+      "timeStart": "11:30",
+      "timeEnd": "",
+      "client": "",
+      "topics": [],
+      "participants": [],
+      "agenda": [],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-10-16T09:18:05.869Z",
+      "updatedAt": "2026-10-16T09:18:05.869Z"
     }
   ],
-  "updatedAt": "2026-10-09T10:00:26.652Z"
+  "updatedAt": "2026-10-16T09:18:05.869Z"
 }
