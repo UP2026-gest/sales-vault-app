@@ -1114,7 +1114,7 @@
     {
       "id": "mvakn8gtm4yb30",
       "code": "26-026",
-      "title": "(Copia) Meeting UP MSF Piazza",
+      "title": "Meeting UP MSF Piazza",
       "date": "2026-10-16",
       "timeStart": "12:00",
       "timeEnd": "13:00",
@@ -1128,27 +1128,23 @@
       ],
       "agenda": [
         {
-          "text": "aggiornamento situazione fatturato/margine",
-          "notes": "basandomi sui precedenti bilanci, il nostro costo (escluso erogazione) dovrebbe essere intorno a ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ¬ 36000 (18k silvia, 12k renato, 6k varie e ammortamenti). \nAl momento, abbiamo fatturato molto meno dello scorso anno ( 2025 71,5k con MOL 32,1k, 45,1%, contro 32,7k con MOL 16,8, 52,7%) quindi - 39k di fattuato ma, a causa di una margnalitÃÂÃÂÃÂÃÂ  molto piÃÂÃÂÃÂÃÂ¹ alta, la diminuzione di MOL ÃÂÃÂÃÂÃÂ¨ -16k. \nNegli ultimi 3 mesi del 2025 abbiamo fatturato 16,68k con MOL di 9,4k, per il 2026 al momento abbiamo 20,8 k approvate con 12,3k di MOL (59%), quindi vuol dire che se entrasse tutto saremmo a 53,5k di fatturato e 27,1k di MOL, quindi ci mancano 9k di MOL al pareggio, corrispondenti a 18k di fatturato. Abbiamo fuori proposte per circa 10 k su cui al momento non abbiamo riscontri"
-        },
-        {
-          "text": "accordo fit factory + proposta Regesta",
+          "text": "qualche possibile contratto non previsto - ASA e corso excel",
           "notes": ""
         },
         {
-          "text": "concordato preventivo, 11 k per  2026 e 20k per 2027",
-          "notes": "rifiutare"
+          "text": "novità su ammortamenti?",
+          "notes": ""
         },
         {
-          "text": "commerciali, valutazione CV",
+          "text": "mio compenso per 2027",
           "notes": ""
         }
       ],
       "notes": "",
       "actions": [],
       "createdAt": "2026-10-16T06:13:20.669Z",
-      "updatedAt": "2026-10-16T06:13:20.669Z"
+      "updatedAt": "2026-10-16T06:15:00.137Z"
     }
   ],
-  "updatedAt": "2026-10-16T06:13:20.669Z"
+  "updatedAt": "2026-10-16T06:15:00.137Z"
 }
