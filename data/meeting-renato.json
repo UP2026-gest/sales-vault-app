@@ -1103,7 +1103,7 @@
         },
         {
           "text": "Contratti per corso di gruppo excel, devo ancora prepararli",
-          "notes": ""
+          "notes": "un contratto con 2 persone? 3 contratti diversi? Servono i dati fatturazione\n"
         },
         {
           "text": "Ordine assistenti sociali Lombardia, rinnovato convenzione 26-28, gratuito per eventi gratuiti",
@@ -1113,7 +1113,7 @@
       "notes": "",
       "actions": [],
       "createdAt": "2026-10-16T06:08:34.553Z",
-      "updatedAt": "2026-10-16T08:37:58.641Z"
+      "updatedAt": "2026-10-16T08:38:42.793Z"
     },
     {
       "id": "mvakn8gtm4yb30",
@@ -1154,5 +1154,5 @@
       "updatedAt": "2026-10-16T07:02:52.383Z"
     }
   ],
-  "updatedAt": "2026-10-16T08:37:58.641Z"
+  "updatedAt": "2026-10-16T08:38:42.793Z"
 }
