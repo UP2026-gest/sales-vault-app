@@ -1051,7 +1051,7 @@
     {
       "id": "mvakh3p56im8yg",
       "code": "26-025",
-      "title": "(Copia) meeting UP",
+      "title": "meeting UP",
       "date": "2026-10-16",
       "timeStart": "11:00",
       "timeEnd": "12:00",
@@ -1070,35 +1070,47 @@
       ],
       "agenda": [
         {
-          "text": "nuovo catalogo urgente",
+          "text": "nuovo catalogo",
           "notes": "si stanno sentendo Vale e Silvia, stiamo aspettando Globalan per la sicurezza informatica"
         },
         {
-          "text": "network docenti, prima segnalazione ma privato",
+          "text": "network docenti, segnalazione per traduzione",
           "notes": "link piattaforma incontro della AI inviato, Vale deve mandare comunicazione su whatsapp"
         },
         {
-          "text": "inserire data 2015 e logo fit factory in catalogo UP",
+          "text": "newsletter, chi si è disiscritto?",
           "notes": ""
         },
         {
-          "text": "incontro network docenti, serve comunque iscrizione",
+          "text": "Assistenti Sociali, rinnovo approvato",
           "notes": ""
         },
         {
-          "text": "newsletter, aggiornamenti? ho iscritto silvia cremaschini",
+          "text": "Regesta, mio workshop e inserimento in formazione interna, vedremo per più ampia",
           "notes": ""
         },
         {
-          "text": "fit factory mi vuole introdurre in Regesta, mercoledÃ¬ o giovedÃ¬ settimana prossima potrei avere appuntamento",
+          "text": "Nicolis, continua a proporre per scuole",
+          "notes": ""
+        },
+        {
+          "text": "Jelena, segnalazione per traduzione e possibile nuovo corso a Vicenza",
+          "notes": ""
+        },
+        {
+          "text": "Fit Factory, a fine evento del 21/10 ricorderemo convenzione in essere",
+          "notes": ""
+        },
+        {
+          "text": "Contratti per corso di gruppo excelo, devo ancora prepararli",
           "notes": ""
         }
       ],
       "notes": "",
       "actions": [],
       "createdAt": "2026-10-16T06:08:34.553Z",
-      "updatedAt": "2026-10-16T06:08:34.553Z"
+      "updatedAt": "2026-10-16T06:13:12.121Z"
     }
   ],
-  "updatedAt": "2026-10-16T06:08:34.553Z"
+  "updatedAt": "2026-10-16T06:13:12.121Z"
 }
