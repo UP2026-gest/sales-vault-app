@@ -417,12 +417,21 @@
       "client": "",
       "topics": [],
       "participants": [],
-      "agenda": [],
+      "agenda": [
+        {
+          "text": "Feedback attività di ieri + prossima attività",
+          "notes": ""
+        },
+        {
+          "text": "Giro clienti",
+          "notes": ""
+        }
+      ],
       "notes": "",
       "actions": [],
       "createdAt": "2026-10-16T09:18:05.869Z",
-      "updatedAt": "2026-10-16T09:18:05.869Z"
+      "updatedAt": "2026-10-16T09:19:34.437Z"
     }
   ],
-  "updatedAt": "2026-10-16T09:18:05.869Z"
+  "updatedAt": "2026-10-16T09:19:34.437Z"
 }
