@@ -454,14 +454,18 @@
         {
           "text": "incontro Nicolis",
           "notes": ""
+        },
+        {
+          "text": "creazione WA business su numero business",
+          "notes": ""
         }
       ],
       "notes": "\n",
       "actions": [],
       "createdAt": "2026-10-23T09:12:08.051Z",
-      "updatedAt": "2026-10-23T09:30:31.306Z"
+      "updatedAt": "2026-10-23T09:34:16.372Z"
     }
   ],
-  "updatedAt": "2026-10-23T09:30:31.306Z",
+  "updatedAt": "2026-10-23T09:34:16.372Z",
   "deleted": []
 }
