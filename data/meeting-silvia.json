@@ -446,14 +446,18 @@
         {
           "text": "corso excel Renato: prova BBB con Renato per corso Excel e aggiungi in gestionale riportando i numeri dei contratti",
           "notes": ""
+        },
+        {
+          "text": "visite clienti per aggiornamento prezzi",
+          "notes": ""
         }
       ],
       "notes": "\n",
       "actions": [],
       "createdAt": "2026-10-23T09:12:08.051Z",
-      "updatedAt": "2026-10-23T09:15:41.948Z"
+      "updatedAt": "2026-10-23T09:16:05.281Z"
     }
   ],
-  "updatedAt": "2026-10-23T09:15:41.948Z",
+  "updatedAt": "2026-10-23T09:16:05.281Z",
   "deleted": []
 }
