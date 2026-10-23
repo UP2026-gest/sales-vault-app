@@ -1204,14 +1204,18 @@
         {
           "text": "trifold",
           "notes": "possiamo metterne qualcuno sul bancone?"
+        },
+        {
+          "text": "Ammortamenti, news?",
+          "notes": ""
         }
       ],
       "notes": "",
       "actions": [],
       "createdAt": "2026-10-23T07:33:59.278Z",
-      "updatedAt": "2026-10-23T09:15:01.221Z"
+      "updatedAt": "2026-10-23T09:54:32.447Z"
     }
   ],
-  "updatedAt": "2026-10-23T09:15:01.221Z",
+  "updatedAt": "2026-10-23T09:54:32.447Z",
   "deleted": []
 }
