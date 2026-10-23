@@ -442,13 +442,18 @@
       "client": "",
       "topics": [],
       "participants": [],
-      "agenda": [],
+      "agenda": [
+        {
+          "text": "corso excel Renato: prova BBB con Renato per corso Excel e aggiungi in gestionale riportando i numeri dei contratti",
+          "notes": ""
+        }
+      ],
       "notes": "\n",
       "actions": [],
       "createdAt": "2026-10-23T09:12:08.051Z",
-      "updatedAt": "2026-10-23T09:15:36.773Z"
+      "updatedAt": "2026-10-23T09:15:41.948Z"
     }
   ],
-  "updatedAt": "2026-10-23T09:15:36.773Z",
+  "updatedAt": "2026-10-23T09:15:41.948Z",
   "deleted": []
 }
