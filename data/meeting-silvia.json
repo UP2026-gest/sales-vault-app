@@ -450,14 +450,18 @@
         {
           "text": "visite clienti per aggiornamento prezzi",
           "notes": ""
+        },
+        {
+          "text": "incontro Nicolis",
+          "notes": ""
         }
       ],
       "notes": "\n",
       "actions": [],
       "createdAt": "2026-10-23T09:12:08.051Z",
-      "updatedAt": "2026-10-23T09:16:05.281Z"
+      "updatedAt": "2026-10-23T09:30:31.306Z"
     }
   ],
-  "updatedAt": "2026-10-23T09:16:05.281Z",
+  "updatedAt": "2026-10-23T09:30:31.306Z",
   "deleted": []
 }
