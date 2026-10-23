@@ -1191,7 +1191,7 @@
         },
         {
           "text": "qrcode con rimandi whatsapp",
-          "notes": "preferirei evitare il mio numero privato"
+          "notes": "preferirei evitare il mio numero privato, ho visto che è possibile associare anche numeri VoIP come "
         },
         {
           "text": "appuntamenti per revisioni prezzi",
@@ -1205,9 +1205,9 @@
       "notes": "",
       "actions": [],
       "createdAt": "2026-10-23T07:33:59.278Z",
-      "updatedAt": "2026-10-23T08:45:28.921Z"
+      "updatedAt": "2026-10-23T08:45:42.933Z"
     }
   ],
-  "updatedAt": "2026-10-23T08:45:28.921Z",
+  "updatedAt": "2026-10-23T08:45:42.933Z",
   "deleted": []
 }
