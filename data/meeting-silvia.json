@@ -431,7 +431,24 @@
       "actions": [],
       "createdAt": "2026-10-16T09:18:05.869Z",
       "updatedAt": "2026-10-16T10:12:52.384Z"
+    },
+    {
+      "id": "mvkr44fn4ibhr5",
+      "code": "26-015",
+      "title": "23/10/2026",
+      "date": "2026-10-23",
+      "timeStart": "",
+      "timeEnd": "",
+      "client": "",
+      "topics": [],
+      "participants": [],
+      "agenda": [],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-10-23T09:12:08.051Z",
+      "updatedAt": "2026-10-23T09:12:08.051Z"
     }
   ],
-  "updatedAt": "2026-10-16T10:12:52.384Z"
+  "updatedAt": "2026-10-23T09:12:08.051Z",
+  "deleted": []
 }
