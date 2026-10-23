@@ -53,9 +53,9 @@
           "text": "Stefania ci fa sapere da Sossi che piattaforma usare",
           "who": "Stefnia",
           "date": "2026-06-12",
-          "done": false,
+          "done": true,
           "createdAt": "2026-06-05T09:19:03.660Z",
-          "updatedAt": "2026-06-05T09:49:51.621Z"
+          "updatedAt": "2026-10-23T07:33:05.825Z"
         },
         {
           "id": "mq0qadc0n4pto9",
@@ -1154,5 +1154,5 @@
       "updatedAt": "2026-10-16T07:02:52.383Z"
     }
   ],
-  "updatedAt": "2026-10-16T08:38:42.793Z"
+  "updatedAt": "2026-10-23T07:33:05.825Z"
 }
