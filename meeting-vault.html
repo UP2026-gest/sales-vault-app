@@ -148,6 +148,13 @@ a.nav-link:hover{background:rgba(255,255,255,.2);color:#fff;}
   background:var(--amber);border:1px solid #d99a10;border-radius:var(--r8);padding:8px 13px;margin-bottom:12px;
   box-shadow:0 2px 6px rgba(0,0,0,.12);}
 .notes-savebar.hidden{display:none;}
+.autosave-status{font-size:11.5px;color:var(--muted);}
+.autosave-status.saving{color:var(--orange);}
+.autosave-status.saved{color:var(--green);}
+.inline-edit{cursor:text;border-radius:6px;padding:1px 4px;margin:-1px -4px;transition:background .12s;}
+.inline-edit:hover{background:var(--bg);outline:1px dashed var(--border);}
+.inline-edit:hover::after{content:' ✏️';font-size:11px;opacity:.55;}
+.inline-input{font:inherit;color:inherit;width:100%;padding:3px 6px;border:1px solid var(--blue);border-radius:6px;background:#fff;}
 .notes-savebar-txt{font-size:12.5px;font-weight:600;color:var(--navy);display:flex;align-items:center;gap:6px;}
 .notes-savebar-btns{display:flex;gap:6px;}
 .agenda-list{display:flex;flex-direction:column;gap:8px;}
@@ -589,11 +596,43 @@ let _notesDirty  = false;  // ci sono note (riunione o agenda) modificate ma non
 // Se ci sono note non salvate, chiede conferma prima di cambiare riunione/schermata.
 // Ritorna true se si può procedere (nessuna modifica, oppure l'utente ha scelto di
 // scartarle), false se l'utente vuole restare per salvare.
-function confirmIfNotesDirty(){
-  if(!_notesDirty) return true;
-  const ok = confirm('Hai delle note non salvate.\n\nPremi "Annulla" per tornare indietro e salvarle con "💾 Salva note",\noppure "OK" per continuare SENZA salvare (le modifiche andranno perse).');
-  if(ok) _notesDirty = false; // l'utente ha scelto di scartare
-  return ok;
+// Con il salvataggio automatico non serve più chiedere: prima di cambiare
+// riunione o schermata le note in sospeso vengono salvate subito.
+function confirmIfNotesDirty(){ flushNotes(); return true; }
+
+// ── SALVATAGGIO AUTOMATICO NOTE ──
+// Le note (riunione e punti dell'ordine del giorno) si salvano da sole
+// 1,5 secondi dopo l'ultima battitura, quando si esce dal campo, prima di
+// cambiare riunione/schermata e prima di chiudere la pagina.
+let _notesTimer = null;
+const NOTES_DELAY = 1500;
+function setAutosaveStatus(txt, cls){
+  document.querySelectorAll('.autosave-status').forEach(el=>{ el.textContent=txt; el.className='autosave-status '+(cls||''); });
+}
+function scheduleNotesSave(){
+  _notesDirty = true;
+  setAutosaveStatus('✏️ Modifiche in corso…','saving');
+  clearTimeout(_notesTimer);
+  _notesTimer = setTimeout(flushNotes, NOTES_DELAY);
+}
+function flushNotes(){
+  clearTimeout(_notesTimer); _notesTimer=null;
+  if(!_notesDirty) return;
+  const m = db.meetings.find(x=>x.id===_renderedMeetId);
+  const area = $('notesArea');
+  if(!m || !area){ _notesDirty=false; return; }
+  m.notes = area.value;
+  const agItems=(m.agenda||[]).map(a=>typeof a==='string'?{text:a,notes:''}:a);
+  document.querySelectorAll('.agenda-notes-area').forEach(ta=>{
+    const i=Number(ta.dataset.ai);
+    if(agItems[i]) agItems[i].notes=ta.value;
+  });
+  m.agenda=agItems;
+  m.updatedAt=nowIso();
+  _notesDirty=false;
+  dbSave();
+  const t=new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+  setAutosaveStatus(`✓ Salvato automaticamente alle ${t}`,'saved');
 }
 
 // Genera codice riunione YY-NNN
@@ -622,12 +661,50 @@ function saveSha(s){ if(s) localStorage.setItem(shaKey(),s); }
 
 function setStatus(msg,cls){ $('ghStatus').textContent=msg; $('ghStatus').className=cls; }
 
+// ── Riparazione accenti ──
+// Le versioni precedenti leggevano i dati da GitHub senza decodificare l'UTF-8:
+// "è" diventava "Ã¨" e, a ogni giro di salvataggio, "ÃÂ¨". Questa funzione
+// ripristina il testo originale (ripetendo la decodifica finché serve).
+function fixMojibake(str){
+  let out=str;
+  for(let i=0;i<4 && /[ÃÂ]/.test(out);i++){
+    try{ const t=decodeURIComponent(escape(out)); if(t===out) break; out=t; } catch{ break; }
+  }
+  return out;
+}
+function deepFix(v){
+  if(typeof v==='string') return fixMojibake(v);
+  if(Array.isArray(v)) return v.map(deepFix);
+  if(v && typeof v==='object'){ const o={}; for(const k in v) o[k]=deepFix(v[k]); return o; }
+  return v;
+}
+// Ripara le riunioni con testo rovinato; marca come aggiornate solo quelle
+// effettivamente corrette, così la versione riparata prevale nella fusione.
+function repairMeetings(list){
+  let changed=0;
+  const out=(list||[]).map(m=>{
+    const before=JSON.stringify(m);
+    const fixed=deepFix(m);
+    if(JSON.stringify(fixed)!==before){ changed++; fixed.updatedAt=nowIso(); }
+    return fixed;
+  });
+  return { list: out, changed };
+}
+
+function normDb(p){
+  const d = (p && Array.isArray(p.meetings)) ? p : { meetings: [] };
+  if(!Array.isArray(d.deleted)) d.deleted = [];   // riunioni eliminate (per non farle ricomparire)
+  return d;
+}
+
 function dbLoad(){
   try {
     const raw = localStorage.getItem(dbKey());
-    if(raw){ const p=JSON.parse(raw); if(Array.isArray(p.meetings)) db=p; else db={meetings:[]}; }
-    else db={meetings:[]};
-  } catch { db={meetings:[]}; }
+    db = normDb(raw ? JSON.parse(raw) : null);
+  } catch { db = normDb(null); }
+  const rep = repairMeetings(db.meetings);
+  db.meetings = rep.list;
+  if(rep.changed>0){ localStorage.setItem(dbKey(), JSON.stringify(db)); _needsPush = true; }
 }
 
 function dbSave(){
@@ -636,23 +713,62 @@ function dbSave(){
   ghPushBg();
 }
 
+// Fonde un archivio remoto nel locale (per ID riunione):
+// - vince la versione con updatedAt più recente (a parità vince il locale)
+// - le riunioni eliminate su un dispositivo non ricompaiono dall'altro
+function mergeRemote(remote){
+  const r = normDb(remote);
+  const delMap = new Map();
+  for(const x of [...db.deleted, ...r.deleted]){
+    if(x?.id && (!delMap.has(x.id) || (x.at||'') > delMap.get(x.id))) delMap.set(x.id, x.at||'');
+  }
+  const byId = new Map(db.meetings.filter(m=>m?.id).map(m=>[m.id,m]));
+  for(const rm of repairMeetings(r.meetings).list){
+    if(!rm?.id) continue;
+    const lm = byId.get(rm.id);
+    if(!lm || (rm.updatedAt||'') > (lm.updatedAt||'')) byId.set(rm.id, rm);
+  }
+  // una riunione eliminata resta eliminata, salvo che sia stata modificata DOPO l'eliminazione
+  db.meetings = [...byId.values()].filter(m => !delMap.has(m.id) || (m.updatedAt||'') > delMap.get(m.id));
+  db.deleted = [...delMap.entries()].map(([id,at])=>({id,at}));
+}
+
+function decodeGhContent(b64){
+  // decodifica corretta dell'UTF-8 (prima mancava: era la causa degli accenti rovinati)
+  return JSON.parse(decodeURIComponent(escape(atob(b64.replace(/\n/g,'')))));
+}
+
+let _needsPush = false;  // un salvataggio è arrivato mentre un altro era in corso
 async function ghPushBg(){
-  if(!ghOk()||_ghPushing) return;
-  _ghPushing=true;
+  if(!ghOk()) return;
+  if(_ghPushing){ _needsPush = true; return; }   // prima veniva perso: ora si rimette in coda
+  _ghPushing = true;
+  setStatus('🔄 Salvataggio…','sync');
   try {
-    const body={ message:'Meeting Vault sync', content:btoa(unescape(encodeURIComponent(JSON.stringify(db,null,2)))) };
-    const sha=getSha(); if(sha) body.sha=sha;
-    const r=await fetch(ghUrl(),{method:'PUT',headers:ghHdr(),body:JSON.stringify(body)});
-    if(r.ok){ const j=await r.json(); saveSha(j.content?.sha); setStatus(`✓ Sincronizzato — ${new Date().toLocaleString('it-IT')}`,'ok'); }
-    else if(r.status===409){
-      const rg=await fetch(ghUrl(),{headers:ghHdr()});
-      if(rg.ok){ const jg=await rg.json(); saveSha(jg.sha); body.sha=jg.sha;
-        const r2=await fetch(ghUrl(),{method:'PUT',headers:ghHdr(),body:JSON.stringify(body)});
-        if(r2.ok){const j2=await r2.json();saveSha(j2.content?.sha);setStatus(`✓ Sincronizzato — ${new Date().toLocaleString('it-IT')}`,'ok');}
+    do {
+      _needsPush = false;
+      let ok = false;
+      for(let attempt=0; attempt<3 && !ok; attempt++){
+        // 1) leggi il remoto  2) fondi  3) scrivi — così non si cancella il lavoro fatto da un altro dispositivo
+        const rg = await fetch(ghUrl(), { headers: ghHdr() });
+        let sha = null;
+        if(rg.ok){
+          const jg = await rg.json(); sha = jg.sha;
+          try { mergeRemote(decodeGhContent(jg.content)); } catch {}
+          localStorage.setItem(dbKey(), JSON.stringify(db));
+        } else if(rg.status !== 404){ throw new Error('read '+rg.status); }
+        const body = { message:'Meeting Vault sync', content: btoa(unescape(encodeURIComponent(JSON.stringify(db,null,2)))) };
+        if(sha) body.sha = sha;
+        const r = await fetch(ghUrl(), { method:'PUT', headers: ghHdr(), body: JSON.stringify(body) });
+        if(r.ok){ const j=await r.json(); saveSha(j.content?.sha); ok = true; }
+        else if(r.status !== 409) throw new Error('write '+r.status);
       }
-    } else setStatus('⚠️ Errore salvataggio GitHub','err');
-  } catch { setStatus('⚠️ Errore connessione','err'); }
-  finally { _ghPushing=false; }
+      if(!ok) throw new Error('conflitto');
+    } while(_needsPush);
+    setStatus(`✓ Sincronizzato — ${new Date().toLocaleString('it-IT')}`,'ok');
+    renderList();   // la fusione può aver portato riunioni nuove da un altro dispositivo
+  } catch { setStatus('⚠️ Errore salvataggio GitHub — dati al sicuro in locale','err'); }
+  finally { _ghPushing = false; }
 }
 
 async function ghPull(){
@@ -663,19 +779,14 @@ async function ghPull(){
     if(r.status===404){ setStatus('✓ Pronto','ok'); return; }
     if(!r.ok){ setStatus('⚠️ Errore lettura GitHub','err'); return; }
     const j=await r.json(); saveSha(j.sha);
-    const remote=JSON.parse(atob(j.content.replace(/\n/g,'')));
-    if(Array.isArray(remote.meetings)){
-      const byId=new Map(db.meetings.filter(m=>m?.id).map(m=>[m.id,m]));
-      for(const rm of remote.meetings){
-        if(!rm?.id) continue;
-        const lm=byId.get(rm.id);
-        if(!lm||(rm.updatedAt||'')>(lm.updatedAt||'')) byId.set(rm.id,rm);
-      }
-      db.meetings=[...byId.values()];
-      localStorage.setItem(dbKey(),JSON.stringify(db));
-    }
+    const remote=decodeGhContent(j.content);
+    const beforeTxt = JSON.stringify(remote.meetings||[]);
+    mergeRemote(remote);
+    localStorage.setItem(dbKey(),JSON.stringify(db));
     setStatus(`✓ Sincronizzato — ${new Date().toLocaleString('it-IT')}`,'ok');
     renderList(); if(_selId) renderDetail();
+    // se il remoto conteneva testo rovinato o è diverso dal locale, riscrivilo riparato
+    if(_needsPush || JSON.stringify(db.meetings) !== beforeTxt) ghPushBg();
   } catch(e){ setStatus('⚠️ Errore sync','err'); }
 }
 
@@ -851,8 +962,14 @@ function renderList(){
 // ══════════════════════════════════════════
 // RENDER DETTAGLIO
 // ══════════════════════════════════════════
+let _renderedMeetId = null;  // riunione attualmente mostrata nel pannello
 function renderDetail(){
   const panel=$('mainPanel');
+  // Se ci sono note non salvate sulla stessa riunione, conservo la bozza:
+  // spuntare un'azione o una sincronizzazione ridisegnano il pannello e prima
+  // il testo scritto andava perso.
+  flushNotes();   // le note in sospeso vengono salvate prima di ridisegnare
+  _renderedMeetId = _selId;
   if(!_selId){ panel.innerHTML='<div class="detail-empty"><div class="icon">◆</div><p>Seleziona una riunione o creane una nuova.</p></div>'; return; }
   const m=db.meetings.find(x=>x.id===_selId);
   if(!m){ panel.innerHTML='<div class="detail-empty"><div class="icon">◆</div><p>Riunione non trovata.</p></div>'; return; }
@@ -899,12 +1016,6 @@ function renderDetail(){
   }).join('');
 
   panel.innerHTML=`
-  <div class="notes-savebar hidden" id="notesSaveBar">
-    <span class="notes-savebar-txt">✏️ Hai modifiche alle note non ancora salvate</span>
-    <div class="notes-savebar-btns">
-      <button class="btn-navy btn-sm" id="btnSaveNotesTop">💾 Salva note</button>
-    </div>
-  </div>
   <div class="card">
     <div class="meet-header">
       <div>
@@ -912,7 +1023,7 @@ function renderDetail(){
           ${m.code?`<span class="meet-code">${esc(m.code)}</span>`:''}
           ${(Array.isArray(m.topics)?m.topics:(m.topic?[m.topic]:[])).map(t=>`<span class="topic-badge t-${t}">${TOPIC_LBL[t]||t}</span>`).join('')}
         </div>
-        <div class="meet-title-big">${esc(m.title)}</div>
+        <div class="meet-title-big"><span class="inline-edit" data-field="title" title="Clicca per modificare">${esc(m.title)}</span></div>
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0;">
         <button class="btn-amber btn-sm" id="btnPdf">📄 Report / PDF</button>
@@ -921,9 +1032,9 @@ function renderDetail(){
       </div>
     </div>
     <div class="meta-grid">
-      <div class="meta-cell"><div class="lbl">Data</div><div class="val">${fdt(m.date)}</div></div>
+      <div class="meta-cell"><div class="lbl">Data</div><div class="val"><span class="inline-edit" data-field="date" title="Clicca per modificare">${fdt(m.date)}</span></div></div>
       <div class="meta-cell"><div class="lbl">Orario</div><div class="val">${m.timeStart||'—'}${m.timeEnd?' → '+m.timeEnd:''}</div></div>
-      <div class="meta-cell"><div class="lbl">Cliente / Partner</div><div class="val">${esc(m.client||'—')}</div></div>
+      <div class="meta-cell"><div class="lbl">Cliente / Partner</div><div class="val"><span class="inline-edit" data-field="client" title="Clicca per modificare">${esc(m.client||'—')}</span></div></div>
       <div class="meta-cell"><div class="lbl">Partecipanti</div><div class="val">${(m.participants||[]).join(', ')||'—'}</div></div>
     </div>
   </div>
@@ -931,7 +1042,7 @@ function renderDetail(){
   ${agendaItems.length?`<div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
       <div class="card-title" style="margin:0;">Ordine del giorno</div>
-      <span style="font-size:11.5px;color:var(--muted);">Le note si salvano con il pulsante "Salva note"</span>
+      <span class="autosave-status">Le note si salvano automaticamente</span>
     </div>
     <div class="agenda-list">${agendaHtml}</div>
   </div>`:''}
@@ -955,7 +1066,7 @@ function renderDetail(){
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
       <div class="card-title" style="margin:0;">Note riunione</div>
-      <button class="btn-navy btn-sm" id="btnSaveNotes">💾 Salva note</button>
+      <span class="autosave-status">Le note si salvano automaticamente</span>
     </div>
     <textarea class="notes-area" id="notesArea" rows="4" placeholder="Note, decisioni prese, punti emersi…">${esc(m.notes||'')}</textarea>
   </div>`;
@@ -965,37 +1076,56 @@ function renderDetail(){
   $('btnPdf').onclick  = ()=>openPdf(m.id);
   $('btnDuplica').onclick = ()=>duplicateMeet(m.id);
 
-  // Salvataggio note condiviso (usato dal pulsante in alto e da quello in basso)
-  function saveNotesNow(){
-    m.notes=$('notesArea').value;
-    const agItems=(m.agenda||[]).map(a=>typeof a==='string'?{text:a,notes:''}:a);
-    document.querySelectorAll('.agenda-notes-area').forEach(ta=>{
-      const i=Number(ta.dataset.ai);
-      if(agItems[i]) agItems[i].notes=ta.value;
-    });
-    m.agenda=agItems;
-    m.updatedAt=nowIso(); dbSave();
-    _notesDirty=false;
-    updateNotesBar();
-    ['btnSaveNotes','btnSaveNotesTop'].forEach(id=>{
-      const b=$(id); if(b){ b.textContent='✓ Salvato'; setTimeout(()=>{ if($(id)) $(id).textContent='💾 Salva note'; },1500); }
+  // Note: salvataggio automatico (vedi scheduleNotesSave / flushNotes)
+  [$('notesArea'), ...document.querySelectorAll('.agenda-notes-area')].forEach(ta=>{
+    if(!ta) return;
+    ta.addEventListener('input', scheduleNotesSave);
+    ta.addEventListener('blur', flushNotes);
+  });
+
+  // Titolo, data e cliente: clic per modificare direttamente nel pannello.
+  // Invio o clic fuori = salva · Esc = annulla.
+  const inlineText = (field)=> field==='date' ? fdt(m.date) : (field==='client' ? (m.client||'—') : (m.title||''));
+  function attachInline(span){
+    span.addEventListener('click', ()=>{
+      const field=span.dataset.field;
+      const inp=document.createElement('input');
+      inp.className='inline-input';
+      inp.type = field==='date' ? 'date' : 'text';
+      inp.value = m[field]||'';
+      if(field==='client') inp.placeholder='Cliente o partner';
+      span.replaceWith(inp);
+      inp.focus(); if(inp.type==='text') inp.select();
+      let done=false;
+      const finish=(save)=>{
+        if(done) return;
+        const v=inp.value.trim();
+        let changed=false;
+        if(save){
+          if((field==='title' || field==='date') && !v){
+            alert(field==='title' ? 'Il titolo non può essere vuoto.' : 'Inserisci una data.');
+            setTimeout(()=>inp.focus(),0); return;
+          }
+          if(v!==(m[field]||'')){ m[field]=v; m.updatedAt=nowIso(); dbSave(); changed=true; }
+        }
+        done=true;
+        // rimetto solo il campo, senza ridisegnare il pannello (non si perde il clic successivo)
+        const ns=document.createElement('span');
+        ns.className='inline-edit'; ns.dataset.field=field; ns.title='Clicca per modificare';
+        ns.textContent=inlineText(field);
+        if(inp.isConnected) inp.replaceWith(ns);
+        attachInline(ns);
+        if(changed) setTimeout(renderList, 250);   // aggiorna l'elenco a sinistra
+      };
+      inp.addEventListener('keydown',e=>{
+        if(e.key==='Enter'){ e.preventDefault(); finish(true); }
+        else if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); finish(false); }
+      });
+      inp.addEventListener('blur',()=>finish(true));
     });
   }
-  // Mostra/nasconde la barra sticky in base allo stato "dirty"
-  function updateNotesBar(){
-    const bar=$('notesSaveBar');
-    if(bar) bar.classList.toggle('hidden', !_notesDirty);
-  }
-  window._mvUpdateNotesBar = updateNotesBar; // esposto per sicurezza
+  panel.querySelectorAll('.inline-edit').forEach(attachInline);
 
-  $('btnSaveNotes').onclick = saveNotesNow;
-  const topBtn=$('btnSaveNotesTop'); if(topBtn) topBtn.onclick = saveNotesNow;
-
-  // Rileva modifiche nelle note (riunione + agenda) → attiva la barra
-  const markDirty=()=>{ if(!_notesDirty){ _notesDirty=true; updateNotesBar(); } };
-  $('notesArea')?.addEventListener('input', markDirty);
-  document.querySelectorAll('.agenda-notes-area').forEach(ta=>ta.addEventListener('input', markDirty));
-  updateNotesBar();
   $('btnAddAction').onclick = ()=>openActionModal(null);
   $('btnQaAction').onclick  = doQuickAction;
   $('qaActionTxt').onkeydown = e=>{ if(e.key==='Enter') doQuickAction(); };
@@ -1004,13 +1134,13 @@ function renderDetail(){
   panel.querySelectorAll('.chk').forEach(c=>{
     c.onclick=()=>{
       const a=m.actions?.find(x=>x.id===c.dataset.aid);
-      if(a){a.done=!a.done;a.updatedAt=nowIso();dbSave();renderDetail();}
+      if(a){a.done=!a.done;a.updatedAt=nowIso();m.updatedAt=nowIso();dbSave();renderDetail();}
     };
   });
   panel.querySelectorAll('.btn-ea').forEach(b=>b.onclick=()=>openActionModal(b.dataset.aid));
   panel.querySelectorAll('.btn-da').forEach(b=>b.onclick=()=>{
     if(!confirm('Eliminare questa azione?')) return;
-    m.actions=m.actions.filter(a=>a.id!==b.dataset.aid); dbSave(); renderDetail();
+    m.actions=m.actions.filter(a=>a.id!==b.dataset.aid); m.updatedAt=nowIso(); dbSave(); renderDetail();
   });
 }
 
@@ -1055,6 +1185,7 @@ function openMeetModal(id){
   _tempAgenda=(m?.agenda||[]).map(a=>typeof a==='string'?{text:a,notes:''}:a);
   renderModalParts(); renderModalAgenda();
   $('mMeet').classList.remove('h');
+  markModalOpened('mMeet');
   setTimeout(()=>$('fMTitle').focus(),50);
 }
 
@@ -1119,16 +1250,19 @@ $('mMeetSave').onclick=()=>{
       notes:'',actions:[],createdAt:nowIso(),updatedAt:nowIso()};
     db.meetings.push(m); _selId=m.id;
   }
-  dbSave(); $('mMeet').classList.add('h'); renderList(); renderDetail();
+  dbSave(); $('mMeet').classList.add('h'); delete _modalSnap['mMeet']; renderList(); renderDetail();
 };
 
 $('mMeetDel').onclick=()=>{
   if(!confirm('Eliminare definitivamente questa riunione?')) return;
   db.meetings=db.meetings.filter(x=>x.id!==_editMeetId);
+  if(!Array.isArray(db.deleted)) db.deleted=[];
+  db.deleted.push({id:_editMeetId, at:nowIso()});  // così non ricompare dagli altri dispositivi
+  delete _modalSnap['mMeet'];
   if(_selId===_editMeetId) _selId=null;
   dbSave(); $('mMeet').classList.add('h'); renderList(); renderDetail();
 };
-$('mMeetClose').onclick=()=>$('mMeet').classList.add('h');
+$('mMeetClose').onclick=()=>tryCloseModal('mMeet');
 
 // ══════════════════════════════════════════
 // MODAL AZIONE
@@ -1143,6 +1277,7 @@ function openActionModal(aid){
   $('fADate').value =a?.date||'';
   $('fADone').value =a?.done?'1':'0';
   $('mAction').classList.remove('h');
+  markModalOpened('mAction');
   setTimeout(()=>$('fATxt').focus(),50);
 }
 
@@ -1157,9 +1292,9 @@ $('mActionSave').onclick=()=>{
   } else {
     m.actions.push({id:uid(),text:txt,who:$('fAWho').value.trim(),date:$('fADate').value,done:$('fADone').value==='1',createdAt:nowIso()});
   }
-  m.updatedAt=nowIso(); dbSave(); $('mAction').classList.add('h'); renderDetail();
+  m.updatedAt=nowIso(); dbSave(); $('mAction').classList.add('h'); delete _modalSnap['mAction']; renderDetail();
 };
-$('mActionClose').onclick=()=>$('mAction').classList.add('h');
+$('mActionClose').onclick=()=>tryCloseModal('mAction');
 
 // ══════════════════════════════════════════
 // PDF
@@ -1357,8 +1492,43 @@ document.querySelectorAll('.f-btn[data-a]').forEach(b=>{
   };
 });
 
+// ── Chiusura finestre (modal) ──
+// Prima: un clic sullo sfondo chiudeva la finestra. Ma selezionando il testo
+// trascinando il mouse oltre il bordo del riquadro, il rilascio "fuori" veniva
+// letto come clic sullo sfondo → finestra chiusa e modifiche perse.
+// Ora: la finestra si chiude dallo sfondo SOLO se il clic inizia e finisce
+// sullo sfondo, e le finestre di modifica chiedono conferma se ci sono
+// modifiche non salvate. Anche il tasto Esc chiude (con la stessa conferma).
+const _modalSnap = {};   // istantanea dei campi all'apertura, per capire se ci sono modifiche
+function modalFieldsSnapshot(id){
+  const box=$(id); if(!box) return '';
+  return [...box.querySelectorAll('input,select,textarea')]
+    .map(el=>el.type==='checkbox'?el.checked:el.value).join('\u0001')
+    + '\u0002' + JSON.stringify(id==='mMeet'?{p:_tempParts,a:_tempAgenda}:null);
+}
+function markModalOpened(id){ _modalSnap[id]=modalFieldsSnapshot(id); }
+function modalIsDirty(id){ return _modalSnap[id]!==undefined && modalFieldsSnapshot(id)!==_modalSnap[id]; }
+function tryCloseModal(id){
+  const editable = (id==='mMeet' || id==='mAction');
+  if(editable && modalIsDirty(id)){
+    if(!confirm('Hai modifiche non salvate in questa finestra.\n\nOK = chiudi senza salvare\nAnnulla = torna alla modifica')) return;
+  }
+  $(id).classList.add('h');
+  delete _modalSnap[id];
+}
 ['mMeet','mAction','mGh','mOverdue'].forEach(id=>{
-  $(id).addEventListener('click',e=>{ if(e.target===e.currentTarget) $(id).classList.add('h'); });
+  const el=$(id);
+  let downOnBackdrop=false;
+  el.addEventListener('mousedown',e=>{ downOnBackdrop = (e.target===e.currentTarget); });
+  el.addEventListener('click',e=>{
+    if(e.target===e.currentTarget && downOnBackdrop) tryCloseModal(id);
+    downOnBackdrop=false;
+  });
+});
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape') return;
+  const open=['mAction','mMeet','mGh','mOverdue'].find(id=>!$(id).classList.contains('h'));
+  if(open) tryCloseModal(open);
 });
 
 // ── CAMPANELLA E POPUP SCADUTE ──
@@ -1405,7 +1575,7 @@ function showOverduePopup(){
     </table>`;
   // Click su riga → apri riunione
   $('mOverdueBody').querySelectorAll('tr[data-mid]').forEach(r=>{
-    r.onclick=()=>{ _selId=r.dataset.mid; $('mOverdue').classList.add('h'); renderList(); renderDetail(); };
+    r.onclick=()=>{ if(r.dataset.mid!==_selId && !confirmIfNotesDirty()) return; _selId=r.dataset.mid; $('mOverdue').classList.add('h'); renderList(); renderDetail(); };
   });
   $('mOverdue').classList.remove('h');
 }
@@ -1425,14 +1595,24 @@ $('mOverdueClose').onclick=()=>$('mOverdue').classList.add('h');
 });
 // Chiusura o ricaricamento della pagina con note non salvate
 window.addEventListener('beforeunload', e=>{
-  if(_notesDirty){ e.preventDefault(); e.returnValue=''; }
+  flushNotes();   // salvataggio immediato in locale (sincronizzato al prossimo avvio)
 });
-// Logout con note non salvate: chiedi conferma (il tasto Esci è già gestito, aggiungiamo il guard)
+// Logout: salva le note in sospeso e aspetta che il salvataggio su GitHub
+// sia finito prima di uscire (altrimenti potrebbe interrompersi a metà).
 (function(){
   const lb=$('btnLogout');
   if(lb){
     const orig=lb.onclick;
-    lb.onclick=(ev)=>{ if(!confirmIfNotesDirty()){ return; } if(orig) orig.call(lb,ev); };
+    lb.onclick=async (ev)=>{
+      confirmIfNotesDirty();
+      if(ghOk() && _needsPush && !_ghPushing) ghPushBg();
+      const t0=Date.now();
+      while(ghOk() && (_ghPushing || _needsPush) && Date.now()-t0 < 8000){
+        setStatus('🔄 Salvataggio prima dell\'uscita…','sync');
+        await new Promise(r=>setTimeout(r,150));
+      }
+      if(orig) orig.call(lb,ev);
+    };
   }
 })();
 
