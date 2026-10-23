@@ -1198,20 +1198,20 @@
           "notes": "preferirei evitare il mio numero privato, ho visto che è possibile associare anche numeri VoIP come quello di Lyber, possiamo verificare? questi sono i passaggi:\nInstalla WhatsApp Business sul tuo telefono. Sta accanto a WhatsApp normale senza toccarlo.\nInserisci il numero Lyber con prefisso internazionale e distrettuale, ad esempio +39 030…\nIl tentativo via SMS fallirà: aspetta che finisca il conto alla rovescia (circa un minuto).\nScegli “Chiamami” e tieni aperta l’app Lyber. Arriva una chiamata con una voce che detta il codice a 6 cifre.\nInserisci il codice e il profilo è attivo.\n\nCosa controllare prima\n\nIn Lyber, verifica che non ci siano filtri sulle chiamate da numeri esteri, anonimi o sconosciuti. La chiamata di verifica spesso arriva da un numero straniero.\nSe c’è un trasferimento di chiamata o una segreteria che risponde subito, disattivali per quel momento.\n\nDopo l’attivazione\n\nAttiva subito la verifica in due passaggi (Impostazioni → Account → Verifica in due passaggi). Chiunque abbia accesso all’app Lyber potrebbe registrare il numero su un altro telefono, e il PIN lo impedisce.\nTieni attivo Lyber. Se cambi telefono o reinstalli WhatsApp Business, ti servirà di nuovo la chiamata di verifica.\nPuoi collegare il profilo anche a WhatsApp Web o desktop sul PC dell’ufficio, così Stefania può rispondere se serve."
         },
         {
-          "text": "trifold",
-          "notes": "possiamo metterne qualcuno sul bancone?"
-        },
-        {
           "text": "TEMplus, diretta di settimana prossima",
           "notes": "quando avranno preparato pagina ce la gireranno, promuoviamola sui nostri social"
+        },
+        {
+          "text": "trifold",
+          "notes": "possiamo metterne qualcuno sul bancone?"
         }
       ],
       "notes": "",
       "actions": [],
       "createdAt": "2026-10-23T07:33:59.278Z",
-      "updatedAt": "2026-10-23T09:09:38.238Z"
+      "updatedAt": "2026-10-23T09:09:44.532Z"
     }
   ],
-  "updatedAt": "2026-10-23T09:09:38.238Z",
+  "updatedAt": "2026-10-23T09:09:44.532Z",
   "deleted": []
 }
