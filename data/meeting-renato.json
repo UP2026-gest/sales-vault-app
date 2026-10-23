@@ -1200,14 +1200,18 @@
         {
           "text": "trifold",
           "notes": "possiamo metterne qualcuno sul bancone?"
+        },
+        {
+          "text": "TEMplus, diretta di settimana prossima",
+          "notes": ""
         }
       ],
       "notes": "",
       "actions": [],
       "createdAt": "2026-10-23T07:33:59.278Z",
-      "updatedAt": "2026-10-23T09:08:47.411Z"
+      "updatedAt": "2026-10-23T09:09:15.521Z"
     }
   ],
-  "updatedAt": "2026-10-23T09:08:47.412Z",
+  "updatedAt": "2026-10-23T09:09:15.521Z",
   "deleted": []
 }
