@@ -292,7 +292,7 @@
         }
       ],
       "createdAt": "2026-06-19T08:15:27.273Z",
-      "updatedAt": "2026-06-22T08:08:30.413Z"
+      "updatedAt": "2026-10-23T07:33:41.234Z"
     },
     {
       "id": "mqoxrqydcxwtfm",
@@ -764,8 +764,9 @@
           "text": "riscontro su interesse ed eventualmente incontro per progetto (ore/sett, provv, compenso, progetto)",
           "who": "Alessandro Bruni",
           "date": "2026-09-25",
-          "done": false,
-          "createdAt": "2026-09-10T09:28:44.674Z"
+          "done": true,
+          "createdAt": "2026-09-10T09:28:44.674Z",
+          "updatedAt": "2026-10-23T07:33:46.086Z"
         }
       ],
       "createdAt": "2026-09-10T07:04:34.600Z",
@@ -1156,5 +1157,5 @@
       "updatedAt": "2026-10-16T07:02:52.383Z"
     }
   ],
-  "updatedAt": "2026-10-23T07:33:40.230Z"
+  "updatedAt": "2026-10-23T07:33:46.086Z"
 }
