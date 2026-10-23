@@ -229,8 +229,9 @@
           "text": "Ordini medici Como e Avvocati Milano, lancio dei post e promozione social",
           "who": "Vale",
           "date": "2026-09-03",
-          "done": false,
-          "createdAt": "2026-06-12T10:13:28.735Z"
+          "done": true,
+          "createdAt": "2026-06-12T10:13:28.735Z",
+          "updatedAt": "2026-10-23T07:33:22.917Z"
         }
       ],
       "createdAt": "2026-06-12T05:38:53.619Z",
@@ -1154,5 +1155,5 @@
       "updatedAt": "2026-10-16T07:02:52.383Z"
     }
   ],
-  "updatedAt": "2026-10-23T07:33:21.658Z"
+  "updatedAt": "2026-10-23T07:33:22.917Z"
 }
