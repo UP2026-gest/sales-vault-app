@@ -162,6 +162,17 @@ a.nav-link:hover{background:rgba(255,255,255,.2);color:#fff;}
 .agenda-item-hdr{display:flex;gap:8px;align-items:flex-start;padding:9px 11px;}
 .agenda-num{font-size:11px;font-weight:700;color:var(--muted);min-width:18px;margin-top:2px;}
 .agenda-txt{flex:1;font-size:13px;font-weight:500;}
+.agenda-item-hdr{align-items:center;}
+.ag-handle{cursor:grab;color:var(--muted);font-size:14px;line-height:1;padding:0 2px;user-select:none;flex-shrink:0;}
+.ag-handle:active{cursor:grabbing;}
+.ag-btns{display:flex;gap:2px;flex-shrink:0;opacity:.55;transition:opacity .12s;}
+.agenda-item:hover .ag-btns,.ag-modal-row:hover .ag-btns{opacity:1;}
+.ag-btns .btn-icon{font-size:12px;padding:2px 5px;}
+.ag-btns .btn-icon:disabled{opacity:.25;cursor:default;}
+.agenda-item.dragging,.ag-modal-row.dragging{opacity:.4;}
+.agenda-item.drop-target,.ag-modal-row.drop-target{box-shadow:0 -3px 0 0 var(--blue);}
+.ag-add{display:flex;gap:6px;margin-top:10px;}
+.ag-add input{flex:1;}
 .agenda-notes{padding:0 11px 9px 37px;font-size:12.5px;color:var(--mid);white-space:pre-wrap;line-height:1.55;}
 .agenda-notes-area{width:100%;margin:0 0 8px 0;padding:6px 11px 8px 37px;
   font-family:inherit;font-size:12.5px;color:var(--text);background:transparent;
@@ -600,6 +611,31 @@ let _notesDirty  = false;  // ci sono note (riunione o agenda) modificate ma non
 // riunione o schermata le note in sospeso vengono salvate subito.
 function confirmIfNotesDirty(){ flushNotes(); return true; }
 
+// ── RIORDINO A TRASCINAMENTO ──
+// Rende riordinabili gli elementi di un elenco afferrandoli dalla maniglia.
+// onMove(da, a) riceve gli indici di partenza e di arrivo.
+function enableDragSort(listEl, itemSel, handleSel, onMove){
+  if(!listEl) return;
+  let fromIdx=null;
+  const items=()=>[...listEl.querySelectorAll(itemSel)];
+  items().forEach((it,idx)=>{
+    const h=it.querySelector(handleSel);
+    if(h){
+      h.addEventListener('mousedown',()=>{ it.draggable=true; });
+      h.addEventListener('touchstart',()=>{ it.draggable=true; },{passive:true});
+    }
+    it.addEventListener('dragstart',e=>{ fromIdx=idx; it.classList.add('dragging'); try{ e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain',String(idx)); }catch{} });
+    it.addEventListener('dragend',()=>{ it.draggable=false; it.classList.remove('dragging'); items().forEach(x=>x.classList.remove('drop-target')); });
+    it.addEventListener('dragover',e=>{ if(fromIdx===null) return; e.preventDefault(); items().forEach(x=>x.classList.remove('drop-target')); it.classList.add('drop-target'); });
+    it.addEventListener('drop',e=>{
+      e.preventDefault();
+      const from=fromIdx; fromIdx=null;
+      if(from!==null && from!==idx) onMove(from, idx);
+    });
+  });
+  document.addEventListener('mouseup',()=>items().forEach(x=>{ if(!x.classList.contains('dragging')) x.draggable=false; }),{once:true});
+}
+
 // ── SALVATAGGIO AUTOMATICO NOTE ──
 // Le note (riunione e punti dell'ordine del giorno) si salvano da sole
 // 1,5 secondi dopo l'ultima battitura, quando si esce dal campo, prima di
@@ -982,10 +1018,16 @@ function renderDetail(){
   const agendaItems=(m.agenda||[]).map(a=>typeof a==='string'?{text:a,notes:''}:a);
   const agendaHtml=agendaItems.length
     ? agendaItems.map((a,i)=>`
-      <div class="agenda-item">
+      <div class="agenda-item" data-ai="${i}">
         <div class="agenda-item-hdr">
+          <span class="ag-handle" data-ai="${i}" title="Trascina per riordinare">⠿</span>
           <span class="agenda-num">${i+1}.</span>
-          <span class="agenda-txt">${esc(a.text||'')}</span>
+          <span class="agenda-txt"><span class="ag-inline inline-edit" data-ai="${i}" title="Clicca per modificare">${esc(a.text||'')}</span></span>
+          <span class="ag-btns">
+            <button class="btn-icon ag-up" data-ai="${i}" title="Sposta su" ${i===0?'disabled':''}>▲</button>
+            <button class="btn-icon ag-down" data-ai="${i}" title="Sposta giù" ${i===agendaItems.length-1?'disabled':''}>▼</button>
+            <button class="btn-icon ag-del" data-ai="${i}" title="Elimina punto" style="color:var(--red);">✕</button>
+          </span>
         </div>
         <textarea class="agenda-notes-area" data-ai="${i}" rows="2"
           placeholder="Note per questo punto…">${esc(a.notes||'')}</textarea>
@@ -1039,13 +1081,17 @@ function renderDetail(){
     </div>
   </div>
 
-  ${agendaItems.length?`<div class="card">
+  <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
       <div class="card-title" style="margin:0;">Ordine del giorno</div>
       <span class="autosave-status">Le note si salvano automaticamente</span>
     </div>
-    <div class="agenda-list">${agendaHtml}</div>
-  </div>`:''}
+    <div class="agenda-list" id="agendaList">${agendaHtml}</div>
+    <div class="ag-add">
+      <input id="agNewInp" placeholder="+ Nuovo punto all'ordine del giorno (Invio per aggiungere)"/>
+      <button class="btn-navy btn-sm" id="agNewBtn">+ Aggiungi</button>
+    </div>
+  </div>
 
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
@@ -1124,7 +1170,60 @@ function renderDetail(){
       inp.addEventListener('blur',()=>finish(true));
     });
   }
-  panel.querySelectorAll('.inline-edit').forEach(attachInline);
+  panel.querySelectorAll('.inline-edit:not(.ag-inline)').forEach(attachInline);
+
+  // ── Ordine del giorno nel pannello: aggiungi, rinomina, riordina, elimina ──
+  // Ogni modifica si salva subito. Prima salvo le note in sospeso (flushNotes),
+  // perché le note sono legate alla posizione del punto.
+  const agendaArr = ()=> (m.agenda||[]).map(a=>typeof a==='string'?{text:a,notes:''}:a);
+  const commitAgenda = (arr)=>{ m.agenda=arr; m.updatedAt=nowIso(); dbSave(); renderDetail(); };
+  const moveAgenda = (from, to)=>{
+    flushNotes();
+    const arr=agendaArr();
+    if(to<0 || to>=arr.length || from===to) return;
+    const [it]=arr.splice(from,1); arr.splice(to,0,it);
+    commitAgenda(arr);
+  };
+  panel.querySelectorAll('.ag-up').forEach(b=>b.onclick=()=>{ const i=+b.dataset.ai; moveAgenda(i,i-1); });
+  panel.querySelectorAll('.ag-down').forEach(b=>b.onclick=()=>{ const i=+b.dataset.ai; moveAgenda(i,i+1); });
+  panel.querySelectorAll('.ag-del').forEach(b=>b.onclick=()=>{
+    flushNotes();
+    const arr=agendaArr(); const i=+b.dataset.ai;
+    if(arr[i]?.notes && !confirm('Questo punto ha delle note. Eliminarlo comunque?')) return;
+    arr.splice(i,1); commitAgenda(arr);
+  });
+  const addPoint=()=>{
+    const v=$('agNewInp').value.trim(); if(!v) return;
+    flushNotes();
+    const arr=agendaArr(); arr.push({text:v,notes:''}); commitAgenda(arr);
+    setTimeout(()=>$('agNewInp')?.focus(),0);   // pronto per il punto successivo
+  };
+  $('agNewBtn').onclick=addPoint;
+  $('agNewInp').onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); addPoint(); } };
+  // rinomina punto: clic sul testo (Invio/clic fuori salva, Esc annulla)
+  panel.querySelectorAll('.ag-inline').forEach(span=>{
+    span.addEventListener('click', ()=>{
+      const i=+span.dataset.ai;
+      const inp=document.createElement('input'); inp.className='inline-input'; inp.value=agendaArr()[i]?.text||'';
+      span.replaceWith(inp); inp.focus(); inp.select();
+      let done=false;
+      const finish=(save)=>{
+        if(done) return; done=true;
+        const v=inp.value.trim();
+        flushNotes();
+        const arr=agendaArr();
+        if(save && v && arr[i] && v!==arr[i].text){ arr[i].text=v; commitAgenda(arr); return; }
+        renderDetail();
+      };
+      inp.addEventListener('keydown',e=>{
+        if(e.key==='Enter'){ e.preventDefault(); finish(true); }
+        else if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); finish(false); }
+      });
+      inp.addEventListener('blur',()=>finish(true));
+    });
+  });
+  // trascinamento: si afferra dalla maniglia ⠿
+  enableDragSort($('agendaList'), '.agenda-item', '.ag-handle', (from,to)=>moveAgenda(from,to));
 
   $('btnAddAction').onclick = ()=>openActionModal(null);
   $('btnQaAction').onclick  = doQuickAction;
@@ -1156,9 +1255,9 @@ function doQuickAction(){
 // ══════════════════════════════════════════
 // MODAL RIUNIONE
 // ══════════════════════════════════════════
-function openMeetModal(id){
+function openMeetModal(id, prefill){
   _editMeetId=id||null; _tempParts=[]; _tempAgenda=[];
-  const m=id?db.meetings.find(x=>x.id===id):null;
+  const m=id?db.meetings.find(x=>x.id===id):(prefill||null);
   $('mMeetTitle').textContent=id?'Modifica riunione':'Nuova riunione';
   $('mMeetDel').style.display=id?'':'none';
   $('fMTitle').value      =m?.title||'';
@@ -1199,11 +1298,16 @@ function renderModalParts(){
 function renderModalAgenda(){
   $('fMAgendaList').innerHTML=_tempAgenda.map((a,i)=>{
     const txt = typeof a==='string'?a:(a.text||'');
-    return `<div style="display:flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--border);border-radius:var(--r8);background:var(--bg);" data-i="${i}">
+    return `<div class="ag-modal-row" style="display:flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--border);border-radius:var(--r8);background:var(--bg);" data-i="${i}">
+      <span class="ag-handle" title="Trascina per riordinare">⠿</span>
       <span style="font-size:11px;font-weight:700;color:var(--muted);min-width:18px;flex-shrink:0;">${i+1}.</span>
       <input class="agenda-edit-inp" data-i="${i}" value="${esc(txt)}"
         style="flex:1;border:none;background:transparent;font-size:13px;padding:2px 4px;border-radius:4px;"/>
-      <button class="btn-icon btn-del-ag" data-i="${i}" style="color:var(--red);font-size:12px;flex-shrink:0;">✕</button>
+      <span class="ag-btns">
+        <button type="button" class="btn-icon btn-up-ag" data-i="${i}" title="Sposta su" ${i===0?'disabled':''}>▲</button>
+        <button type="button" class="btn-icon btn-down-ag" data-i="${i}" title="Sposta giù" ${i===_tempAgenda.length-1?'disabled':''}>▼</button>
+        <button type="button" class="btn-icon btn-del-ag" data-i="${i}" style="color:var(--red);">✕</button>
+      </span>
     </div>`;
   }).join('');
   // Salva modifica testo on-blur
@@ -1217,6 +1321,15 @@ function renderModalAgenda(){
     inp.addEventListener('blur',  ()=>{ inp.style.background='transparent'; inp.style.border='none'; });
   });
   $('fMAgendaList').querySelectorAll('.btn-del-ag').forEach(b=>b.onclick=()=>{_tempAgenda.splice(Number(b.dataset.i),1);renderModalAgenda();});
+  const moveTemp=(from,to)=>{
+    // prima raccolgo eventuali testi modificati ma non ancora confermati
+    $('fMAgendaList').querySelectorAll('.agenda-edit-inp').forEach(inp=>{ const a=_tempAgenda[+inp.dataset.i]; if(a&&typeof a==='object') a.text=inp.value.trim(); });
+    if(to<0||to>=_tempAgenda.length||from===to) return;
+    const [it]=_tempAgenda.splice(from,1); _tempAgenda.splice(to,0,it); renderModalAgenda();
+  };
+  $('fMAgendaList').querySelectorAll('.btn-up-ag').forEach(b=>b.onclick=()=>{ const i=+b.dataset.i; moveTemp(i,i-1); });
+  $('fMAgendaList').querySelectorAll('.btn-down-ag').forEach(b=>b.onclick=()=>{ const i=+b.dataset.i; moveTemp(i,i+1); });
+  enableDragSort($('fMAgendaList'), '.ag-modal-row', '.ag-handle', moveTemp);
 }
 
 $('btnAddPart').onclick=()=>{
@@ -1300,22 +1413,23 @@ $('mActionClose').onclick=()=>tryCloseModal('mAction');
 // PDF
 // ══════════════════════════════════════════
 function duplicateMeet(id){
+  // Apre la finestra "Nuova riunione" già compilata con i dati di questa.
+  // La copia viene creata solo premendo "Salva": se chiudi, non resta nulla.
   const m = db.meetings.find(x=>x.id===id);
   if(!m) return;
-  const copy = JSON.parse(JSON.stringify(m)); // deep copy
-  copy.id = uid();
-  copy.code = nextMeetCode();
-  copy.title = '(Copia) ' + copy.title;
-  copy.date = todayStr();
-  copy.actions = []; // le azioni non si duplicano
-  copy.notes = '';
-  copy.createdAt = nowIso();
-  copy.updatedAt = nowIso();
-  db.meetings.push(copy);
-  _selId = copy.id;
-  dbSave();
-  renderList();
-  renderDetail();
+  flushNotes();
+  openMeetModal(null, {
+    title: '(Copia) ' + (m.title||''),
+    date: todayStr(),
+    timeStart: m.timeStart||'', timeEnd: m.timeEnd||'',
+    client: m.client||'',
+    topics: Array.isArray(m.topics)?[...m.topics]:(m.topic?[m.topic]:[]),
+    participants: [...(m.participants||[])],
+    // stessi punti all'ordine del giorno, con le loro note
+    agenda: (m.agenda||[]).map(a=>({ text: typeof a==='string'?a:(a.text||''), notes: typeof a==='string'?'':(a.notes||'') })),
+  });
+  $('mMeetTitle').textContent = 'Nuova riunione — copia di “' + (m.title||'') + '”';
+  setTimeout(()=>{ const t=$('fMTitle'); t.focus(); t.select(); },60);
 }
 
 function openPdf(id){
