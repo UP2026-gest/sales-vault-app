@@ -1159,7 +1159,7 @@
     {
       "id": "mvknlwmm1wf2i1",
       "code": "26-027",
-      "title": "(Copia) meeting UP",
+      "title": "meeting UP",
       "date": "2026-10-23",
       "timeStart": "11:00",
       "timeEnd": "12:00",
@@ -1178,51 +1178,19 @@
       ],
       "agenda": [
         {
-          "text": "nuovo catalogo",
-          "notes": "si stanno sentendo Vale e Silvia, stiamo aspettando Globalan per la sicurezza informatica"
-        },
-        {
-          "text": "network docenti, segnalazione per traduzione",
-          "notes": "link piattaforma incontro della AI inviato, Vale deve mandare comunicazione su whatsapp"
-        },
-        {
-          "text": "newsletter, chi si Ã¨ disiscritto?",
+          "text": "Nicolis,scuola de André, attesa conferma possibile UP",
           "notes": ""
         },
         {
-          "text": "Assistenti Sociali, rinnovo approvato",
-          "notes": ""
-        },
-        {
-          "text": "Regesta, mio workshop e inserimento in formazione interna, vedremo per piÃ¹ ampia",
-          "notes": ""
-        },
-        {
-          "text": "Nicolis, continua a proporre per scuole",
-          "notes": ""
-        },
-        {
-          "text": "Jelena, segnalazione per traduzione e possibile nuovo corso a Vicenza",
-          "notes": ""
-        },
-        {
-          "text": "Fit Factory, a fine evento del 21/10 ricorderemo convenzione in essere",
-          "notes": ""
-        },
-        {
-          "text": "Contratti per corso di gruppo excel, devo ancora prepararli",
+          "text": "Contratti per corso di gruppo excel, sono arrivati? Ho fatto nuovi modelli offerte e ctr",
           "notes": "un contratto con 2 persone? 3 contratti diversi? Servono i dati fatturazione\n"
-        },
-        {
-          "text": "Ordine assistenti sociali Lombardia, rinnovato convenzione 26-28, gratuito per eventi gratuiti",
-          "notes": ""
         }
       ],
       "notes": "",
       "actions": [],
       "createdAt": "2026-10-23T07:33:59.278Z",
-      "updatedAt": "2026-10-23T07:33:59.278Z"
+      "updatedAt": "2026-10-23T07:39:35.090Z"
     }
   ],
-  "updatedAt": "2026-10-23T07:33:59.278Z"
+  "updatedAt": "2026-10-23T07:39:35.090Z"
 }
