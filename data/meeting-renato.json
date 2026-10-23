@@ -193,9 +193,9 @@
           "text": "traduzione vietnamita per landing page italiano per stranieri",
           "who": "stefania",
           "date": "2026-06-19",
-          "done": false,
+          "done": true,
           "createdAt": "2026-06-12T05:41:42.034Z",
-          "updatedAt": "2026-06-12T10:11:28.907Z"
+          "updatedAt": "2026-10-23T07:33:21.658Z"
         },
         {
           "id": "mqaocxj7s71r6d",
@@ -1154,5 +1154,5 @@
       "updatedAt": "2026-10-16T07:02:52.383Z"
     }
   ],
-  "updatedAt": "2026-10-23T07:33:11.870Z"
+  "updatedAt": "2026-10-23T07:33:21.658Z"
 }
