@@ -458,14 +458,18 @@
         {
           "text": "creazione WA business su numero fisso",
           "notes": ""
+        },
+        {
+          "text": "contenuto per Network",
+          "notes": ""
         }
       ],
       "notes": "\n",
       "actions": [],
       "createdAt": "2026-10-23T09:12:08.051Z",
-      "updatedAt": "2026-10-23T09:34:32.045Z"
+      "updatedAt": "2026-10-23T09:46:14.657Z"
     }
   ],
-  "updatedAt": "2026-10-23T09:34:32.045Z",
+  "updatedAt": "2026-10-23T09:46:14.657Z",
   "deleted": []
 }
