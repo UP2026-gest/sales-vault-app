@@ -195,7 +195,7 @@
           "date": "2026-06-19",
           "done": true,
           "createdAt": "2026-06-12T05:41:42.034Z",
-          "updatedAt": "2026-10-23T07:33:21.658Z"
+          "updatedAt": "2026-08-27T14:53:14.194Z"
         },
         {
           "id": "mqaocxj7s71r6d",
@@ -229,13 +229,12 @@
           "text": "Ordini medici Como e Avvocati Milano, lancio dei post e promozione social",
           "who": "Vale",
           "date": "2026-09-03",
-          "done": true,
-          "createdAt": "2026-06-12T10:13:28.735Z",
-          "updatedAt": "2026-10-23T07:33:22.917Z"
+          "done": false,
+          "createdAt": "2026-06-12T10:13:28.735Z"
         }
       ],
       "createdAt": "2026-06-12T05:38:53.619Z",
-      "updatedAt": "2026-10-23T08:21:05.353Z"
+      "updatedAt": "2026-10-27T14:23:35.076Z"
     },
     {
       "id": "mqknlwdlvc8gtp",
@@ -286,13 +285,12 @@
           "text": "riepilogo invio email database per mia valutazione e telefonate",
           "who": "Valentina",
           "date": "2026-06-30",
-          "done": true,
-          "createdAt": "2026-06-22T08:07:51.879Z",
-          "updatedAt": "2026-10-23T07:33:40.229Z"
+          "done": false,
+          "createdAt": "2026-06-22T08:07:51.879Z"
         }
       ],
       "createdAt": "2026-06-19T08:15:27.273Z",
-      "updatedAt": "2026-10-23T08:21:05.353Z"
+      "updatedAt": "2026-10-27T14:23:35.076Z"
     },
     {
       "id": "mqoxrqydcxwtfm",
@@ -334,7 +332,7 @@
       "notes": "",
       "actions": [],
       "createdAt": "2026-06-22T08:11:01.045Z",
-      "updatedAt": "2026-10-23T08:21:05.353Z"
+      "updatedAt": "2026-10-27T14:23:35.076Z"
     },
     {
       "id": "mr4o3ebo366epf",
@@ -389,7 +387,7 @@
       "notes": "",
       "actions": [],
       "createdAt": "2026-07-03T08:24:27.204Z",
-      "updatedAt": "2026-10-23T08:21:05.353Z"
+      "updatedAt": "2026-10-27T14:23:35.076Z"
     },
     {
       "id": "mr4o94mowc0zob",
@@ -427,7 +425,7 @@
       "notes": "",
       "actions": [],
       "createdAt": "2026-07-03T08:28:54.576Z",
-      "updatedAt": "2026-10-23T08:21:05.353Z"
+      "updatedAt": "2026-10-27T14:23:35.076Z"
     },
     {
       "id": "mrelvc9fhu9hmj",
@@ -469,7 +467,7 @@
       "notes": "attività gestione del tempo legata al fitness e suoi clienti\nconvenzione reciproca\nore omaggio per referenze e nuovi iscritti\nquando fanno viaggi, dispensa di sopravvivenza (per esempio a formentera metà maggio 2027)\nattività in lingua in generale \nmandare brochure e elenco corsi\ninfo@fitfactory.space",
       "actions": [],
       "createdAt": "2026-07-10T07:19:53.811Z",
-      "updatedAt": "2026-10-23T08:21:05.353Z"
+      "updatedAt": "2026-10-27T14:23:35.076Z"
     },
     {
       "id": "ms79p7fhjrz3kp",
@@ -515,7 +513,7 @@
       "notes": "Regesta è una società che si occupa di consulenza aziendale, Fabio fornisce gratuitamente formazione ai dipendenti Regesta (una volta l'anno online, circa un'ora) in cambio Regesta inserisce  UP nelle società tra cui i dipendenti possono usufruire",
       "actions": [],
       "createdAt": "2026-07-30T08:44:31.325Z",
-      "updatedAt": "2026-10-23T08:21:05.353Z"
+      "updatedAt": "2026-10-27T14:23:35.077Z"
     },
     {
       "id": "ms8oxbz3itk433",
@@ -540,11 +538,11 @@
       "agenda": [
         {
           "text": "Database, invio email, come sta andando?",
-          "notes": "LE HO CHIESTO DI FARMI AVERE ALLA FINE IL RIEPILOGO DI QUELLE CHE NON SONO STATE APERTE E UN FILE EXCEL CON IL RIEPILOGO DI TUTTO, COSì POSSO TELEFONARE. TERREMO COME PROMO SOLO IL TEST ONLINE AZIENDALE MA ANCHE PER TEDESCO OLTRE CHE SPAGNOLO E INGLESE."
+          "notes": "LE HO CHIESTO DI FARMI AVERE ALLA FINE IL RIEPILOGO DI QUELLE CHE NON SONO STATE APERTE E UN FILE EXCEL CON IL RIEPILOGO DI TUTTO, COSÃ¬ POSSO TELEFONARE. TERREMO COME PROMO SOLO IL TEST ONLINE AZIENDALE MA ANCHE PER TEDESCO OLTRE CHE SPAGNOLO E INGLESE."
         },
         {
           "text": "landing page italiano su pagina FB vietnamiti, traduzione, è in fase di approvazione, news?",
-          "notes": "LA TRADUZIONE IN INGLESE è PRONTA, VALE SOLLECITA STEFANIA PER VIETNAMITA"
+          "notes": "LA TRADUZIONE IN INGLESE Ã¨ PRONTA, VALE SOLLECITA STEFANIA PER VIETNAMITA"
         },
         {
           "text": "Network up, 8 iscritti + Jelena",
@@ -558,7 +556,7 @@
       "notes": "",
       "actions": [],
       "createdAt": "2026-07-31T08:38:30.879Z",
-      "updatedAt": "2026-10-23T08:21:05.354Z"
+      "updatedAt": "2026-10-27T14:23:35.077Z"
     },
     {
       "id": "mtbnaezvdhdp5x",
@@ -617,10 +615,10 @@
       "agenda": [
         {
           "text": "situazione bilancio e previsione",
-          "notes": "spese previste 2026 â¬ 35000 (17k silvia, 12k io con spese, 6k tra inps banca ammortamenti mutuo\nFatturato attuale â¬ 34,3k di cui circa 3,4k trad con MOL 0,9k e 30,9k corsi con MOL 19,2k - TOTALE MOL 20,1K\nmancano quindi 15k di MOL, di cui:\n- 6,2k di MOL arriveranno dai 8,4K conseguiti e non fatturati\n- 5k di MOL dovrebbero arrivare da 8-10K informalmente accettati\nMANCANO QUINDI 4K DI MOL CHE POSSONO ARRIVARE DA:\n- circa 8k di proposte inviated, cui non abbiamo ancora risposta\n- altre entrate nell'anno, al momento non note"
+          "notes": "spese previste 2026 € 35000 (17k silvia, 12k io con spese, 6k tra inps banca ammortamenti mutuo\nFatturato attuale € 34,3k di cui circa 3,4k trad con MOL 0,9k e 30,9k corsi con MOL 19,2k - TOTALE MOL 20,1K\nmancano quindi 15k di MOL, di cui:\n- 6,2k di MOL arriveranno dai 8,4K conseguiti e non fatturati\n- 5k di MOL dovrebbero arrivare da 8-10K informalmente accettati\nMANCANO QUINDI 4K DI MOL CHE POSSONO ARRIVARE DA:\n- circa 8k di proposte inviated, cui non abbiamo ancora risposta\n- altre entrate nell'anno, al momento non note"
         }
       ],
-      "notes": "spese previste 2026 â¬ 35000 (17k silvia, 12k io con spese, 6k tra inps banca ammortamenti mutuo etc.)\nFatturato attuale â¬ 34,3k di cui circa 3,4k trad con MOL 0,9k e 30,9k corsi con MOL 19,2k - TOTALE MOL 20,1K\nmancano quindi 15k di MOL, di cui:\n- 6,2k di MOL arriveranno dai 8,4K conseguiti e non fatturati\n- 5k di MOL dovrebbero arrivare da 8-10K informalmente accettati\nMANCANO QUINDI 4K DI MOL CHE POSSONO ARRIVARE DA:\n- circa 8k di proposte inviated, cui non abbiamo ancora risposta\n- altre entrate nell'anno, al momento non note\n\nINSERIMENTO DI UN COMMERCIALE PER LAVORO SU SCUOLE? CONTROGARANTISCO CON LA POSSIBILE RINUNCIA DI TRE MESI DI STIPENDIO E UN MESE DI RIMBORSO SPESE (O DUE E DUE)",
+      "notes": "spese previste 2026 € 35000 (17k silvia, 12k io con spese, 6k tra inps banca ammortamenti mutuo etc.)\nFatturato attuale € 34,3k di cui circa 3,4k trad con MOL 0,9k e 30,9k corsi con MOL 19,2k - TOTALE MOL 20,1K\nmancano quindi 15k di MOL, di cui:\n- 6,2k di MOL arriveranno dai 8,4K conseguiti e non fatturati\n- 5k di MOL dovrebbero arrivare da 8-10K informalmente accettati\nMANCANO QUINDI 4K DI MOL CHE POSSONO ARRIVARE DA:\n- circa 8k di proposte inviated, cui non abbiamo ancora risposta\n- altre entrate nell'anno, al momento non note\n\nINSERIMENTO DI UN COMMERCIALE PER LAVORO SU SCUOLE? CONTROGARANTISCO CON LA POSSIBILE RINUNCIA DI TRE MESI DI STIPENDIO E UN MESE DI RIMBORSO SPESE (O DUE E DUE)",
       "actions": [],
       "createdAt": "2026-08-28T13:55:00.841Z",
       "updatedAt": "2026-08-28T14:05:50.742Z"
@@ -678,7 +676,7 @@
       "notes": "",
       "actions": [],
       "createdAt": "2026-09-03T15:47:12.533Z",
-      "updatedAt": "2026-10-23T08:21:05.354Z"
+      "updatedAt": "2026-10-27T14:23:35.081Z"
     },
     {
       "id": "mtlpg4vysvuuyo",
@@ -739,7 +737,7 @@
       "notes": "Alessandro: va nelle scuole medie e esuperiori a proporre i testi scolastici, poi offriva formazione gratuita. Lui crea corsi, vorrebbe creare corsi per noi perché noi li proponiamo su MEPA. Gli ho detto che se lui ci presenta le scuola, puntiamo all'affidamento diretto.\nElena fa anche formazione finanziaria ma dice che deve essere calata maggiormente sulla realta scolatica; ha creato il progetto ???\nMArco Redaelli che lavora per Confap, Elena ce li vuole presentare",
       "actions": [],
       "createdAt": "2026-09-04T08:35:29.701Z",
-      "updatedAt": "2026-09-04T09:34:47.628Z"
+      "updatedAt": "2026-10-27T14:23:35.081Z"
     },
     {
       "id": "mtv6mgbs6hcqcb",
@@ -764,13 +762,12 @@
           "text": "riscontro su interesse ed eventualmente incontro per progetto (ore/sett, provv, compenso, progetto)",
           "who": "Alessandro Bruni",
           "date": "2026-09-25",
-          "done": true,
-          "createdAt": "2026-09-10T09:28:44.674Z",
-          "updatedAt": "2026-10-23T07:33:46.086Z"
+          "done": false,
+          "createdAt": "2026-09-10T09:28:44.674Z"
         }
       ],
       "createdAt": "2026-09-10T07:04:34.600Z",
-      "updatedAt": "2026-10-23T07:33:48.501Z"
+      "updatedAt": "2026-10-27T14:23:35.081Z"
     },
     {
       "id": "mu6mdacnvlidb5",
@@ -872,7 +869,7 @@
       "notes": "",
       "actions": [],
       "createdAt": "2026-09-25T08:36:55.829Z",
-      "updatedAt": "2026-09-25T08:39:03.764Z"
+      "updatedAt": "2026-10-27T14:23:35.082Z"
     },
     {
       "id": "mugpplqkgjoegn",
@@ -910,7 +907,7 @@
       "notes": "vedi file su C:\\Users\\renat\\OneDrive\\UP srls condivisa\\RENATO\\MEETING VARI\n\n",
       "actions": [],
       "createdAt": "2026-09-25T08:42:03.980Z",
-      "updatedAt": "2026-10-23T08:21:05.354Z"
+      "updatedAt": "2026-10-27T14:23:35.082Z"
     },
     {
       "id": "muy69tatfbuqj3",
@@ -957,7 +954,7 @@
       "notes": "stiamo diventando sempre più una azienda che vuole affiancare i nostri clienti e partner per tutte quelle richieste di formazione che esulano da quelle obbligatorie di legge, per fornire corsi aggiornati, su misura dell'azienda, anche con percorsi brevi e molto mirati.\nPer questo continuiamo a integrare la nostra offerta formativa, che adesso ti presenterà Silvia.\nL'altro aspetto è commerciale, per Raffmetal stiamo mantenendo usando gli stessi valori economici dal 2021, l'anno prossimo dovremo adeguarli e la call è anche per dare numeri e motivazioni: nel quinquennio 2021-2026 l'inflazione è aumentate di circa 18-19%, noi prevediamo un aumento di circa il 15% sui corsi e del 10% sui MD",
       "actions": [],
       "createdAt": "2026-10-11T15:58:18.017Z",
-      "updatedAt": "2026-10-12T13:23:17.541Z"
+      "updatedAt": "2026-10-27T14:23:35.082Z"
     },
     {
       "id": "mv6pfntzgbqlxz",
@@ -1012,7 +1009,7 @@
       "notes": "scaletta, mando io con anche domande Micol\nti mando una breve bio\nuno o due giorni mi mandano link a cui collegarmi\nmando elenco nostri corsi",
       "actions": [],
       "createdAt": "2026-10-13T13:16:20.711Z",
-      "updatedAt": "2026-10-13T14:54:25.124Z"
+      "updatedAt": "2026-10-27T14:23:35.082Z"
     },
     {
       "id": "mvakeisu6zo1rr",
@@ -1216,6 +1213,6 @@
       "updatedAt": "2026-10-23T09:54:32.447Z"
     }
   ],
-  "updatedAt": "2026-10-23T09:54:32.447Z",
+  "updatedAt": "2026-10-16T06:15:00.137Z",
   "deleted": []
 }
