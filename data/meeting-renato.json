@@ -1251,15 +1251,15 @@
         },
         {
           "text": "Gestionale didattica",
-          "notes": ""
+          "notes": "rifacimento per sicurezza PHP, da 8 a 16 ore Anastasi, valutare "
         }
       ],
       "notes": "",
       "actions": [],
       "createdAt": "2026-10-27T14:24:27.051Z",
-      "updatedAt": "2026-10-27T14:24:27.051Z"
+      "updatedAt": "2026-10-27T14:24:44.299Z"
     }
   ],
-  "updatedAt": "2026-10-27T14:24:27.051Z",
+  "updatedAt": "2026-10-27T14:24:44.299Z",
   "deleted": []
 }
