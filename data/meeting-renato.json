@@ -1251,15 +1251,15 @@
         },
         {
           "text": "Gestionale didattica",
-          "notes": "rifacimento per sicurezza PHP, da 8 a 16 ore Anastasi, valutare "
+          "notes": "rifacimento per sicurezza PHP, da 8 a 16 ore Anastasi, valutare se spostare nel 2027, se integrare qualche nuova funzione, se MSF è interessata"
         }
       ],
       "notes": "",
       "actions": [],
       "createdAt": "2026-10-27T14:24:27.051Z",
-      "updatedAt": "2026-10-27T14:24:44.299Z"
+      "updatedAt": "2026-10-27T14:25:05.462Z"
     }
   ],
-  "updatedAt": "2026-10-27T14:24:44.299Z",
+  "updatedAt": "2026-10-27T14:25:05.462Z",
   "deleted": []
 }
