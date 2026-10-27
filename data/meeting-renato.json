@@ -538,11 +538,11 @@
       "agenda": [
         {
           "text": "Database, invio email, come sta andando?",
-          "notes": "LE HO CHIESTO DI FARMI AVERE ALLA FINE IL RIEPILOGO DI QUELLE CHE NON SONO STATE APERTE E UN FILE EXCEL CON IL RIEPILOGO DI TUTTO, COSÃ¬ POSSO TELEFONARE. TERREMO COME PROMO SOLO IL TEST ONLINE AZIENDALE MA ANCHE PER TEDESCO OLTRE CHE SPAGNOLO E INGLESE."
+          "notes": "LE HO CHIESTO DI FARMI AVERE ALLA FINE IL RIEPILOGO DI QUELLE CHE NON SONO STATE APERTE E UN FILE EXCEL CON IL RIEPILOGO DI TUTTO, COSì POSSO TELEFONARE. TERREMO COME PROMO SOLO IL TEST ONLINE AZIENDALE MA ANCHE PER TEDESCO OLTRE CHE SPAGNOLO E INGLESE."
         },
         {
           "text": "landing page italiano su pagina FB vietnamiti, traduzione, è in fase di approvazione, news?",
-          "notes": "LA TRADUZIONE IN INGLESE Ã¨ PRONTA, VALE SOLLECITA STEFANIA PER VIETNAMITA"
+          "notes": "LA TRADUZIONE IN INGLESE è PRONTA, VALE SOLLECITA STEFANIA PER VIETNAMITA"
         },
         {
           "text": "Network up, 8 iscritti + Jelena",
@@ -556,7 +556,7 @@
       "notes": "",
       "actions": [],
       "createdAt": "2026-07-31T08:38:30.879Z",
-      "updatedAt": "2026-10-27T14:23:35.077Z"
+      "updatedAt": "2026-10-27T14:24:27.440Z"
     },
     {
       "id": "mtbnaezvdhdp5x",
@@ -1211,8 +1211,55 @@
       "actions": [],
       "createdAt": "2026-10-23T07:33:59.278Z",
       "updatedAt": "2026-10-23T09:54:32.447Z"
+    },
+    {
+      "id": "mvqs167fse37j8",
+      "code": "26-028",
+      "title": "meeting UP",
+      "date": "2026-10-30",
+      "timeStart": "11:00",
+      "timeEnd": "12:00",
+      "client": "",
+      "topics": [
+        "commerciale",
+        "didattica",
+        "amministrazione",
+        "mkt"
+      ],
+      "participants": [
+        "Stefania",
+        "Silvia",
+        "Valentina",
+        "Lucia"
+      ],
+      "agenda": [
+        {
+          "text": "Contratti per corso di gruppo excel, sono arrivati? Ho fatto nuovi modelli offerte e ctr",
+          "notes": "Quando arrivano compilati, procediamo alla fatturazione. LUCIA CI TIENE AGGIORNATI\n\n"
+        },
+        {
+          "text": "appuntamenti per revisioni prezzi",
+          "notes": "Raffmetal, fatto con aumento del 15%. Confapi, bozza listino, appuntamento il 6/11. CNA, appuntamento 30/10. Maxion NR. Brebemi da sentire. Confcommercio BS NR. Ordine ingegneri Brescia da sentire. "
+        },
+        {
+          "text": "trifold",
+          "notes": "possiamo metterne qualcuno sul bancone?"
+        },
+        {
+          "text": "Ammortamenti, news?",
+          "notes": ""
+        },
+        {
+          "text": "Gestionale didattica",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-10-27T14:24:27.051Z",
+      "updatedAt": "2026-10-27T14:24:27.051Z"
     }
   ],
-  "updatedAt": "2026-10-16T06:15:00.137Z",
+  "updatedAt": "2026-10-27T14:24:27.051Z",
   "deleted": []
 }
