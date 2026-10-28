@@ -1262,8 +1262,34 @@
       "actions": [],
       "createdAt": "2026-10-27T14:24:27.051Z",
       "updatedAt": "2026-10-28T14:29:42.910Z"
+    },
+    {
+      "id": "mvs7r3cwm4slqt",
+      "code": "26-029",
+      "title": "Meeting UP MSF Piazza",
+      "date": "2026-10-30",
+      "timeStart": "12:00",
+      "timeEnd": "13:00",
+      "client": "",
+      "topics": [
+        "gestionale"
+      ],
+      "participants": [
+        "Stefania",
+        "Matteo"
+      ],
+      "agenda": [
+        {
+          "text": "ammortamenti, file Mara del 28/10?",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-10-28T14:32:16.832Z",
+      "updatedAt": "2026-10-28T14:32:16.832Z"
     }
   ],
-  "updatedAt": "2026-10-28T14:29:42.910Z",
+  "updatedAt": "2026-10-28T14:32:16.832Z",
   "deleted": []
 }
