@@ -1252,14 +1252,18 @@
         {
           "text": "Gestionale didattica",
           "notes": "rifacimento per sicurezza PHP, da 8 a 16 ore Anastasi, valutare se spostare nel 2027, se integrare qualche nuova funzione, se MSF è interessata"
+        },
+        {
+          "text": "adeguamento al tracking pixel entro il 29 ottobre",
+          "notes": ""
         }
       ],
       "notes": "",
       "actions": [],
       "createdAt": "2026-10-27T14:24:27.051Z",
-      "updatedAt": "2026-10-27T14:25:05.462Z"
+      "updatedAt": "2026-10-28T14:29:31.150Z"
     }
   ],
-  "updatedAt": "2026-10-27T14:25:05.462Z",
+  "updatedAt": "2026-10-28T14:29:31.150Z",
   "deleted": []
 }
