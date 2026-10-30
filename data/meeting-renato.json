@@ -1288,8 +1288,39 @@
       "actions": [],
       "createdAt": "2026-10-28T14:32:16.832Z",
       "updatedAt": "2026-10-28T14:32:16.832Z"
+    },
+    {
+      "id": "mvum7zwanrtk50",
+      "code": "26-030",
+      "title": "CNA bergamo",
+      "date": "2026-10-30",
+      "timeStart": "10:00",
+      "timeEnd": "11:00",
+      "client": "CNA bergamo",
+      "topics": [
+        "commerciale",
+        "didattica"
+      ],
+      "participants": [
+        "Silvia",
+        "Arianna mulé"
+      ],
+      "agenda": [
+        {
+          "text": "situazione attuale",
+          "notes": ""
+        },
+        {
+          "text": "proposta formativa 2027",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-10-30T06:52:52.475Z",
+      "updatedAt": "2026-10-30T06:52:52.475Z"
     }
   ],
-  "updatedAt": "2026-10-28T14:32:16.832Z",
+  "updatedAt": "2026-10-30T06:52:52.475Z",
   "deleted": []
 }
