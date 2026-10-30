@@ -1308,7 +1308,7 @@
       "agenda": [
         {
           "text": "situazione attuale",
-          "notes": "corso comunicazione €/h 70 * 8 h + €/trasf 45 = € 685 + IVA\n"
+          "notes": "corso comunicazione €/h 70 * 8 h + €/trasf 45 = € 685 + IVA\ncorso macchine €/h 190*4 + "
         },
         {
           "text": "proposta formativa 2027",
@@ -1318,9 +1318,9 @@
       "notes": "",
       "actions": [],
       "createdAt": "2026-10-30T06:52:52.475Z",
-      "updatedAt": "2026-10-30T06:54:49.798Z"
+      "updatedAt": "2026-10-30T06:57:36.646Z"
     }
   ],
-  "updatedAt": "2026-10-30T06:54:49.799Z",
+  "updatedAt": "2026-10-30T06:57:36.646Z",
   "deleted": []
 }
