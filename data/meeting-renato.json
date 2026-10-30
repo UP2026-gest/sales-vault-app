@@ -1308,7 +1308,7 @@
       "agenda": [
         {
           "text": "situazione attuale",
-          "notes": "corso comunicazione €/h 70 + "
+          "notes": "corso comunicazione €/h 70 + €"
         },
         {
           "text": "proposta formativa 2027",
@@ -1318,9 +1318,9 @@
       "notes": "",
       "actions": [],
       "createdAt": "2026-10-30T06:52:52.475Z",
-      "updatedAt": "2026-10-30T06:54:21.022Z"
+      "updatedAt": "2026-10-30T06:54:23.255Z"
     }
   ],
-  "updatedAt": "2026-10-30T06:54:21.022Z",
+  "updatedAt": "2026-10-30T06:54:23.255Z",
   "deleted": []
 }
