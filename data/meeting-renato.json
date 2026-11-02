@@ -1338,6 +1338,10 @@
         {
           "text": "capire attuale posizione",
           "notes": ""
+        },
+        {
+          "text": "capire obiettivi futuri",
+          "notes": ""
         }
       ],
       "notes": "",
@@ -1352,9 +1356,9 @@
         }
       ],
       "createdAt": "2026-11-02T14:27:44.188Z",
-      "updatedAt": "2026-11-02T14:28:00.864Z"
+      "updatedAt": "2026-11-02T14:28:11.298Z"
     }
   ],
-  "updatedAt": "2026-11-02T14:28:00.864Z",
+  "updatedAt": "2026-11-02T14:28:11.298Z",
   "deleted": []
 }
