@@ -1353,7 +1353,7 @@
         },
         {
           "text": "Tempi e organizzazione",
-          "notes": "lun solo appuntamento, mart-sab"
+          "notes": "lun solo eventuale appuntamento, mart-sab"
         }
       ],
       "notes": "",
@@ -1368,9 +1368,9 @@
         }
       ],
       "createdAt": "2026-11-02T14:27:44.188Z",
-      "updatedAt": "2026-11-02T14:59:34.477Z"
+      "updatedAt": "2026-11-02T14:59:42.074Z"
     }
   ],
-  "updatedAt": "2026-11-02T14:59:34.477Z",
+  "updatedAt": "2026-11-02T14:59:42.074Z",
   "deleted": []
 }
