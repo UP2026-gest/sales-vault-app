@@ -1323,8 +1323,24 @@
       "actions": [],
       "createdAt": "2026-10-30T06:52:52.475Z",
       "updatedAt": "2026-10-30T09:20:15.110Z"
+    },
+    {
+      "id": "mvzcsibfbaphtu",
+      "code": "26-031",
+      "title": "Caracciolo",
+      "date": "2026-11-02",
+      "timeStart": "15:30",
+      "timeEnd": "16:30",
+      "client": "Caracciolo Andrea, Esanu Maria",
+      "topics": [],
+      "participants": [],
+      "agenda": [],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-11-02T14:27:44.188Z",
+      "updatedAt": "2026-11-02T14:27:44.188Z"
     }
   ],
-  "updatedAt": "2026-10-30T09:20:15.110Z",
+  "updatedAt": "2026-11-02T14:27:44.188Z",
   "deleted": []
 }
