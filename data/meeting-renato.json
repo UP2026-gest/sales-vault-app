@@ -1346,6 +1346,10 @@
         {
           "text": "quali aree si sente forte",
           "notes": ""
+        },
+        {
+          "text": "quali deve migliorare",
+          "notes": ""
         }
       ],
       "notes": "",
@@ -1360,9 +1364,9 @@
         }
       ],
       "createdAt": "2026-11-02T14:27:44.188Z",
-      "updatedAt": "2026-11-02T14:28:37.942Z"
+      "updatedAt": "2026-11-02T14:28:42.603Z"
     }
   ],
-  "updatedAt": "2026-11-02T14:28:37.942Z",
+  "updatedAt": "2026-11-02T14:28:42.603Z",
   "deleted": []
 }
