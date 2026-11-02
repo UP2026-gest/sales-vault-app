@@ -1345,7 +1345,7 @@
         },
         {
           "text": "quali aree si sente forte",
-          "notes": "scelta giocatori tecnichre, "
+          "notes": "scelta giocatori tecnichre, cosa hanno dentro le persone, "
         },
         {
           "text": "quali deve migliorare",
@@ -1368,9 +1368,9 @@
         }
       ],
       "createdAt": "2026-11-02T14:27:44.188Z",
-      "updatedAt": "2026-11-02T14:54:34.239Z"
+      "updatedAt": "2026-11-02T14:54:40.939Z"
     }
   ],
-  "updatedAt": "2026-11-02T14:54:34.239Z",
+  "updatedAt": "2026-11-02T14:54:40.939Z",
   "deleted": []
 }
