@@ -1353,7 +1353,7 @@
         },
         {
           "text": "Tempi e organizzazione",
-          "notes": "lun solo eventuale appuntamento, mart-ven, 9-19\norganizza\n"
+          "notes": "lun solo eventuale appuntamento, mart-ven, 9-19\nA. si gestisce\n"
         }
       ],
       "notes": "",
@@ -1368,9 +1368,9 @@
         }
       ],
       "createdAt": "2026-11-02T14:27:44.188Z",
-      "updatedAt": "2026-11-02T15:00:35.290Z"
+      "updatedAt": "2026-11-02T15:00:44.209Z"
     }
   ],
-  "updatedAt": "2026-11-02T15:00:35.290Z",
+  "updatedAt": "2026-11-02T15:00:44.209Z",
   "deleted": []
 }
