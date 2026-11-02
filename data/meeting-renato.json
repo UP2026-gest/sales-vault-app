@@ -1356,7 +1356,7 @@
           "notes": "lun solo eventuale appuntamento, mart-ven, 9-19\nA. si gestisce\n"
         }
       ],
-      "notes": "proporre: gestione del tempo,",
+      "notes": "proporre: gestione del tempo, inglese a A., ",
       "actions": [
         {
           "id": "mvzcspi9xx7phd",
@@ -1368,9 +1368,9 @@
         }
       ],
       "createdAt": "2026-11-02T14:27:44.188Z",
-      "updatedAt": "2026-11-02T15:15:18.177Z"
+      "updatedAt": "2026-11-02T15:15:24.920Z"
     }
   ],
-  "updatedAt": "2026-11-02T15:15:18.177Z",
+  "updatedAt": "2026-11-02T15:15:24.920Z",
   "deleted": []
 }
