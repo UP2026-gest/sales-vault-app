@@ -1336,11 +1336,20 @@
       "participants": [],
       "agenda": [],
       "notes": "",
-      "actions": [],
+      "actions": [
+        {
+          "id": "mvzcspi9xx7phd",
+          "text": "capire attuale posizione",
+          "who": "",
+          "date": "",
+          "done": false,
+          "createdAt": "2026-11-02T14:27:53.505Z"
+        }
+      ],
       "createdAt": "2026-11-02T14:27:44.188Z",
-      "updatedAt": "2026-11-02T14:27:44.188Z"
+      "updatedAt": "2026-11-02T14:27:53.505Z"
     }
   ],
-  "updatedAt": "2026-11-02T14:27:44.188Z",
+  "updatedAt": "2026-11-02T14:27:53.505Z",
   "deleted": []
 }
