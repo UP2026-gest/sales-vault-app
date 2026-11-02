@@ -1334,7 +1334,12 @@
       "client": "Caracciolo Andrea, Esanu Maria",
       "topics": [],
       "participants": [],
-      "agenda": [],
+      "agenda": [
+        {
+          "text": "capire attuale posizione",
+          "notes": ""
+        }
+      ],
       "notes": "",
       "actions": [
         {
@@ -1347,9 +1352,9 @@
         }
       ],
       "createdAt": "2026-11-02T14:27:44.188Z",
-      "updatedAt": "2026-11-02T14:27:53.505Z"
+      "updatedAt": "2026-11-02T14:28:00.864Z"
     }
   ],
-  "updatedAt": "2026-11-02T14:27:53.505Z",
+  "updatedAt": "2026-11-02T14:28:00.864Z",
   "deleted": []
 }
