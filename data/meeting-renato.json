@@ -1349,7 +1349,7 @@
         },
         {
           "text": "quali deve migliorare",
-          "notes": "nel carattere, la maggior parte delle persone gli sono in"
+          "notes": "nel carattere, la maggior parte delle persone gli sono amp"
         },
         {
           "text": "Tempi e organizzazione",
@@ -1368,9 +1368,9 @@
         }
       ],
       "createdAt": "2026-11-02T14:27:44.188Z",
-      "updatedAt": "2026-11-02T14:55:31.430Z"
+      "updatedAt": "2026-11-02T14:55:34.090Z"
     }
   ],
-  "updatedAt": "2026-11-02T14:55:31.430Z",
+  "updatedAt": "2026-11-02T14:55:34.090Z",
   "deleted": []
 }
