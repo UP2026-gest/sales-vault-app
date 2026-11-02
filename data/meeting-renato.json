@@ -1350,6 +1350,10 @@
         {
           "text": "quali deve migliorare",
           "notes": ""
+        },
+        {
+          "text": "Tempi e organizzazione",
+          "notes": ""
         }
       ],
       "notes": "",
@@ -1364,9 +1368,9 @@
         }
       ],
       "createdAt": "2026-11-02T14:27:44.188Z",
-      "updatedAt": "2026-11-02T14:28:42.603Z"
+      "updatedAt": "2026-11-02T14:29:04.397Z"
     }
   ],
-  "updatedAt": "2026-11-02T14:28:42.603Z",
+  "updatedAt": "2026-11-02T14:29:04.397Z",
   "deleted": []
 }
