@@ -1342,6 +1342,10 @@
         {
           "text": "capire obiettivi futuri",
           "notes": ""
+        },
+        {
+          "text": "quali aree si sente forte",
+          "notes": ""
         }
       ],
       "notes": "",
@@ -1356,9 +1360,9 @@
         }
       ],
       "createdAt": "2026-11-02T14:27:44.188Z",
-      "updatedAt": "2026-11-02T14:28:11.298Z"
+      "updatedAt": "2026-11-02T14:28:37.942Z"
     }
   ],
-  "updatedAt": "2026-11-02T14:28:11.298Z",
+  "updatedAt": "2026-11-02T14:28:37.942Z",
   "deleted": []
 }
