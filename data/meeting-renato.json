@@ -1403,8 +1403,37 @@
       "actions": [],
       "createdAt": "2026-11-05T10:15:06.561Z",
       "updatedAt": "2026-11-05T13:11:49.289Z"
+    },
+    {
+      "id": "mw3m8zbf70ifg8",
+      "code": "26-034",
+      "title": "Confapi BS",
+      "date": "2026-11-06",
+      "timeStart": "09:30",
+      "timeEnd": "10:30",
+      "client": "Confapi Brescia",
+      "topics": [],
+      "participants": [],
+      "agenda": [
+        {
+          "text": "recap corsi aperti",
+          "notes": ""
+        },
+        {
+          "text": "formazione 2027",
+          "notes": ""
+        },
+        {
+          "text": "listino corsi lingua 2027",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-11-05T14:03:33.963Z",
+      "updatedAt": "2026-11-05T14:03:33.963Z"
     }
   ],
-  "updatedAt": "2026-11-05T13:11:49.289Z",
+  "updatedAt": "2026-11-05T14:03:33.963Z",
   "deleted": []
 }
