@@ -468,8 +468,24 @@
       "actions": [],
       "createdAt": "2026-10-23T09:12:08.051Z",
       "updatedAt": "2026-10-23T09:49:48.939Z"
+    },
+    {
+      "id": "mw3b6vpirmo2s9",
+      "code": "26-016",
+      "title": "Nicolis",
+      "date": "2026-11-05",
+      "timeStart": "",
+      "timeEnd": "",
+      "client": "",
+      "topics": [],
+      "participants": [],
+      "agenda": [],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-11-05T08:54:00.199Z",
+      "updatedAt": "2026-11-05T08:54:00.199Z"
     }
   ],
-  "updatedAt": "2026-10-23T09:49:48.939Z",
+  "updatedAt": "2026-11-05T08:54:00.199Z",
   "deleted": []
 }
