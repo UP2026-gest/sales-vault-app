@@ -1385,8 +1385,26 @@
       "actions": [],
       "createdAt": "2026-11-05T08:27:36.750Z",
       "updatedAt": "2026-11-05T09:34:44.787Z"
+    },
+    {
+      "id": "mw3e36m9dyikrz",
+      "code": "26-033",
+      "title": "Web heroes",
+      "date": "2026-11-05",
+      "timeStart": "11:15",
+      "timeEnd": "12:00",
+      "client": "",
+      "topics": [],
+      "participants": [
+        "Paolo Heroes"
+      ],
+      "agenda": [],
+      "notes": "sviluppare comunicazione aziende e pmi, 90% digitale per esempio sviluppo siti, adesso lavorano più su siti standard e mno costori (prima erano più custom).",
+      "actions": [],
+      "createdAt": "2026-11-05T10:15:06.561Z",
+      "updatedAt": "2026-11-05T11:05:11.423Z"
     }
   ],
-  "updatedAt": "2026-11-05T09:34:44.787Z",
+  "updatedAt": "2026-11-05T11:05:11.423Z",
   "deleted": []
 }
