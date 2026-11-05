@@ -1369,8 +1369,24 @@
       ],
       "createdAt": "2026-11-02T14:27:44.188Z",
       "updatedAt": "2026-11-02T15:20:43.841Z"
+    },
+    {
+      "id": "mw3a8xwuyqlz7h",
+      "code": "26-032",
+      "title": "Daniele Arboit + Nicolis",
+      "date": "2026-11-05",
+      "timeStart": "09:30",
+      "timeEnd": "10:30",
+      "client": "",
+      "topics": [],
+      "participants": [],
+      "agenda": [],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-11-05T08:27:36.750Z",
+      "updatedAt": "2026-11-05T08:27:36.750Z"
     }
   ],
-  "updatedAt": "2026-11-02T15:20:43.841Z",
+  "updatedAt": "2026-11-05T08:27:36.750Z",
   "deleted": []
 }
