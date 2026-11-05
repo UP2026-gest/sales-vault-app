@@ -1425,15 +1425,15 @@
         },
         {
           "text": "listino corsi lingua 2027",
-          "notes": "1/01/2020 – 01/01/2024\t+16,1%\tStorico ISTAT ufficiale (Indice FOI: da 102,7 a 119,3)\n01/01/2024 – 01/01/2027\t+6,7%\tPrevisionale (Dati reali 2024-2025 + stime di chiusura per il 2026)\n01/01/2020 – 01/01/2027\t+23,9%\n"
+          "notes": "1/01/2020 – 01/01/2024\t+16,1%\tStorico ISTAT ufficiale (Indice FOI: da 102,7 a 119,3) - 01/01/2024 – 01/01/2027\t+6,7%\tPrevisionale (Dati reali 2024-2025 + stime di chiusura per il 2026)\n01/01/2020 – 01/01/2027\t+23,9%\n"
         }
       ],
       "notes": "",
       "actions": [],
       "createdAt": "2026-11-05T14:03:33.963Z",
-      "updatedAt": "2026-11-05T14:05:35.672Z"
+      "updatedAt": "2026-11-05T14:05:48.723Z"
     }
   ],
-  "updatedAt": "2026-11-05T14:05:35.672Z",
+  "updatedAt": "2026-11-05T14:05:48.723Z",
   "deleted": []
 }
