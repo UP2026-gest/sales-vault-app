@@ -1239,7 +1239,7 @@
         },
         {
           "text": "appuntamenti per revisioni prezzi",
-          "notes": "Raffmetal, fatto con aumento del 15%. Confapi, bozza listino, appuntamento il 6/11, ci hanno dato l'ok informale. CNA, appuntamento 30/10. Maxion NR. Brebemi da sentire. Confcommercio BS NR. Ordine ingegneri Brescia da sentire. "
+          "notes": "Raffmetal, fatto con aumento del 15%. Confapi, bozza listino, appuntamento il 6/11, ci hanno dato l'ok informale. CNA, appuntamento 30/10, ok. Maxion NR. Brebemi da sentire. Confcommercio BS NR. Ordine ingegneri Brescia da sentire. "
         },
         {
           "text": "trifold",
@@ -1261,7 +1261,7 @@
       "notes": "",
       "actions": [],
       "createdAt": "2026-10-27T14:24:27.051Z",
-      "updatedAt": "2026-11-06T09:51:41.677Z"
+      "updatedAt": "2026-11-06T09:51:46.234Z"
     },
     {
       "id": "mvs7r3cwm4slqt",
@@ -1434,6 +1434,6 @@
       "updatedAt": "2026-11-06T08:53:20.216Z"
     }
   ],
-  "updatedAt": "2026-11-06T09:51:41.677Z",
+  "updatedAt": "2026-11-06T09:51:46.234Z",
   "deleted": []
 }
