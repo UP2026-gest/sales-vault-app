@@ -1286,12 +1286,16 @@
         {
           "text": "ammortamenti, file Mara del 28/10?",
           "notes": ""
+        },
+        {
+          "text": "crm didattica, vogliono mettere anche in MSF",
+          "notes": ""
         }
       ],
       "notes": "",
       "actions": [],
       "createdAt": "2026-10-28T14:32:16.832Z",
-      "updatedAt": "2026-10-28T14:32:16.832Z"
+      "updatedAt": "2026-11-06T10:20:23.083Z"
     },
     {
       "id": "mvum7zwanrtk50",
@@ -1438,6 +1442,6 @@
       "updatedAt": "2026-11-06T08:53:20.216Z"
     }
   ],
-  "updatedAt": "2026-11-06T10:19:26.451Z",
+  "updatedAt": "2026-11-06T10:20:23.083Z",
   "deleted": []
 }
