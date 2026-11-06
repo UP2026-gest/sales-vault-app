@@ -1271,7 +1271,7 @@
       "id": "mvs7r3cwm4slqt",
       "code": "26-029",
       "title": "Meeting UP MSF Piazza",
-      "date": "2026-10-30",
+      "date": "2026-11-06",
       "timeStart": "12:00",
       "timeEnd": "13:00",
       "client": "",
@@ -1295,7 +1295,7 @@
       "notes": "",
       "actions": [],
       "createdAt": "2026-10-28T14:32:16.832Z",
-      "updatedAt": "2026-11-06T10:20:23.083Z"
+      "updatedAt": "2026-11-06T10:24:19.805Z"
     },
     {
       "id": "mvum7zwanrtk50",
@@ -1442,6 +1442,6 @@
       "updatedAt": "2026-11-06T08:53:20.216Z"
     }
   ],
-  "updatedAt": "2026-11-06T10:20:23.083Z",
+  "updatedAt": "2026-11-06T10:24:19.805Z",
   "deleted": []
 }
