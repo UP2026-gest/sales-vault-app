@@ -1256,12 +1256,16 @@
         {
           "text": "adeguamento al tracking pixel entro il 29 ottobre",
           "notes": "vedi email di Michela del 28/10/2026"
+        },
+        {
+          "text": "aggiornamento sviluppi commerciali",
+          "notes": ""
         }
       ],
       "notes": "",
       "actions": [],
       "createdAt": "2026-10-27T14:24:27.051Z",
-      "updatedAt": "2026-11-06T09:51:46.234Z"
+      "updatedAt": "2026-11-06T09:52:16.436Z"
     },
     {
       "id": "mvs7r3cwm4slqt",
@@ -1434,6 +1438,6 @@
       "updatedAt": "2026-11-06T08:53:20.216Z"
     }
   ],
-  "updatedAt": "2026-11-06T09:51:46.234Z",
+  "updatedAt": "2026-11-06T09:52:16.436Z",
   "deleted": []
 }
