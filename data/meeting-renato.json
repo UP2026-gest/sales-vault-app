@@ -1417,7 +1417,7 @@
       "agenda": [
         {
           "text": "recap corsi aperti",
-          "notes": "nirox, non riescono"
+          "notes": "nirox, non riescono\nemplouer"
         },
         {
           "text": "formazione 2027",
@@ -1431,9 +1431,9 @@
       "notes": "",
       "actions": [],
       "createdAt": "2026-11-05T14:03:33.963Z",
-      "updatedAt": "2026-11-06T08:43:13.670Z"
+      "updatedAt": "2026-11-06T08:45:00.974Z"
     }
   ],
-  "updatedAt": "2026-11-06T08:43:13.670Z",
+  "updatedAt": "2026-11-06T08:45:00.974Z",
   "deleted": []
 }
