@@ -1440,8 +1440,55 @@
       "actions": [],
       "createdAt": "2026-11-05T14:03:33.963Z",
       "updatedAt": "2026-11-06T08:53:20.216Z"
+    },
+    {
+      "id": "mw9gvv53jz4nvd",
+      "code": "26-035",
+      "title": "meeting UP",
+      "date": "2026-11-13",
+      "timeStart": "11:00",
+      "timeEnd": "12:00",
+      "client": "",
+      "topics": [
+        "commerciale",
+        "didattica",
+        "amministrazione",
+        "mkt"
+      ],
+      "participants": [
+        "Stefania",
+        "Silvia",
+        "Valentina",
+        "Lucia"
+      ],
+      "agenda": [
+        {
+          "text": "appuntamenti per revisioni prezzi",
+          "notes": "Raffmetal, fatto con aumento del 15%. Confapi, bozza listino, appuntamento il 6/11, ci hanno dato l'ok informale. CNA, appuntamento 30/10, ok. Maxion NR. Brebemi da sentire. Confcommercio BS NR. Ordine ingegneri Brescia NR. "
+        },
+        {
+          "text": "trifold",
+          "notes": "possiamo metterne qualcuno sul bancone? VALENTINA li stampa e li mette sul bancone, incarica Dennis di verificare.\nInoltre li stampa per darli all'evento di oggi"
+        },
+        {
+          "text": "Gestionale didattica",
+          "notes": "rifacimento per sicurezza PHP, da 8 a 16 ore Anastasi, valutare se spostare nel 2027, se integrare qualche nuova funzione, se MSF è interessata. Vale sente Michela per conferma sito in HTML"
+        },
+        {
+          "text": "adeguamento al tracking pixel entro il 29 ottobre",
+          "notes": "vedi email di Michela del 28/10/2026"
+        },
+        {
+          "text": "aggiornamento sviluppi commerciali",
+          "notes": "Caracciolo, offerta per proseguimento inglese e GdT, poi leadership e altro.\nNicolis ci ha presentato Daniele Arboit, proprietario di 3 centri wall street, distributore italiano marchio pingu's, certificazione cambridge per le scuole. Cerca un partner su brescia per erogazione dei corsi di preparazione, inizieremo piano con un paio di scuole, se va tutto bene potremo estendere anche su altre scuole e province\nWEB Heroes, nulla di definito ma sono molto dinamici, ci hanno portato in CNA Brescia per macchine.\nIl libro, le iniziative a cui ho partecipato, etc. hanno messo in moto una serie di contatti vecchi e nuovi, bene così, io dove puntare a questo."
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-11-09T16:20:01.000Z",
+      "updatedAt": "2026-11-09T16:20:01.000Z"
     }
   ],
-  "updatedAt": "2026-11-05T14:06:46.881Z",
+  "updatedAt": "2026-11-09T16:20:01.000Z",
   "deleted": []
 }
