@@ -1487,8 +1487,24 @@
       "actions": [],
       "createdAt": "2026-11-09T16:20:01.000Z",
       "updatedAt": "2026-11-09T16:21:33.530Z"
+    },
+    {
+      "id": "mwc82xmge041vr",
+      "code": "26-036",
+      "title": "Call Silvia per Argentea",
+      "date": "2026-11-11",
+      "timeStart": "15:30",
+      "timeEnd": "16:00",
+      "client": "",
+      "topics": [],
+      "participants": [],
+      "agenda": [],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-11-11T14:36:52.792Z",
+      "updatedAt": "2026-11-11T14:36:52.792Z"
     }
   ],
-  "updatedAt": "2026-11-09T16:21:33.530Z",
+  "updatedAt": "2026-11-11T14:36:52.792Z",
   "deleted": []
 }
