@@ -1506,14 +1506,15 @@
           "text": "Scaricare presenze",
           "who": "",
           "date": "",
-          "done": false,
-          "createdAt": "2026-11-11T14:40:10.929Z"
+          "done": true,
+          "createdAt": "2026-11-11T14:40:10.929Z",
+          "updatedAt": "2026-11-11T14:40:13.484Z"
         }
       ],
       "createdAt": "2026-11-11T14:36:52.792Z",
-      "updatedAt": "2026-11-11T14:40:10.929Z"
+      "updatedAt": "2026-11-11T14:40:13.484Z"
     }
   ],
-  "updatedAt": "2026-11-11T14:40:10.929Z",
+  "updatedAt": "2026-11-11T14:40:13.484Z",
   "deleted": []
 }
