@@ -1502,14 +1502,18 @@
         {
           "text": "scaricare presenze",
           "notes": ""
+        },
+        {
+          "text": "gestione delle cancellazioni",
+          "notes": ""
         }
       ],
       "notes": "lunedi 9/11 si collegano dirigente e docente, il dirigente si stacca prima, olga avvisa silvia con messaggio ma silvia non ha visto. Il giorno dopo Enaip dice che non va bene, Silvia chiede come risolvere . Poi il dirigente scrive a tutti e chiede scusa, chiede per il recupero ma enaip non risponde, risponde invece a silvia e agli altri dirigenti di organizzarsi e mettere in coda.",
       "actions": [],
       "createdAt": "2026-11-11T14:36:52.792Z",
-      "updatedAt": "2026-11-11T14:40:21.209Z"
+      "updatedAt": "2026-11-11T14:40:29.793Z"
     }
   ],
-  "updatedAt": "2026-11-11T14:40:21.209Z",
+  "updatedAt": "2026-11-11T14:40:29.793Z",
   "deleted": []
 }
