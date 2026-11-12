@@ -1528,7 +1528,7 @@
       "agenda": [
         {
           "text": "UNI/PdR 125:2022",
-          "notes": "La UNI/PdR 125:2022 è una prassi di riferimento UNI. Definisce i requisiti per la Certificazione di Parità di Genere prevista dal PNRR.\nIn pratica chiede all’azienda di gestire la parità come un sistema, misurato con indicatori (KPI)\nI pesi sono questi: Cultura e strategia 15%, Governance 15%, Processi HR 10%, Opportunità di crescita e inclusione delle donne 20%, Equità remunerativa 20%, Genitorialità e conciliazione vita-lavoro 20%. Per ottenere la certificazione basta un punteggio minimo del 60% sui 33 indicatori.\nBias inconsci rientra in "
+          "notes": "La UNI/PdR 125:2022 è una prassi di riferimento UNI. Definisce i requisiti per la Certificazione di Parità di Genere prevista dal PNRR.\nIn pratica chiede all’azienda di gestire la parità come un sistema, misurato con indicatori (KPI)\nI pesi sono questi: Cultura e strategia 15%, Governance 15%, Processi HR 10%, Opportunità di crescita e inclusione delle donne 20%, Equità remunerativa 20%, Genitorialità e conciliazione vita-lavoro 20%. Per ottenere la certificazione basta un punteggio minimo del 60% sui 33 indicatori.\nBias inconsci rientra nei KPI \"Cultura e strategia\""
         },
         {
           "text": "corso Bias inconsci",
@@ -1542,9 +1542,9 @@
       "notes": "",
       "actions": [],
       "createdAt": "2026-11-12T12:59:46.436Z",
-      "updatedAt": "2026-11-12T13:00:48.834Z"
+      "updatedAt": "2026-11-12T13:01:03.142Z"
     }
   ],
-  "updatedAt": "2026-11-12T13:00:48.834Z",
+  "updatedAt": "2026-11-12T13:01:03.142Z",
   "deleted": []
 }
