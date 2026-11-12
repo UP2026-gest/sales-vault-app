@@ -484,8 +484,41 @@
       "actions": [],
       "createdAt": "2026-11-05T08:54:00.199Z",
       "updatedAt": "2026-11-05T09:44:05.348Z"
+    },
+    {
+      "id": "mwdfdaww12o591",
+      "code": "26-017",
+      "title": "Incontro con Sebastian Bertoni",
+      "date": "2026-11-12",
+      "timeStart": "10:30",
+      "timeEnd": "11:30",
+      "client": "",
+      "topics": [],
+      "participants": [],
+      "agenda": [
+        {
+          "text": "corso excel feedback",
+          "notes": ""
+        },
+        {
+          "text": "richieste corsi di Confapi",
+          "notes": ""
+        },
+        {
+          "text": "richiesta corsi IA act",
+          "notes": ""
+        },
+        {
+          "text": "collaborazioni",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-11-12T10:48:40.065Z",
+      "updatedAt": "2026-11-12T10:48:40.065Z"
     }
   ],
-  "updatedAt": "2026-11-05T09:44:05.348Z",
+  "updatedAt": "2026-11-12T10:48:40.065Z",
   "deleted": []
 }
