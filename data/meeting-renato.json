@@ -1528,7 +1528,7 @@
       "agenda": [
         {
           "text": "UNI/PdR 125:2022",
-          "notes": ""
+          "notes": "La UNI/PdR 125:2022 non è una legge: è una prassi di riferimento UNI. È stata pubblicata il 16 marzo 2022 e definisce i requisiti per la Certificazione di Parità di Genere prevista dal PNRR"
         },
         {
           "text": "corso Bias inconsci",
@@ -1542,9 +1542,9 @@
       "notes": "",
       "actions": [],
       "createdAt": "2026-11-12T12:59:46.436Z",
-      "updatedAt": "2026-11-12T12:59:46.436Z"
+      "updatedAt": "2026-11-12T12:59:49.724Z"
     }
   ],
-  "updatedAt": "2026-11-12T12:59:46.436Z",
+  "updatedAt": "2026-11-12T12:59:49.724Z",
   "deleted": []
 }
