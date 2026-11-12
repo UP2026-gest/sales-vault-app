@@ -1512,8 +1512,39 @@
       "actions": [],
       "createdAt": "2026-11-11T14:36:52.792Z",
       "updatedAt": "2026-11-11T14:44:25.082Z"
+    },
+    {
+      "id": "mwdk1wn813ux0e",
+      "code": "26-037",
+      "title": "EDB Elettronica",
+      "date": "2026-11-12",
+      "timeStart": "15:00",
+      "timeEnd": "16:00",
+      "client": "EDB Elettronica",
+      "topics": [],
+      "participants": [
+        "Elisa Scalvini"
+      ],
+      "agenda": [
+        {
+          "text": "UNI/PdR 125:2022",
+          "notes": ""
+        },
+        {
+          "text": "corso Bias inconsci",
+          "notes": ""
+        },
+        {
+          "text": "altri corsi UP",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-11-12T12:59:46.436Z",
+      "updatedAt": "2026-11-12T12:59:46.436Z"
     }
   ],
-  "updatedAt": "2026-11-11T14:44:25.082Z",
+  "updatedAt": "2026-11-12T12:59:46.436Z",
   "deleted": []
 }
