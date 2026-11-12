@@ -1528,7 +1528,7 @@
       "agenda": [
         {
           "text": "UNI/PdR 125:2022",
-          "notes": "La UNI/PdR 125:2022 è una prassi di riferimento UNI. Definisce i requisiti per la Certificazione di Parità di Genere prevista dal PNRR."
+          "notes": "La UNI/PdR 125:2022 è una prassi di riferimento UNI. Definisce i requisiti per la Certificazione di Parità di Genere prevista dal PNRR.\nIn pratica chiede all’azienda di gestire la parità come un sistema, misurato con indicatori (KPI)"
         },
         {
           "text": "corso Bias inconsci",
@@ -1542,9 +1542,9 @@
       "notes": "",
       "actions": [],
       "createdAt": "2026-11-12T12:59:46.436Z",
-      "updatedAt": "2026-11-12T13:00:03.837Z"
+      "updatedAt": "2026-11-12T13:00:11.615Z"
     }
   ],
-  "updatedAt": "2026-11-12T13:00:03.837Z",
+  "updatedAt": "2026-11-12T13:00:11.615Z",
   "deleted": []
 }
