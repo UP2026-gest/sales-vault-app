@@ -816,3 +816,23 @@ hr {
   font-size: 10.5px;
   font-weight: 600;
 }
+
+/* ══════════════════════════════════════════════
+   SALVATAGGIO AUTOMATICO — indicatore nella barra azioni
+   ══════════════════════════════════════════════ */
+.formActions.top { align-items: center; }
+#dirtyHint.autosave-status {
+  flex: 1;
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  margin: 0;
+}
+#dirtyHint.autosave-status.saving { color: var(--orange, #c75a00); background: #fff8ee; border-color: #f0d8b8; }
+#dirtyHint.autosave-status.saved  { color: var(--green, #1a7a3a); background: #edf7f1; border-color: #bfe3cc; }
+#dirtyHint.autosave-status.warn   { color: var(--red, #b52a2a);   background: #fdf0f0; border-color: #f0b0b0; }

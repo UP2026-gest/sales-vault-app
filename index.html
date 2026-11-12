@@ -134,14 +134,11 @@
     <section class="card">
       <h2>Dettaglio opportunità</h2>
 
-      <div id="dirtyHint" class="warn" style="display:none; margin-bottom:12px;">
-        ⚠️ Hai modifiche non salvate: premi "Salva" prima di cambiare opportunità.
-      </div>
 
       <form id="oppForm">
 
         <div class="formActions top">
-          <button id="saveBtn" type="submit">💾 Salva</button>
+          <div id="dirtyHint" class="autosave-status">Le modifiche si salvano automaticamente</div>
           <button id="archiveBtn" type="button">📦 Archivia</button>
           <button id="deleteBtn" type="button" class="danger" style="display:none;">🗑 Elimina</button>
         </div>
@@ -408,6 +405,7 @@
         window.oppToForm = function(o){
           origOppToForm.apply(this, arguments);
           contractEl.value = o.contractNumber || "";
+          if(typeof setFormSnapshot === "function") setFormSnapshot();   // il n° contratto fa parte del form
         };
       }
       // Svuota il campo contratto su nuova opportunità
@@ -416,6 +414,7 @@
         window.newOpp = function(){
           origNewOpp.apply(this, arguments);
           contractEl.value = "";
+          if(typeof setFormSnapshot === "function") setFormSnapshot();
         };
       }
 

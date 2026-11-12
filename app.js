@@ -246,6 +246,9 @@ function migrateDb(d){
   if(!d || typeof d !== "object") return defaultDb();
   if(!Array.isArray(d.opportunities)) d.opportunities = [];
   if(!Array.isArray(d.leads)) d.leads = [];
+  // Opportunità eliminate definitivamente: { id, at }. Servono alla fusione con
+  // GitHub per non far ricomparire un'opportunità cancellata.
+  if(!Array.isArray(d.deleted)) d.deleted = [];
   if(!Array.isArray(d.salespeople) || d.salespeople.length === 0)
     d.salespeople = defaultDb().salespeople;
   d.salespeople = normalizeSalespeopleList(d.salespeople);
@@ -456,7 +459,15 @@ function mergeDb(local, remote){
     }
   }
 
-  merged.opportunities = [...resultMap.values()];
+  // Eliminazioni: unisco gli elenchi e tolgo le opportunità cancellate
+  // (a meno che siano state modificate DOPO la cancellazione).
+  const delMap = new Map();
+  for(const x of [...(local.deleted||[]), ...(remote.deleted||[])]){
+    if(x?.id && (!delMap.has(x.id) || (x.at||"") > delMap.get(x.id))) delMap.set(x.id, x.at||"");
+  }
+  merged.deleted = [...delMap.entries()].map(([id,at])=>({id,at}));
+  merged.opportunities = [...resultMap.values()]
+    .filter(o => !delMap.has(o.id) || (o.updatedAt||"") > delMap.get(o.id));
 
   // Merge salespeople: unione dei due set
   const sp = new Set([
@@ -494,6 +505,7 @@ function mergeDb(local, remote){
 // ═══════════════════════════════════════════════════════════════
 
 let _syncLock = false; // evita push concorrenti
+let _syncPending = false; // un salvataggio arrivato durante un altro: va rifatto subito dopo
 
 async function syncPull(silent = false){
   if(!GH.isConfigured()) return false;
@@ -531,7 +543,7 @@ async function syncPull(silent = false){
  */
 async function syncSave(){
   if(!GH.isConfigured()) return false;
-  if(_syncLock){ console.warn("syncSave: lock attivo, skip"); return false; }
+  if(_syncLock){ _syncPending = true; return false; }   // prima veniva scartato: ora resta in coda
   _syncLock = true;
 
   setGhStatus("Sincronizzazione…", "syncing");
@@ -587,6 +599,7 @@ async function syncSave(){
     }
   } finally {
     _syncLock = false;
+    if(_syncPending){ _syncPending = false; setTimeout(syncSave, 0); }
   }
 }
 
@@ -608,6 +621,10 @@ function startPolling(){
     refreshOwnerSelects();
     refreshLeadDatalist();
     renderAllSafe();
+    if(currentOppId && !isFormDirty() && !ui.oppForm.contains(document.activeElement)){
+      const fresh = db.opportunities.find(x => x.id === currentOppId);
+      if(fresh) oppToForm(normalizeOpp(fresh));
+    }
     setGhStatus(`Aggiornato da remoto — ${new Date().toLocaleTimeString("it-IT")}`, "ok");
   }, 30_000);
 }
@@ -733,12 +750,92 @@ function getFormState(){
     leadContactName:ui.leadContactName?.value||"",
     leadPhone:      ui.leadPhone?.value||"",
     leadEmail:      ui.leadEmail?.value||"",
+    owner:          getOwnerFromPills(),
+    contractNumber: (document.getElementById("contractNumber")?.value||"").trim(),
   };
 }
 function setFormSnapshot(){ formSnapshot = JSON.stringify(getFormState()); }
 function isFormDirty(){ return !dirtyBypass && JSON.stringify(getFormState()) !== formSnapshot; }
+
+// ── SALVATAGGIO AUTOMATICO ──
+// L'opportunità si salva da sola 1,5 secondi dopo l'ultima modifica, quando
+// esci da un campo, prima di aprire un'altra opportunità e prima di chiudere
+// la pagina. Una nuova opportunità viene creata appena ha Data e Nome.
+let _autoTimer = null;
+const AUTO_DELAY = 1500;
+function setAutoStatus(txt, cls){
+  if(!ui.dirtyHint) return;
+  ui.dirtyHint.textContent = txt;
+  ui.dirtyHint.className = "autosave-status " + (cls||"");
+  ui.dirtyHint.style.display = txt ? "block" : "none";
+}
 function updateDirtyHint(){
-  if(ui.dirtyHint) ui.dirtyHint.style.display = isFormDirty() ? "block" : "none";
+  if(isFormDirty()){
+    setAutoStatus("✏️ Modifiche in corso…", "saving");
+    clearTimeout(_autoTimer);
+    _autoTimer = setTimeout(autoSaveOpp, AUTO_DELAY);
+  }
+}
+function autoSaveOpp(){
+  clearTimeout(_autoTimer); _autoTimer = null;
+  if(!isFormDirty()) return true;
+  // mentre scrivi il nome del cliente aspetto che tu esca dal campo,
+  // per non creare in rubrica clienti con il nome a metà ("Con", "Conf"…)
+  if(document.activeElement === ui.lead){ _autoTimer = setTimeout(autoSaveOpp, AUTO_DELAY); return false; }
+  if(!ui.createdAt.value || !ui.oppName.value.trim()){
+    setAutoStatus(currentOppId ? "⚠️ Data creazione e Nome opportunità sono obbligatori: modifica non ancora salvata"
+                               : "Nuova opportunità: si salverà da sola appena inserisci il Nome", "warn");
+    return false;
+  }
+  persistForm();
+  const t = new Date().toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"});
+  setAutoStatus(`✓ Salvato automaticamente alle ${t}`, "saved");
+  return true;
+}
+// Salvataggio vero e proprio dei campi del form (usato da autosalvataggio e Invio)
+function persistForm(){
+  // opportunità persa/abbandonata: niente prossima azione commerciale
+  if(["chiusa persa","abbandonata"].includes(ui.oppStatus.value)){
+    if(document.activeElement !== ui.nextAction)     ui.nextAction.value = "";
+    if(document.activeElement !== ui.nextActionDate) ui.nextActionDate.value = "";
+  }
+  // aggiorna il progressivo dei numeri contratto (prima avveniva solo col pulsante Salva)
+  try{
+    const cn = (document.getElementById("contractNumber")?.value||"").trim();
+    if(/^\d{5}$/.test(cn)){
+      const m = JSON.parse(localStorage.getItem("sales_vault_contract_seq")||"{}");
+      const yy = cn.slice(0,2), n = parseInt(cn.slice(2),10);
+      if(n > (m[yy]||0)){ m[yy] = n; localStorage.setItem("sales_vault_contract_seq", JSON.stringify(m)); }
+    }
+  } catch {}
+  upsertLeadFromInputs();
+  const o = formToOpp();
+  const idx = db.opportunities.findIndex(x => x.id === o.id);
+  if(idx === -1){
+    db.opportunities.push(o);
+  } else {
+    o.invoices = db.opportunities[idx].invoices || [];
+    db.opportunities[idx] = o;
+  }
+  const savedIdx = db.opportunities.findIndex(x => x.id === o.id);
+  clearNextActionDateForOpp(savedIdx);
+  applyInvoiceAutoStatus(savedIdx);
+  const isNew = currentOppId !== o.id;
+  currentOppId = o.id;
+  ui.deleteBtn.disabled = false;
+  const badge = o.oppId ? `<span class="oppid-badge">${escapeHtml(o.oppId)}</span>` : "";
+  ui.fileInfo.innerHTML = `${badge}ID interno: ${o.id}`;
+  saveDb();
+  refreshLeadDatalist();
+  renderAll();
+  // se un campo è stato aggiornato in automatico (es. data prossima azione
+  // azzerata, stato ricavato dalle fatture) lo riporto nel form
+  const fresh = normalizeOpp(db.opportunities[savedIdx]);
+  if(ui.nextActionDate && ui.nextActionDate.value !== (fresh.nextActionDate||"") && document.activeElement !== ui.nextActionDate) ui.nextActionDate.value = fresh.nextActionDate||"";
+  if(ui.oppStatus.value !== fresh.status && document.activeElement !== ui.oppStatus) ui.oppStatus.value = fresh.status;
+  if(ui.oppPhase.value  !== fresh.phase  && document.activeElement !== ui.oppPhase)  ui.oppPhase.value  = fresh.phase;
+  setFormSnapshot();
+  return isNew;
 }
 /**
  * Se il form non è dirty: risolve subito true (procedi).
@@ -746,41 +843,16 @@ function updateDirtyHint(){
  *   true  = l'utente ha scelto "Esci senza salvare" oppure ha salvato
  *   false = l'utente ha scelto "Annulla"
  */
+// Prima di cambiare opportunità/schermata: salvo subito. Solo se c'è una NUOVA
+// opportunità senza nome (quindi non salvabile) chiedo se scartarla.
 function confirmIfDirty(){
   if(!isFormDirty()) return Promise.resolve(true);
-  return new Promise(resolve => {
-    // Usa la modal esistente
-    if(ui.modalTitle) ui.modalTitle.textContent = "Modifiche non salvate";
-    ui.modalBody.innerHTML = `
-      <div style="font-size:15px; margin-bottom:16px;">
-        Hai modifiche non salvate su questa opportunità.<br>
-        <b>Vuoi salvarla prima di uscire?</b>
-      </div>
-      <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button id="_dirtySave"   style="background:#1a7a3a; color:white; border-color:#1a7a3a; width:auto; padding:8px 18px;">💾 Salva</button>
-        <button id="_dirtyLeave"  style="width:auto; padding:8px 18px;">Esci senza salvare</button>
-        <button id="_dirtyCancel" style="width:auto; padding:8px 18px;" class="danger">Annulla</button>
-      </div>`;
-    ui.modal.classList.remove("hidden");
-
-    document.getElementById("_dirtySave").onclick = () => {
-      closeModal();
-      // Salva l'opportunità corrente (simula submit del form)
-      if(currentOppId || ui.oppName.value.trim()){
-        const evt = new Event("submit", { bubbles:true, cancelable:true });
-        ui.oppForm.dispatchEvent(evt);
-      }
-      resolve(true);
-    };
-    document.getElementById("_dirtyLeave").onclick = () => {
-      closeModal();
-      resolve(true);
-    };
-    document.getElementById("_dirtyCancel").onclick = () => {
-      closeModal();
-      resolve(false);
-    };
-  });
+  if(document.activeElement === ui.lead) ui.lead.blur();
+  if(autoSaveOpp()) return Promise.resolve(true);
+  const msg = currentOppId
+    ? "Data creazione e Nome opportunità sono obbligatori: l'ultima modifica non è stata salvata.\n\nOK = esci e scarta l'ultima modifica\nAnnulla = resta e completa i campi"
+    : "La nuova opportunità non ha ancora un Nome e non è stata salvata.\n\nOK = scartala\nAnnulla = resta e completala";
+  return Promise.resolve(confirm(msg));
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1052,7 +1124,8 @@ function oppToForm(o){
   if(ui.deleteBtn) ui.deleteBtn.style.display = isArch ? "" : "none";
 
   setFormSnapshot();
-  updateDirtyHint();
+  clearTimeout(_autoTimer);
+  setAutoStatus("Le modifiche si salvano automaticamente", "");
 }
 
 function formToOpp(){
@@ -1079,6 +1152,7 @@ function formToOpp(){
     split:          !!(ui.oppSplit && ui.oppSplit.checked),
     contractNumber: (document.getElementById("contractNumber")?.value || "").trim(),
     invoices:       inv,
+    archived:       existing?.archived === true,   // prima andava perso: salvare un'archiviata la ripristinava
     createdAtTs:    existing?.createdAtTs || nowIso(),
     updatedAt:      nowIso(),
   });
@@ -1116,7 +1190,8 @@ function newOpp(){
   ui.calcBox.textContent = "";
   ui.fileInfo.textContent = "";
   setFormSnapshot();
-  updateDirtyHint();
+  clearTimeout(_autoTimer);
+  setAutoStatus("Nuova opportunità: si salverà da sola appena inserisci il Nome", "");
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1348,32 +1423,8 @@ function markPlannedAsIssued(invId){
 
 function saveOpp(e){
   e.preventDefault();
-  upsertLeadFromInputs();
-  const o = formToOpp();
-  if(!o.createdAt || !o.name){ alert("Compila almeno Data creazione e Nome opportunità."); return; }
-
-  const idx = db.opportunities.findIndex(x => x.id === o.id);
-  if(idx === -1){
-    db.opportunities.push(o);
-  } else {
-    o.invoices   = db.opportunities[idx].invoices   || [];
-    db.opportunities[idx] = o;
-  }
-
-  const savedIdx = db.opportunities.findIndex(x => x.id === o.id);
-  clearNextActionDateForOpp(savedIdx);
-  applyInvoiceAutoStatus(savedIdx);
-
-  currentOppId = o.id;
-  ui.deleteBtn.disabled = false;
-  const badge = o.oppId ? `<span class="oppid-badge">${escapeHtml(o.oppId)}</span>` : "";
-  ui.fileInfo.innerHTML = `${badge}ID interno: ${o.id}`;
-
-  saveDb();
-  refreshLeadDatalist();
-  renderAll();
-  setFormSnapshot();
-  updateDirtyHint();
+  if(document.activeElement === ui.lead) ui.lead.blur();
+  autoSaveOpp();
 }
 
 function archiveOpp(){
@@ -1412,6 +1463,9 @@ function deleteOpp(){
   if(!confirm("ATTENZIONE: eliminazione definitiva e irreversibile. Continuare?")) return;
   if(!confirm("Sei sicuro? I dati non potranno essere recuperati.")) return;
   db.opportunities = db.opportunities.filter(x => x.id !== currentOppId);
+  if(!Array.isArray(db.deleted)) db.deleted = [];
+  db.deleted.push({ id: currentOppId, at: nowIso() });   // non deve ricomparire dalla sincronizzazione
+  currentOppId = null;                                     // evita che il salvataggio automatico la ricrei
   saveDb();
   renderAll();
   newOpp();
@@ -1473,6 +1527,46 @@ function matchesIssuedInvoiceFilter(o){
   if(f==="lastMonth"){ const {start,end}=monthRange(-1); return dates.some(d=>d>=start&&d<=end); }
   if(f==="year"){      const y=new Date().getFullYear(); return dates.some(d=>d>=`${y}-01-01`&&d<=`${y}-12-31`); }
   return true;
+}
+
+// Elenco completo dei filtri del cruscotto con il loro valore, per l'intestazione del report.
+// Ritorna [{ label, value, active }] nell'ordine in cui compaiono nella colonna Filtri.
+function reportSelections(){
+  const out = [];
+  const selText = el => el && el.selectedOptions && el.selectedOptions[0] ? el.selectedOptions[0].textContent.trim() : "";
+  const q = ui.q?.value.trim() || "";
+  out.push({ label:"Ricerca",                     value: q ? `“${q}”` : "—", active: !!q });
+  out.push({ label:"Anno creazione opportunità",  value: selText(ui.yearFilter),       active: (ui.yearFilter?.value||"all") !== "all" });
+  out.push({ label:"Anno competenza fattura",     value: selText(ui.fiscalYearFilter), active: (ui.fiscalYearFilter?.value||"all") !== "all" });
+  out.push({ label:"Stato",                       value: selText(ui.statusFilter),     active: !!ui.statusFilter?.value });
+  const ph = getCheckedValues(ui.phaseFilterBox), pr = getCheckedValues(ui.productFilterBox);
+  out.push({ label:"Fase",     value: ph.length ? ph.join(" · ") : "tutte", active: ph.length > 0 });
+  out.push({ label:"Prodotto", value: pr.length ? pr.join(" · ") : "tutti", active: pr.length > 0 });
+  out.push({ label:"Commerciale",          value: selText(ui.ownerFilter),      active: !!ui.ownerFilter?.value });
+  out.push({ label:"Archivio",             value: selText(ui.archiveFilter),    active: (ui.archiveFilter?.value||"active") !== "active" });
+  out.push({ label:"Prossime azioni",      value: selText(ui.dueFilter),        active: (ui.dueFilter?.value||"all") !== "all" });
+  out.push({ label:"Fatture programmate",  value: selText(ui.invPlannedFilter), active: (ui.invPlannedFilter?.value||"all") !== "all" });
+  out.push({ label:"Fatture emesse",       value: selText(ui.invIssuedFilter),  active: (ui.invIssuedFilter?.value||"all") !== "all" });
+  return out;
+}
+
+// Caratteristiche per cui si possono suddividere le opportunità nel report.
+const REPORT_GROUPS = {
+  phase:      { label:"Fase",            key:o=>o.phase||"(senza fase)",          order:()=>ENUM.phaseValues },
+  product:    { label:"Prodotto",        key:o=>o.product||"(senza prodotto)",    order:()=>ENUM.productValues },
+  status:     { label:"Stato",           key:o=>o.status||"(senza stato)",        order:()=>ENUM.statusValues },
+  owner:      { label:"Commerciale",     key:o=>o.owner||"(nessuno)",             order:()=>normalizeSalespeopleList(db.salespeople) },
+  fiscalYear: { label:"Anno competenza", key:o=>fiscalYearOf(o),                  order:()=>[] },
+  lead:       { label:"Cliente",         key:o=>o.lead||"(senza cliente)",        order:()=>[] },
+};
+// Suddivisione proposta in base ai filtri: la fase o il prodotto con più voci spuntate.
+function defaultReportGrouping(){
+  const ph = getCheckedValues(ui.phaseFilterBox).length, pr = getCheckedValues(ui.productFilterBox).length;
+  if(ph > 1 && pr > 1) return { g1:"phase", g2:"product" };
+  if(ph > 1) return { g1:"phase", g2:"none" };
+  if(pr > 1) return { g1:"product", g2:"none" };
+  if(!ui.statusFilter?.value) return { g1:"status", g2:"none" };
+  return { g1:"phase", g2:"none" };
 }
 
 // Riepilogo testuale dei filtri attivi (usato nell'intestazione del report).
@@ -2153,11 +2247,18 @@ ui.exportCsvBtn.addEventListener("click", exportCsv);
 
 ui.ghSyncBtn?.addEventListener("click", openGhSetupModal);
 ui.modalCloseBtn.addEventListener("click", closeModal);
-ui.modal.addEventListener("click", (e) => { if(e.target === ui.modal) closeModal(); });
+let _modalDownOnBackdrop = false;
+ui.modal.addEventListener("mousedown", (e) => { _modalDownOnBackdrop = (e.target === ui.modal); });
+ui.modal.addEventListener("click", (e) => { if(e.target === ui.modal && _modalDownOnBackdrop) closeModal(); _modalDownOnBackdrop = false; });
+document.addEventListener("keydown", (e) => { if(e.key === "Escape" && !ui.modal.classList.contains("hidden")) closeModal(); });
 
 window.addEventListener("beforeunload", (e) => {
-  if(isFormDirty()){ e.preventDefault(); e.returnValue = ""; }
+  if(isFormDirty() && !autoSaveOpp()){ e.preventDefault(); e.returnValue = ""; }
 });
+// uscendo da un campo il salvataggio parte subito (senza attendere 1,5 s)
+ui.oppForm?.addEventListener("focusout", () => { setTimeout(() => { if(isFormDirty()) autoSaveOpp(); }, 0); });
+// il pulsante "+ Assegna" del n° contratto cambia il campo senza digitazione
+document.getElementById("assignContractBtn")?.addEventListener("click", () => setTimeout(updateDirtyHint, 0));
 
 // ═══════════════════════════════════════════════════════════════
 // INIZIALIZZAZIONE
@@ -2220,7 +2321,7 @@ setTimeout(() => { try { showFiscalReminder(false); } catch(e){} }, 2500);
 // REPORT MENSILE
 // ═══════════════════════════════════════════════════════════════
 
-function generateReport() {
+function generateReport(opts = {}) {
   // Il report si basa sui FILTRI ATTIVI del cruscotto (non più su un intervallo
   // di date). Considera solo le opportunità che passano matchesFilters, così
   // rispetta anno di competenza, fase, prodotto, stato, commerciale, ecc.
@@ -2359,6 +2460,29 @@ function generateReport() {
     .section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px;
       color: #7a85a0; border-bottom: 1px solid #dde2ec; padding-bottom: 6px; margin-bottom: 12px; }
     .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 8px; }
+    .sel-box { background: #f7f8fb; border: 1px solid #dde2ec; border-radius: 10px; padding: 10px 14px; }
+    .sel-table { width: auto; font-size: 13px; margin-bottom: 6px; }
+    .sel-table td { border: none; padding: 3px 14px 3px 0; }
+    .sel-k { color: #7a85a0; font-weight: 600; white-space: nowrap; }
+    .sel-v { font-weight: 700; color: #1a2744; }
+    .sel-none { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+    .sel-idle { font-size: 11.5px; color: #7a85a0; margin-top: 3px; }
+    .note { font-size: 11px; color: #7a85a0; margin-top: 4px; }
+    .group { margin-bottom: 18px; break-inside: avoid-page; }
+    .group-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; background: #1a2744; color: #fff;
+      border-radius: 8px 8px 0 0; padding: 8px 12px; }
+    .group-k { font-size: 10.5px; text-transform: uppercase; letter-spacing: .6px; opacity: .65; }
+    .group-v { font-size: 14px; font-weight: 700; }
+    .group-n { font-size: 12px; opacity: .85; margin-left: auto; }
+    .sub-head td { background: #eef3fd; color: #2255c4; font-weight: 700; font-size: 11.5px; }
+    .sub-total td { font-weight: 600; background: #f8f9fb; font-size: 11.5px; }
+    .grand-row td { font-weight: 700; background: #1a2744; color: #fff; }
+    .grand-bar { display: flex; flex-wrap: wrap; gap: 6px 22px; align-items: flex-end; background: #1a2744; color: #fff;
+      border-radius: 8px; padding: 10px 14px; margin-top: 6px; font-family: 'DM Mono', monospace; font-weight: 700; font-size: 13px; break-inside: avoid; }
+    .grand-bar .gb-title { font-family: 'DM Sans', sans-serif; margin-right: auto; }
+    .grand-bar small { display: block; font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 10px; opacity: .7; text-transform: uppercase; letter-spacing: .4px; }
+    .tag { display: inline-block; font-size: 9.5px; font-weight: 700; padding: 0 5px; border-radius: 4px; background: #eef3fd; color: #2255c4; margin-left: 4px; }
+    .details-head { font-size: 15px; font-weight: 700; color: #1a2744; margin: 34px 0 14px; padding-top: 14px; border-top: 2px solid #1a2744; }
     .kpi { background: #f2f4f8; border-radius: 10px; padding: 12px 14px; }
     .kpi .val { font-size: 20px; font-weight: 700; color: #1a2744; }
     .kpi .lbl { font-size: 11px; color: #7a85a0; margin-top: 2px; }
@@ -2571,6 +2695,125 @@ function generateReport() {
     </tr>`;
   ownerHtml += `</tbody></table>`;
 
+  // ═════════ NUOVO CORPO DEL REPORT ═════════
+  // 1) le selezioni che hanno generato il report
+  // 2) riepilogo numerico
+  // 3) elenco delle opportunità suddivise per le caratteristiche scelte
+  const pct = n => (Number.isFinite(n) ? n : 0).toFixed(1).replace(".", ",") + "%";
+  const g1 = REPORT_GROUPS[opts.g1] ? opts.g1 : "none";
+  const g2 = (REPORT_GROUPS[opts.g2] && opts.g2 !== g1) ? opts.g2 : "none";
+
+  const sel = reportSelections();
+  const selActive = sel.filter(x => x.active), selIdle = sel.filter(x => !x.active);
+  const selHtml = `
+    <div class="sel-box">
+      ${selActive.length
+        ? `<table class="sel-table"><tbody>${selActive.map(x => `<tr><td class="sel-k">${escapeHtml(x.label)}</td><td class="sel-v">${escapeHtml(x.value)}</td></tr>`).join("")}</tbody></table>`
+        : `<div class="sel-none">Nessun filtro attivo: il report comprende tutte le opportunità attive.</div>`}
+      ${selIdle.length ? `<div class="sel-idle">Senza filtro: ${selIdle.map(x => escapeHtml(x.label)).join(" · ")}</div>` : ""}
+      <div class="sel-idle">Suddivisione: <b>${g1 === "none" ? "nessuna (elenco unico)" : escapeHtml(REPORT_GROUPS[g1].label) + (g2 !== "none" ? " → " + escapeHtml(REPORT_GROUPS[g2].label) : "")}</b>
+        · ${opps.length} opportunità su ${db.opportunities.length}</div>
+    </div>`;
+
+  // calcoli per riga
+  const rowData = o => {
+    const base = molBaseFor(o).base, cost = toNum(o.serviceCost), mol = base - cost;
+    return { ve: toNum(o.valueExpected), iss: totalIssued(o), pln: totalPlanned(o), cost, base, mol };
+  };
+  const sumOf = list => list.reduce((t, o) => { const r = rowData(o);
+    t.n++; t.ve += r.ve; t.iss += r.iss; t.pln += r.pln; t.cost += r.cost; t.base += r.base; t.mol += r.mol; return t; },
+    { n:0, ve:0, iss:0, pln:0, cost:0, base:0, mol:0 });
+  const T = sumOf(opps);
+
+  const kpiHtml = `
+    <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);">
+      <div class="kpi"><div class="val">${T.n}</div><div class="lbl">Opportunità nel report</div></div>
+      <div class="kpi"><div class="val mono">${fmtEur(T.ve)}</div><div class="lbl">Valore previsto totale</div></div>
+      <div class="kpi green"><div class="val mono">${fmtEur(T.iss)}</div><div class="lbl">Fatturato emesso</div></div>
+    </div>
+    <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);">
+      <div class="kpi amber"><div class="val mono">${fmtEur(T.pln)}</div><div class="lbl">Fatture pianificate</div></div>
+      <div class="kpi"><div class="val mono">${fmtEur(T.cost)}</div><div class="lbl">Costo erogazione</div></div>
+      <div class="kpi ${T.mol >= 0 ? "green" : "red"}"><div class="val mono">${fmtEur(T.mol)} · ${pct(T.base > 0 ? T.mol / T.base * 100 : 0)}</div><div class="lbl">MOL</div></div>
+    </div>
+    <div class="note">MOL = base − costo erogazione, dove la base è per ogni opportunità il fatturato emesso, oppure le fatture pianificate, oppure il valore previsto (stessa regola del cruscotto). Base totale: ${fmtEur(T.base)}.</div>`;
+
+  // colonne descrittive: mostro Stato / Fase / Prodotto tranne quelle usate per suddividere
+  const descCols = [["status","Stato"],["phase","Fase"],["product","Prodotto"]].filter(([k]) => k !== g1 && k !== g2);
+  const nCols = 3 + descCols.length + 6;
+  const head = `<thead><tr><th>Opportunità</th><th>Cliente</th><th>Commerciale</th>${descCols.map(([,l]) => `<th>${l}</th>`).join("")}
+    <th class="right">Valore previsto</th><th class="right">Emesso</th><th class="right">Pianificato</th><th class="right">Costo</th><th class="right">MOL</th><th class="right">MOL %</th></tr></thead>`;
+  const rowHtml = o => { const r = rowData(o); return `<tr>
+      <td><span class="badge blue mono">${escapeHtml(o.oppId||"")}</span>${escapeHtml(o.name)}${o.split ? ' <span class="tag">splittato</span>' : ""}${o.archived ? ' <span class="tag">archiviata</span>' : ""}</td>
+      <td>${escapeHtml(o.lead)}</td><td>${escapeHtml(o.owner)}</td>
+      ${descCols.map(([k]) => `<td>${escapeHtml(o[k]||"")}</td>`).join("")}
+      <td class="right mono">${fmtEur(r.ve)}</td><td class="right mono">${r.iss ? fmtEur(r.iss) : "—"}</td><td class="right mono">${r.pln ? fmtEur(r.pln) : "—"}</td>
+      <td class="right mono">${r.cost ? fmtEur(r.cost) : (o.split ? fmtEur(0) : '<span class="warn">mancante</span>')}</td>
+      <td class="right mono">${fmtEur(r.mol)}</td><td class="right mono">${pct(r.base > 0 ? r.mol / r.base * 100 : 0)}</td></tr>`; };
+  const totRow = (label, t, cls) => `<tr class="${cls}"><td colspan="${3 + descCols.length}">${label} — ${t.n} opp.</td>
+      <td class="right mono">${fmtEur(t.ve)}</td><td class="right mono">${fmtEur(t.iss)}</td><td class="right mono">${fmtEur(t.pln)}</td>
+      <td class="right mono">${fmtEur(t.cost)}</td><td class="right mono">${fmtEur(t.mol)}</td><td class="right mono">${pct(t.base > 0 ? t.mol / t.base * 100 : 0)}</td></tr>`;
+
+  const sortOpps = list => [...list].sort((a, b) => String(a.oppId||"").localeCompare(String(b.oppId||"")));
+  // divide un elenco per una caratteristica, nell'ordine "naturale" (quello dei menu)
+  const groupBy = (list, dim, includeKeys = []) => {
+    const def = REPORT_GROUPS[dim], m = new Map();
+    for(const k of includeKeys) m.set(k, []);
+    for(const o of list){ const k = def.key(o); if(!m.has(k)) m.set(k, []); m.get(k).push(o); }
+    const ord = def.order();
+    return [...m.entries()].sort(([a], [b]) => {
+      const ia = ord.indexOf(a), ib = ord.indexOf(b);
+      if(ia !== -1 || ib !== -1) return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+      return dim === "fiscalYear" ? String(a).localeCompare(String(b)) : String(a).localeCompare(String(b), "it");
+    });
+  };
+  // le voci spuntate nei filtri compaiono anche se senza opportunità (così si vede che sono state cercate)
+  const checkedFor = dim => dim === "phase" ? getCheckedValues(ui.phaseFilterBox) : dim === "product" ? getCheckedValues(ui.productFilterBox) : [];
+
+  let listHtml = "";
+  if(opps.length === 0){
+    listHtml = `<p class="muted">Nessuna opportunità corrisponde alle selezioni.</p>`;
+  } else if(g1 === "none"){
+    listHtml = `<div class="table-wrap"><table>${head}<tbody>${sortOpps(opps).map(rowHtml).join("")}${totRow("Totale", T, "grand-row")}</tbody></table></div>`;
+  } else {
+    for(const [k1, list1] of groupBy(opps, g1, checkedFor(g1))){
+      const t1 = sumOf(list1);
+      let body = "";
+      if(list1.length === 0){
+        body = `<tr><td colspan="${nCols}" class="muted">Nessuna opportunità.</td></tr>`;
+      } else if(g2 === "none"){
+        body = sortOpps(list1).map(rowHtml).join("");
+      } else {
+        for(const [k2, list2] of groupBy(list1, g2)){
+          body += `<tr class="sub-head"><td colspan="${nCols}">${escapeHtml(REPORT_GROUPS[g2].label)}: ${escapeHtml(k2)}</td></tr>`;
+          body += sortOpps(list2).map(rowHtml).join("");
+          body += totRow(`Subtotale ${escapeHtml(k2)}`, sumOf(list2), "sub-total");
+        }
+      }
+      listHtml += `
+        <div class="group">
+          <div class="group-head">
+            <span class="group-k">${escapeHtml(REPORT_GROUPS[g1].label)}</span>
+            <span class="group-v">${escapeHtml(k1)}</span>
+            <span class="group-n">${t1.n} opp. · valore ${fmtEur(t1.ve)} · MOL ${fmtEur(t1.mol)} (${pct(t1.base > 0 ? t1.mol / t1.base * 100 : 0)})</span>
+          </div>
+          <div class="table-wrap"><table>${head}<tbody>${body}${list1.length ? totRow("Totale " + escapeHtml(k1), t1, "total-row") : ""}</tbody></table></div>
+        </div>`;
+    }
+    // totale generale come barra con voci etichettate (le colonne non sono allineabili tra gruppi diversi)
+    listHtml += `<div class="grand-bar"><span class="gb-title">TOTALE GENERALE · ${T.n} opp.</span>
+      <span><small>Valore previsto</small>${fmtEur(T.ve)}</span><span><small>Emesso</small>${fmtEur(T.iss)}</span>
+      <span><small>Pianificato</small>${fmtEur(T.pln)}</span><span><small>Costo</small>${fmtEur(T.cost)}</span>
+      <span><small>MOL</small>${fmtEur(T.mol)}</span><span><small>MOL %</small>${pct(T.base > 0 ? T.mol / T.base * 100 : 0)}</span></div>`;
+  }
+
+  const mainHtml = `
+    <h1>Report Commerciale</h1>
+    <div class="subtitle">UP Formazione · Generato il ${fmtDate(todayStr())}</div>
+    <div class="section"><div class="section-title">Selezioni che hanno generato il report</div>${selHtml}</div>
+    <div class="section"><div class="section-title">Riepilogo</div>${kpiHtml}</div>
+    <div class="section"><div class="section-title">Opportunità${g1 !== "none" ? " suddivise per " + escapeHtml(REPORT_GROUPS[g1].label.toLowerCase()) + (g2 !== "none" ? " e " + escapeHtml(REPORT_GROUPS[g2].label.toLowerCase()) : "") : ""}</div>${listHtml}</div>`;
+
   return `<!doctype html><html lang="it"><head>
     <meta charset="utf-8"/>
     <title>Report UP Formazione – ${periodLabel()}</title>
@@ -2580,33 +2823,10 @@ function generateReport() {
       <span style="font-size:13px;font-weight:600;">Report UP Formazione — ${escapeHtml(periodLabel())}</span>
       <button onclick="window.print()" style="background:#e8a020;color:#1a2744;border:none;border-radius:8px;padding:7px 16px;font-weight:700;cursor:pointer;font-size:13px;">🖨 Stampa</button>
     </div>
-    <h1>Report Commerciale</h1>
-    <div class="subtitle">Periodo: ${escapeHtml(periodLabel())} · Generato il ${fmtDate(todayStr())}</div>
+    ${mainHtml}
 
-    <div class="section">
-      <div class="section-title">Riepilogo</div>
-      <div class="kpi-grid">
-        <div class="kpi green"><div class="val mono">${fmtEur(fatturato)}</div><div class="lbl">Fatturato emesso nel periodo</div></div>
-        <div class="kpi amber"><div class="val mono">${fmtEur(pianificato)}</div><div class="lbl">Fatture pianificate in arrivo</div></div>
-        <div class="kpi"><div class="val mono">${fmtEur(pipelineVal)}</div><div class="lbl">Pipeline aperta (${pipelineOpps.length} opp.)</div></div>
-        <div class="kpi"><div class="val mono">${fmtEur(pipelinePond)}</div><div class="lbl">Pipeline ponderata</div></div>
-      </div>
-      <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);">
-        <div class="kpi green"><div class="val">${vinteOpps.length}</div><div class="lbl">Opportunità vinte · ${fmtEur(valoreVinte)}</div></div>
-        <div class="kpi red"><div class="val">${perseOpps.length}</div><div class="lbl">Opportunità perse / abbandonate</div></div>
-        <div class="kpi red"><div class="val">${scaduteOpps.length}</div><div class="lbl">Azioni commerciali scadute</div></div>
-      </div>
-      <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-top:10px;">
-        <div class="kpi"><div class="val mono">${fmtEur(molBaseTotal)}</div><div class="lbl">Valore totale (base MOL)</div></div>
-        <div class="kpi"><div class="val mono">${fmtEur(molCostTotal)}</div><div class="lbl">Costo erogazione totale</div></div>
-        <div class="kpi ${molValue>=0?'green':'red'}"><div class="val mono">${fmtEur(molValue)} — ${molPct.toFixed(1)}%</div><div class="lbl">MOL (opportunità filtrate)</div></div>
-      </div>
-      <div style="font-size:11px;color:#7a85a0;margin-top:6px;">
-        MOL su ${opps.length} opportunità filtrate · base a cascata: fatturato emesso → fatture pianificate → valore previsto.
-        Coincide con i valori del cruscotto per gli stessi filtri.
-      </div>
-    </div>
-
+    ${opts.details ? `
+    <div class="details-head">Dettagli aggiuntivi</div>
     <div class="section">
       <div class="section-title">Fatturato emesso nel periodo</div>
       ${fattHtml}
@@ -2663,36 +2883,51 @@ function generateReport() {
       <div class="section-title">Dettaglio per commerciale</div>
       <div class="table-wrap">${ownerHtml}</div>
     </div>
+    ` : ""}
   </body></html>`;
 }
 
 function showReportModal() {
   ui.modalTitle.textContent = "📊 Genera report";
-
-  // Il report si basa sui filtri attivi del cruscotto. Mostro un riepilogo
-  // di ciò che verrà incluso, così l'utente sa cosa sta per generare.
-  const summary = activeFilterSummary();
   const count = db.opportunities.map(normalizeOpp).filter(matchesFilters).length;
-  const total = db.opportunities.length;
+  const sel = reportSelections().filter(x => x.active);
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem("sales_vault_report_opts") || "{}"); } catch {}
+  const def = defaultReportGrouping();
+  const opt = (v, cur) => `<option value="${v}" ${v === cur ? "selected" : ""}>${v === "none" ? "nessuna" : REPORT_GROUPS[v].label}</option>`;
+  const dims = ["none", ...Object.keys(REPORT_GROUPS)];
 
   ui.modalBody.innerHTML = `
-    <div style="margin-bottom:14px;font-size:13px;line-height:1.6;">
-      Il report considera le <b>opportunità attualmente filtrate</b> nel cruscotto.
-      Per cambiare cosa includere, chiudi questa finestra e modifica i filtri
-      (Anno competenza, Fase, Prodotto, Stato, Commerciale…), poi riapri il report.
+    <div style="font-size:13px;line-height:1.55;margin-bottom:10px;">
+      Il report comprende le <b>${count} opportunità</b> visibili adesso, cioè quelle che rispettano queste selezioni:
     </div>
-    <div style="background:#e8f0fe;border-radius:8px;padding:10px 12px;margin-bottom:16px;font-size:13px;color:#1a4a9a;">
-      🔍 <b>Filtri attivi:</b> ${summary ? escapeHtml(summary) : "nessuno (tutte le opportunità)"}
-      <div style="margin-top:4px;color:#555;font-size:12px;">${count} opportunità su ${total} verranno incluse nel report.</div>
+    <div style="background:#e8f0fe;border-radius:8px;padding:9px 12px;margin-bottom:14px;font-size:13px;color:#1a4a9a;">
+      ${sel.length ? sel.map(x => `<div><b>${escapeHtml(x.label)}:</b> ${escapeHtml(x.value)}</div>`).join("") : "Nessun filtro attivo (tutte le opportunità attive)."}
+      <div style="margin-top:4px;color:#555;font-size:11.5px;">Per cambiarle chiudi questa finestra e modifica i filtri.</div>
     </div>
-    <button type="button" onclick="openReport()" style="width:100%;padding:9px;background:#1a2744;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">📄 Genera e apri report</button>
-  `;
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+      <label style="font-size:12px;font-weight:600;color:#4a5570;">Suddividi le opportunità per
+        <select id="repG1" style="margin-top:4px;">${dims.map(v => opt(v, def.g1)).join("")}</select></label>
+      <label style="font-size:12px;font-weight:600;color:#4a5570;">e poi per
+        <select id="repG2" style="margin-top:4px;">${dims.map(v => opt(v, def.g2)).join("")}</select></label>
+    </div>
+    <label style="display:flex;gap:8px;align-items:flex-start;font-size:12.5px;margin-bottom:16px;cursor:pointer;">
+      <input type="checkbox" id="repDetails" ${saved.details ? "checked" : ""} style="width:16px;min-width:16px;max-width:16px;height:16px;margin-top:1px;flex:0 0 auto;"/>
+      <span>Aggiungi in fondo le sezioni di dettaglio (fatture emesse e pianificate, vinte e perse, riconciliazione, dettaglio per commerciale)</span>
+    </label>
+    <button type="button" id="repGo" style="width:100%;padding:9px;background:#1a2744;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">📄 Genera e apri report</button>`;
   ui.modal.classList.remove("hidden");
+  document.getElementById("repGo").onclick = openReport;
 }
 
-
 function openReport() {
-  const html = generateReport();
+  const opts = {
+    g1: document.getElementById("repG1")?.value || "phase",
+    g2: document.getElementById("repG2")?.value || "none",
+    details: !!document.getElementById("repDetails")?.checked,
+  };
+  try { localStorage.setItem("sales_vault_report_opts", JSON.stringify({ details: opts.details })); } catch {}
+  const html = generateReport(opts);
   const win  = window.open("", "_blank");
   win.document.write(html);
   win.document.close();
