@@ -1551,8 +1551,31 @@
       "actions": [],
       "createdAt": "2026-11-12T12:59:46.436Z",
       "updatedAt": "2026-11-12T14:20:07.523Z"
+    },
+    {
+      "id": "mweqfwg0jgcqx7",
+      "code": "26-038",
+      "title": "Bertoni Sebastian",
+      "date": "2026-11-13",
+      "timeStart": "10:30",
+      "timeEnd": "11:00",
+      "client": "",
+      "topics": [],
+      "participants": [
+        "Sebastian Bertoni"
+      ],
+      "agenda": [
+        {
+          "text": "Collaborazione con Assocamuna",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-11-13T08:46:23.232Z",
+      "updatedAt": "2026-11-13T08:46:23.232Z"
     }
   ],
-  "updatedAt": "2026-11-13T08:36:07.977Z",
+  "updatedAt": "2026-11-13T08:46:23.232Z",
   "deleted": []
 }
