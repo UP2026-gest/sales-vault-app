@@ -506,7 +506,7 @@
         },
         {
           "text": "richiesta corsi IA act",
-          "notes": ""
+          "notes": "2 incontri da 4 ore"
         },
         {
           "text": "Corso IA e stereotipi",
@@ -520,9 +520,9 @@
       "notes": "",
       "actions": [],
       "createdAt": "2026-11-12T10:48:40.065Z",
-      "updatedAt": "2026-11-13T09:30:30.407Z"
+      "updatedAt": "2026-11-13T09:31:01.393Z"
     }
   ],
-  "updatedAt": "2026-11-13T09:30:30.407Z",
+  "updatedAt": "2026-11-13T09:31:01.393Z",
   "deleted": []
 }
