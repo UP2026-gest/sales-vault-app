@@ -1481,12 +1481,16 @@
         {
           "text": "aggiornamento sviluppi commerciali",
           "notes": "Caracciolo\nArboit, c'è il problema dell'IVA, loro sono esenti IVA, per noi sarebbe complicato perché tornerebbe utile per privati e PA ma ci chiede sforzo di contabilità\nWEB Heroes"
+        },
+        {
+          "text": "corso excel fatturato",
+          "notes": ""
         }
       ],
       "notes": "",
       "actions": [],
       "createdAt": "2026-11-09T16:20:01.000Z",
-      "updatedAt": "2026-11-09T16:21:33.530Z"
+      "updatedAt": "2026-11-13T08:35:23.739Z"
     },
     {
       "id": "mwc82xmge041vr",
@@ -1545,6 +1549,6 @@
       "updatedAt": "2026-11-12T14:20:07.523Z"
     }
   ],
-  "updatedAt": "2026-11-12T14:20:07.523Z",
+  "updatedAt": "2026-11-13T08:35:23.739Z",
   "deleted": []
 }
