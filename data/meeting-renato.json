@@ -1488,13 +1488,13 @@
         },
         {
           "text": "PdR125",
-          "notes": ""
+          "notes": "La UNI/PdR 125:2022 è una prassi di riferimento UNI. Definisce i requisiti per la Certificazione di Parità di Genere prevista dal PNRR.\nIn pratica chiede all’azienda di gestire la parità come un sistema, misurato con indicatori (KPI)"
         }
       ],
       "notes": "",
       "actions": [],
       "createdAt": "2026-11-09T16:20:01.000Z",
-      "updatedAt": "2026-11-13T08:36:04.401Z"
+      "updatedAt": "2026-11-13T08:36:07.977Z"
     },
     {
       "id": "mwc82xmge041vr",
@@ -1553,6 +1553,6 @@
       "updatedAt": "2026-11-12T14:20:07.523Z"
     }
   ],
-  "updatedAt": "2026-11-13T08:36:04.401Z",
+  "updatedAt": "2026-11-13T08:36:07.977Z",
   "deleted": []
 }
