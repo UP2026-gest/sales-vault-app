@@ -1485,12 +1485,16 @@
         {
           "text": "corso excel fatturato",
           "notes": ""
+        },
+        {
+          "text": "PdR125",
+          "notes": ""
         }
       ],
       "notes": "",
       "actions": [],
       "createdAt": "2026-11-09T16:20:01.000Z",
-      "updatedAt": "2026-11-13T08:35:23.739Z"
+      "updatedAt": "2026-11-13T08:36:04.401Z"
     },
     {
       "id": "mwc82xmge041vr",
@@ -1549,6 +1553,6 @@
       "updatedAt": "2026-11-12T14:20:07.523Z"
     }
   ],
-  "updatedAt": "2026-11-13T08:35:23.739Z",
+  "updatedAt": "2026-11-13T08:36:04.401Z",
   "deleted": []
 }
