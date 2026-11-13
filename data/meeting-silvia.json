@@ -498,7 +498,7 @@
       "agenda": [
         {
           "text": "corso excel feedback",
-          "notes": "verificare BBB durata lezione"
+          "notes": "verificare BBB durata lezione e inviare slide che mi manderà Sebastian"
         },
         {
           "text": "richieste corsi di Confapi",
@@ -520,9 +520,9 @@
       "notes": "",
       "actions": [],
       "createdAt": "2026-11-12T10:48:40.065Z",
-      "updatedAt": "2026-11-13T09:25:00.638Z"
+      "updatedAt": "2026-11-13T09:25:16.180Z"
     }
   ],
-  "updatedAt": "2026-11-13T09:25:00.638Z",
+  "updatedAt": "2026-11-13T09:25:16.180Z",
   "deleted": []
 }
