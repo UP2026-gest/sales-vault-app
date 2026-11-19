@@ -1,0 +1,1763 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Meeting Vault – UP Formazione</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --navy:#1a2744; --navy2:#243459; --navy3:#2e4070;
+  --amber:#e8a020; --amber2:#fdf3e0;
+  --green:#1a7a3a; --green2:#edf7f1;
+  --red:#b52a2a; --red2:#fdf0f0;
+  --orange:#c75a00; --orange2:#fff4ec;
+  --blue:#2255c4; --blue2:#eef3fd;
+  --purple:#5b3ec8; --purple2:#f3f0fd;
+  --bg:#f2f4f8; --surface:#fff;
+  --border:#dde2ec; --border2:#c8cfe0;
+  --text:#1a2133; --mid:#4a5570; --muted:#7a85a0;
+  --r8:8px; --r12:12px; --r16:16px;
+  --sh1:0 1px 3px rgba(26,39,68,.07);
+  --sh2:0 4px 12px rgba(26,39,68,.10);
+  --sh3:0 12px 32px rgba(26,39,68,.16);
+  font-family:'DM Sans',sans-serif; font-size:15px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ── LOCK SCREEN ── */
+#lockScreen{position:fixed;inset:0;background:var(--navy);display:flex;
+  align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:0;}
+#lockScreen.h{display:none;}
+.lock-box{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);
+  border-radius:var(--r16);padding:36px 40px;width:min(380px,90vw);text-align:center;}
+.lock-logo{font-size:28px;font-weight:700;color:#fff;margin-bottom:4px;}
+.lock-logo span{color:var(--amber);}
+.lock-sub{font-size:13px;color:rgba(255,255,255,.5);margin-bottom:28px;}
+.lock-label{font-size:12px;font-weight:600;color:rgba(255,255,255,.6);
+  text-align:left;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;}
+.lock-input{width:100%;padding:11px 14px;border-radius:var(--r8);border:1px solid rgba(255,255,255,.2);
+  background:rgba(255,255,255,.1) !important;color:#ffffff !important;font-size:15px;font-family:inherit;
+  letter-spacing:3px;text-align:center;margin-bottom:10px;}
+.lock-input::placeholder{letter-spacing:0;color:rgba(255,255,255,.35);}
+.lock-input:focus{outline:none;border-color:var(--amber);box-shadow:none;background:rgba(255,255,255,.15) !important;}
+.lock-btn{width:100%;padding:11px;border-radius:var(--r8);border:none;
+  background:var(--amber);color:var(--navy);font-size:14px;font-weight:700;
+  cursor:pointer;transition:background .15s;margin-bottom:8px;}
+.lock-btn:hover{background:#d48f18;}
+.lock-err{font-size:12px;color:#ff8080;min-height:18px;margin-bottom:4px;}
+#lockUserSel{background:rgba(255,255,255,.1) !important;border:1px solid rgba(255,255,255,.2);color:#fff !important;padding:9px 12px;border-radius:var(--r8);font-size:14px;margin-bottom:12px;width:100%;}
+#lockUserSel option{background:var(--navy);color:#fff;}
+.lock-hint{font-size:11px;color:rgba(255,255,255,.3);margin-top:8px;}
+.lock-setup-link{font-size:12px;color:rgba(255,255,255,.4);cursor:pointer;
+  text-decoration:underline;margin-top:12px;display:inline-block;}
+.lock-setup-link:hover{color:rgba(255,255,255,.7);}
+
+/* ── HEADER ── */
+.bar{display:flex;justify-content:space-between;align-items:center;
+  padding:0 20px;height:60px;background:var(--navy);
+  position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+.bar h1{font-size:17px;font-weight:700;color:#fff;}
+.bar h1 span{color:var(--amber);}
+.bar-user{font-size:11.5px;color:rgba(255,255,255,.5);margin-top:1px;}
+#ghStatus{font-size:11.5px;margin-top:1px;}
+#ghStatus.ok{color:#5edb8a;} #ghStatus.err{color:#ff8080;font-weight:600;}
+#ghStatus.sync{color:#ffc966;} #ghStatus.info{color:rgba(255,255,255,.4);}
+.bar-right{display:flex;gap:6px;align-items:center;}
+
+/* ── BUTTONS ── */
+button{cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;
+  border-radius:var(--r8);border:1px solid transparent;padding:7px 13px;
+  transition:background .15s;white-space:nowrap;}
+button:disabled{opacity:.4;cursor:not-allowed;}
+.btn-amber{background:var(--amber);color:var(--navy);border-color:var(--amber);font-weight:700;}
+.btn-amber:hover{background:#d48f18;}
+.btn-navy{background:var(--navy);color:#fff;border-color:var(--navy);}
+.btn-navy:hover{background:var(--navy3);}
+.btn-ghost{background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.2);}
+.btn-ghost:hover{background:rgba(255,255,255,.2);}
+.btn-sec{background:var(--bg);color:var(--mid);border-color:var(--border);}
+.btn-sec:hover{background:var(--border);}
+.btn-danger{background:var(--red2);color:var(--red);border-color:#f0b0b0;}
+.btn-danger:hover{background:#fbe0e0;}
+.btn-sm{padding:5px 10px;font-size:12px;}
+.btn-xs{padding:3px 8px;font-size:11px;}
+.btn-icon{padding:4px 7px;font-size:14px;background:transparent;border:none;color:var(--muted);}
+.btn-icon:hover{color:var(--text);}
+a.nav-link{display:inline-flex;align-items:center;padding:6px 13px;border-radius:var(--r8);
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
+  color:rgba(255,255,255,.85);font-size:13px;font-weight:500;text-decoration:none;transition:background .15s;}
+a.nav-link:hover{background:rgba(255,255,255,.2);color:#fff;}
+
+/* ── LAYOUT ── */
+.layout{display:grid;grid-template-columns:290px 1fr;min-height:calc(100vh - 60px);}
+.sidebar{border-right:1px solid var(--border);padding:14px;background:var(--surface);
+  display:flex;flex-direction:column;gap:10px;overflow-y:auto;}
+.main{padding:16px;overflow:auto;}
+
+/* ── SIDEBAR ── */
+.s-title{font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.7px;color:var(--muted);}
+.s-input{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--r8);
+  font-family:inherit;font-size:13px;background:var(--bg);color:var(--text);}
+.s-input:focus{outline:none;border-color:var(--blue);}
+.filter-row{display:flex;gap:4px;flex-wrap:wrap;}
+.f-btn{padding:3px 9px;font-size:11.5px;font-weight:500;border-radius:20px;
+  border:1px solid var(--border);background:var(--bg);color:var(--muted);cursor:pointer;}
+.f-btn.on{background:var(--navy);border-color:var(--navy);color:#fff;}
+.meet-list{display:flex;flex-direction:column;gap:6px;flex:1;}
+.meet-card{border:1px solid var(--border);border-radius:var(--r12);padding:10px 12px;
+  cursor:pointer;background:var(--surface);transition:border-color .12s;}
+.meet-card:hover{border-color:var(--border2);}
+.meet-card.sel{border-color:var(--navy);box-shadow:0 0 0 2px rgba(26,39,68,.1);}
+.meet-card-title{font-size:13px;font-weight:600;color:var(--text);}
+.meet-card-meta{font-size:11.5px;color:var(--muted);margin-top:3px;}
+.meet-card-foot{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;align-items:center;}
+
+/* ── TOPIC BADGE ── */
+.topic-badge{display:inline-block;font-size:10px;font-weight:700;border-radius:4px;padding:2px 6px;}
+.t-commerciale{background:#eef3fd;color:#2255c4;}
+.t-didattica{background:#edf7f1;color:#1a7a3a;}
+.t-hr{background:#f3f0fd;color:#5b3ec8;}
+.t-amministrazione{background:#fff4ec;color:#c75a00;}
+.t-mkt{background:#fdf3e0;color:#b87000;}
+.t-gestionale{background:#f0f0f0;color:#555;}
+.t-altro{background:#f5f5f5;color:#888;}
+
+/* ── DETAIL ── */
+.detail-empty{display:flex;flex-direction:column;align-items:center;
+  justify-content:center;height:calc(100vh - 120px);color:var(--muted);gap:10px;}
+.detail-empty .icon{font-size:40px;opacity:.4;}
+.card{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r16);padding:16px;box-shadow:var(--sh1);margin-bottom:12px;}
+.card-title{font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.7px;color:var(--muted);border-bottom:1px solid var(--border);
+  padding-bottom:8px;margin-bottom:12px;}
+.meet-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+.meet-title-big{font-size:20px;font-weight:700;color:var(--navy);}
+.meta-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0;}
+.meta-cell{background:var(--bg);border-radius:var(--r8);padding:9px 11px;}
+.meta-cell .lbl{font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.5px;color:var(--muted);margin-bottom:3px;}
+.meta-cell .val{font-size:13px;font-weight:500;}
+
+/* ── AGENDA / NOTE ── */
+.notes-savebar{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:var(--amber);border:1px solid #d99a10;border-radius:var(--r8);padding:8px 13px;margin-bottom:12px;
+  box-shadow:0 2px 6px rgba(0,0,0,.12);}
+.notes-savebar.hidden{display:none;}
+.autosave-status{font-size:11.5px;color:var(--muted);}
+.autosave-status.saving{color:var(--orange);}
+.autosave-status.saved{color:var(--green);}
+.inline-edit{cursor:text;border-radius:6px;padding:1px 4px;margin:-1px -4px;transition:background .12s;}
+.inline-edit:hover{background:var(--bg);outline:1px dashed var(--border);}
+.inline-edit:hover::after{content:' ✏️';font-size:11px;opacity:.55;}
+.inline-input{font:inherit;color:inherit;width:100%;padding:3px 6px;border:1px solid var(--blue);border-radius:6px;background:#fff;}
+.notes-savebar-txt{font-size:12.5px;font-weight:600;color:var(--navy);display:flex;align-items:center;gap:6px;}
+.notes-savebar-btns{display:flex;gap:6px;}
+.agenda-list{display:flex;flex-direction:column;gap:8px;}
+.agenda-item{border:1px solid var(--border);border-radius:var(--r8);background:var(--bg);overflow:hidden;}
+.agenda-item-hdr{display:flex;gap:8px;align-items:flex-start;padding:9px 11px;}
+.agenda-num{font-size:11px;font-weight:700;color:var(--muted);min-width:18px;margin-top:2px;}
+.agenda-txt{flex:1;font-size:13px;font-weight:500;}
+.agenda-item-hdr{align-items:center;}
+.ag-handle{cursor:grab;color:var(--muted);font-size:14px;line-height:1;padding:0 2px;user-select:none;flex-shrink:0;}
+.ag-handle:active{cursor:grabbing;}
+.ag-btns{display:flex;gap:2px;flex-shrink:0;opacity:.55;transition:opacity .12s;}
+.agenda-item:hover .ag-btns,.ag-modal-row:hover .ag-btns{opacity:1;}
+.ag-btns .btn-icon{font-size:12px;padding:2px 5px;}
+.ag-btns .btn-icon:disabled{opacity:.25;cursor:default;}
+.agenda-item.dragging,.ag-modal-row.dragging{opacity:.4;}
+.agenda-item.drop-target,.ag-modal-row.drop-target{box-shadow:0 -3px 0 0 var(--blue);}
+.ag-add{display:flex;gap:6px;margin-top:10px;}
+.ag-add input{flex:1;}
+.agenda-notes{padding:0 11px 9px 37px;font-size:12.5px;color:var(--mid);white-space:pre-wrap;line-height:1.55;}
+.agenda-notes-area{width:100%;margin:0 0 8px 0;padding:6px 11px 8px 37px;
+  font-family:inherit;font-size:12.5px;color:var(--text);background:transparent;
+  border:none;border-top:1px dashed var(--border);resize:none;line-height:1.55;}
+.agenda-notes-area:focus{outline:none;background:rgba(255,255,255,.7);}
+.notes-area{width:100%;padding:10px 12px;border:1px solid var(--border);
+  border-radius:var(--r8);font-family:inherit;font-size:13px;background:var(--bg);
+  resize:vertical;line-height:1.6;color:var(--text);}
+.notes-area:focus{outline:none;border-color:var(--blue);background:#fff;}
+
+/* ── AZIONI ── */
+.action-row{display:flex;align-items:center;gap:8px;padding:8px 10px;
+  border-bottom:1px solid var(--border);transition:background .1s;}
+.action-row:last-child{border-bottom:none;}
+.action-row:hover{background:var(--bg);}
+.action-row.done .action-txt{text-decoration:line-through;color:var(--muted);}
+.chk{width:17px;height:17px;border-radius:4px;border:2px solid var(--border);
+  background:#fff;cursor:pointer;flex-shrink:0;display:flex;align-items:center;
+  justify-content:center;font-size:10px;transition:all .12s;}
+.chk.on{background:var(--green);border-color:var(--green);color:#fff;}
+.action-body{flex:1;min-width:0;}
+.action-txt{font-size:13px;}
+.action-meta{display:flex;gap:8px;margin-top:3px;flex-wrap:wrap;}
+.action-who{font-size:11.5px;color:var(--muted);}
+.action-dt{font-size:11.5px;color:var(--muted);font-family:'DM Mono',monospace;}
+.action-dt.ov{color:var(--red);font-weight:600;}
+.action-dt.soon{color:var(--orange);font-weight:600;}
+.action-acts{display:flex;gap:2px;}
+.quick-action{display:flex;gap:6px;padding:8px 10px;border-top:1px dashed var(--border);flex-wrap:wrap;}
+.quick-action input{border:1px solid var(--border);border-radius:var(--r8);
+  padding:5px 9px;font-size:12.5px;font-family:inherit;background:var(--bg);}
+.quick-action input:focus{outline:none;border-color:var(--blue);background:#fff;}
+.qa-txt{flex:1;min-width:120px;}
+.qa-who{width:120px;}
+.qa-dt{width:130px;font-family:'DM Mono',monospace;}
+
+/* ── FORM ── */
+input,select,textarea{width:100%;padding:7px 10px;border-radius:var(--r8);
+  border:1px solid var(--border);background:var(--bg);font-family:inherit;
+  font-size:13px;color:var(--text);transition:border-color .15s;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(34,85,196,.1);background:#fff;}
+label{display:block;font-size:12px;font-weight:500;color:var(--mid);margin-bottom:10px;}
+label input,label select,label textarea{margin-top:4px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.sec-lbl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;
+  color:var(--muted);border-bottom:1px solid var(--border);padding-bottom:5px;margin:14px 0 10px;}
+
+/* ── MODAL ── */
+.modal{position:fixed;inset:0;background:rgba(10,15,30,.45);display:flex;
+  align-items:center;justify-content:center;padding:16px;z-index:500;backdrop-filter:blur(2px);}
+.modal.h{display:none;}
+.modal-box{background:var(--surface);border-radius:var(--r16);border:1px solid var(--border);
+  width:min(700px,100%);max-height:90vh;overflow-y:auto;box-shadow:var(--sh3);}
+.modal-hdr{display:flex;justify-content:space-between;align-items:center;
+  padding:13px 17px;border-bottom:1px solid var(--border);
+  position:sticky;top:0;background:var(--surface);z-index:1;
+  border-radius:var(--r16) var(--r16) 0 0;}
+.modal-hdr strong{font-size:14px;}
+.modal-body{padding:17px;}
+
+/* ── PILLS PARTECIPANTI ── */
+.pills{display:flex;flex-wrap:wrap;gap:5px;min-height:28px;}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;
+  border-radius:20px;background:var(--blue2);color:var(--blue);font-size:12px;font-weight:500;}
+.pill .rm{cursor:pointer;opacity:.6;font-size:11px;}
+.pill .rm:hover{opacity:1;}
+
+hr{border:0;border-top:1px solid var(--border);margin:12px 0;}
+
+/* ── TOPIC MULTI-SELECT ── */
+.topic-checks{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
+.topic-check{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;
+  border-radius:20px;border:1px solid var(--border);background:var(--bg);
+  font-size:12.5px;font-weight:500;color:var(--mid);cursor:pointer;user-select:none;
+  transition:all .12s;}
+.topic-check input{display:none;}
+.topic-check.on{background:var(--navy);border-color:var(--navy);color:#fff;}
+
+/* ── CAMPANELLA ── */
+.bell-btn{position:relative;padding:6px 10px;font-size:16px;line-height:1;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
+  color:rgba(255,255,255,.75);border-radius:var(--r8);min-width:38px;
+  display:inline-flex;align-items:center;justify-content:center;}
+.bell-btn:hover{background:rgba(255,255,255,.22);color:#fff;}
+.bell-btn.has-overdue{background:var(--amber);color:var(--navy);border-color:var(--amber);}
+.bell-badge{position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;
+  font-size:10px;font-weight:700;font-family:'DM Mono',monospace;border-radius:10px;
+  min-width:18px;height:18px;padding:0 4px;display:flex;align-items:center;
+  justify-content:center;border:2px solid var(--navy);pointer-events:none;}
+
+/* ── CODICE RIUNIONE ── */
+.meet-code{font-family:'DM Mono',monospace;font-size:11px;font-weight:700;
+  background:var(--blue2);color:var(--blue);border-radius:4px;
+  padding:1px 6px;margin-right:5px;}
+
+/* ── SETUP ── */
+#setupScreen{position:fixed;inset:0;background:var(--navy);display:flex;
+  align-items:center;justify-content:center;z-index:9998;flex-direction:column;}
+#setupScreen.h{display:none;}
+.setup-box{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);
+  border-radius:var(--r16);padding:36px 40px;width:min(420px,90vw);}
+.setup-box h2{font-size:18px;font-weight:700;color:#fff;margin-bottom:6px;}
+.setup-box p{font-size:13px;color:rgba(255,255,255,.5);margin-bottom:24px;}
+.setup-row{margin-bottom:14px;}
+.setup-row label{font-size:12px;font-weight:600;color:rgba(255,255,255,.6);
+  display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;}
+.setup-row input{background:rgba(255,255,255,.1) !important;border:1px solid rgba(255,255,255,.2);
+  color:#fff !important;padding:9px 12px;border-radius:var(--r8);font-family:inherit;font-size:13px;}
+.setup-row input:focus{outline:none;border-color:var(--amber);}
+.setup-row input::placeholder{color:rgba(255,255,255,.3);}
+#setupAdminPin,#setupNewName,#setupNewPin{background:rgba(255,255,255,.1) !important;border:1px solid rgba(255,255,255,.2);color:#fff !important;}
+#adminPinInp{background:rgba(255,255,255,.08) !important;color:var(--text) !important;}
+.setup-add{background:transparent;border:1px dashed rgba(255,255,255,.25);color:rgba(255,255,255,.6);
+  padding:7px 14px;border-radius:var(--r8);cursor:pointer;font-size:13px;margin-bottom:14px;}
+.setup-add:hover{border-color:rgba(255,255,255,.5);color:#fff;}
+.setup-user-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+.setup-user{display:flex;gap:8px;align-items:center;}
+.setup-user span{flex:1;color:#fff;font-size:13px;}
+.setup-user .rm{background:transparent;border:none;color:rgba(255,255,255,.4);
+  cursor:pointer;font-size:16px;padding:0;}
+.setup-user .rm:hover{color:#ff8080;}
+.setup-save{width:100%;padding:11px;border-radius:var(--r8);border:none;
+  background:var(--amber);color:var(--navy);font-size:14px;font-weight:700;cursor:pointer;}
+.setup-err{font-size:12px;color:#ff8080;margin-top:8px;min-height:18px;}
+</style>
+</head>
+<body>
+
+<!-- ── SETUP (prima configurazione) ── -->
+<div id="setupScreen" class="h">
+  <div class="setup-box">
+    <h2>⚙️ Prima configurazione</h2>
+    <p>Crea gli utenti del Meeting Vault. Ogni utente vedrà solo le proprie riunioni.</p>
+    <div class="setup-row">
+      <label>PIN Amministratore (per gestire gli utenti)</label>
+      <input id="setupAdminPin" type="password" maxlength="6" placeholder="Scegli un PIN admin (4-6 cifre)"/>
+    </div>
+    <div id="setupUserList" class="setup-user-list"></div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <input id="setupNewName" placeholder="Nome utente (es. Renato)" style="flex:1;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:8px 11px;border-radius:var(--r8);font-family:inherit;font-size:13px;"/>
+      <input id="setupNewPin" placeholder="PIN (4 cifre)" type="password" maxlength="4" style="width:120px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:8px 11px;border-radius:var(--r8);font-family:inherit;font-size:13px;letter-spacing:3px;text-align:center;"/>
+      <button class="setup-add" id="btnSetupAdd" style="margin:0;">+ Aggiungi</button>
+    </div>
+    <div class="setup-err" id="setupErr"></div>
+    <button class="setup-save" id="btnSetupSave">✓ Salva e inizia</button>
+  </div>
+</div>
+
+<!-- ── LOCK SCREEN ── -->
+<div id="lockScreen">
+  <div class="lock-box">
+    <div class="lock-logo">◆ <span>Meeting</span> Vault</div>
+    <div class="lock-sub">UP Formazione</div>
+    <div class="lock-label">Seleziona utente</div>
+    <select id="lockUserSel" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:9px 12px;border-radius:var(--r8);font-size:14px;margin-bottom:12px;width:100%;"></select>
+    <div class="lock-label" style="margin-top:4px;">PIN</div>
+    <input id="lockPin" class="lock-input" type="password" maxlength="6" placeholder="• • • •" autocomplete="off"/>
+    <div class="lock-err" id="lockErr"></div>
+    <button class="lock-btn" id="btnLogin">Entra</button>
+    <div class="lock-hint">Ogni utente vede solo le proprie riunioni.</div>
+    <span class="lock-setup-link" id="linkSetup">⚙️ Gestisci utenti (admin)</span>
+  </div>
+</div>
+
+<!-- ── APP ── -->
+<header class="bar">
+  <div>
+    <h1>◆ <span>Meeting</span> Vault</h1>
+    <div class="bar-user" id="barUser"></div>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;">
+    <div class="bar-right">
+      <a href="index.html" class="nav-link" id="navSales">◆ Sales Vault</a>
+    <a href="project-vault.html" class="nav-link" id="navProject">◈ Project Vault</a>
+      <button class="btn-amber" id="btnNewMeet">+ Nuova riunione</button>
+      <button class="btn-ghost" id="btnGhSync">☁️ Sync</button>
+      <button class="bell-btn" id="bellBtn" title="Azioni scadute">
+        🔔<span class="bell-badge" id="bellBadge" style="display:none;">0</span>
+      </button>
+      <button class="btn-ghost btn-sm" id="btnChangePin">🔑 Cambia PIN</button>
+      <button class="btn-ghost btn-sm" id="btnLogout" title="Esci">🔒 Esci</button>
+    </div>
+    <div id="ghStatus" class="info" style="margin-top:3px;">GitHub Sync non configurato</div>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="s-title">Riunioni</div>
+    <input class="s-input" id="searchQ" placeholder="Cerca per titolo, cliente, partner, partecipante, parola chiave…"/>
+    <div>
+      <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:5px;">ARGOMENTO</div>
+      <div class="filter-row" id="topicFilters">
+        <button class="f-btn on" data-t="all">Tutti</button>
+        <button class="f-btn" data-t="commerciale">Commerciale</button>
+        <button class="f-btn" data-t="didattica">Didattica</button>
+        <button class="f-btn" data-t="hr">HR</button>
+        <button class="f-btn" data-t="amministrazione">Amm.</button>
+        <button class="f-btn" data-t="mkt">MKT</button>
+        <button class="f-btn" data-t="gestionale">Gestionale</button>
+        <button class="f-btn" data-t="altro">Altro</button>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:5px;">ANNO</div>
+      <select class="s-input" id="yearFilter" style="padding:5px 8px;font-size:12px;">
+        <option value="all">Tutti gli anni</option>
+      </select>
+    </div>
+    <div>
+      <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:5px;">AZIONI</div>
+      <div class="filter-row">
+        <button class="f-btn on" data-a="all">Tutte</button>
+        <button class="f-btn" data-a="open">Con azioni aperte</button>
+        <button class="f-btn" data-a="overdue">Con azioni scadute</button>
+      </div>
+    </div>
+    <div class="meet-list" id="meetList"></div>
+  </aside>
+  <main class="main" id="mainPanel">
+    <div class="detail-empty">
+      <div class="icon">◆</div>
+      <p>Seleziona una riunione o creane una nuova.</p>
+    </div>
+  </main>
+</div>
+
+<!-- ── MODAL RIUNIONE ── -->
+<div class="modal h" id="mMeet">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <strong id="mMeetTitle">Nuova riunione</strong>
+      <button class="btn-sec btn-sm" id="mMeetClose">✕ Chiudi</button>
+    </div>
+    <div class="modal-body">
+      <label>Titolo riunione *<input id="fMTitle" placeholder="es. Incontro commerciale Confapi"/></label>
+      <div class="g3">
+        <label>Data *<input id="fMDate" type="date"/></label>
+        <label>Ora inizio<select id="fMTimeStart"><option value="">—</option><option value="07:00">07:00</option><option value="07:15">07:15</option><option value="07:30">07:30</option><option value="07:45">07:45</option><option value="08:00">08:00</option><option value="08:15">08:15</option><option value="08:30">08:30</option><option value="08:45">08:45</option><option value="09:00">09:00</option><option value="09:15">09:15</option><option value="09:30">09:30</option><option value="09:45">09:45</option><option value="10:00">10:00</option><option value="10:15">10:15</option><option value="10:30">10:30</option><option value="10:45">10:45</option><option value="11:00">11:00</option><option value="11:15">11:15</option><option value="11:30">11:30</option><option value="11:45">11:45</option><option value="12:00">12:00</option><option value="12:15">12:15</option><option value="12:30">12:30</option><option value="12:45">12:45</option><option value="13:00">13:00</option><option value="13:15">13:15</option><option value="13:30">13:30</option><option value="13:45">13:45</option><option value="14:00">14:00</option><option value="14:15">14:15</option><option value="14:30">14:30</option><option value="14:45">14:45</option><option value="15:00">15:00</option><option value="15:15">15:15</option><option value="15:30">15:30</option><option value="15:45">15:45</option><option value="16:00">16:00</option><option value="16:15">16:15</option><option value="16:30">16:30</option><option value="16:45">16:45</option><option value="17:00">17:00</option><option value="17:15">17:15</option><option value="17:30">17:30</option><option value="17:45">17:45</option><option value="18:00">18:00</option><option value="18:15">18:15</option><option value="18:30">18:30</option><option value="18:45">18:45</option><option value="19:00">19:00</option><option value="19:15">19:15</option><option value="19:30">19:30</option><option value="19:45">19:45</option><option value="20:00">20:00</option><option value="20:15">20:15</option><option value="20:30">20:30</option><option value="20:45">20:45</option><option value="21:00">21:00</option><option value="21:15">21:15</option><option value="21:30">21:30</option><option value="21:45">21:45</option><option value="22:00">22:00</option><option value="22:15">22:15</option><option value="22:30">22:30</option><option value="22:45">22:45</option></select></label>
+        <label>Ora fine<select id="fMTimeEnd"><option value="">—</option><option value="07:00">07:00</option><option value="07:15">07:15</option><option value="07:30">07:30</option><option value="07:45">07:45</option><option value="08:00">08:00</option><option value="08:15">08:15</option><option value="08:30">08:30</option><option value="08:45">08:45</option><option value="09:00">09:00</option><option value="09:15">09:15</option><option value="09:30">09:30</option><option value="09:45">09:45</option><option value="10:00">10:00</option><option value="10:15">10:15</option><option value="10:30">10:30</option><option value="10:45">10:45</option><option value="11:00">11:00</option><option value="11:15">11:15</option><option value="11:30">11:30</option><option value="11:45">11:45</option><option value="12:00">12:00</option><option value="12:15">12:15</option><option value="12:30">12:30</option><option value="12:45">12:45</option><option value="13:00">13:00</option><option value="13:15">13:15</option><option value="13:30">13:30</option><option value="13:45">13:45</option><option value="14:00">14:00</option><option value="14:15">14:15</option><option value="14:30">14:30</option><option value="14:45">14:45</option><option value="15:00">15:00</option><option value="15:15">15:15</option><option value="15:30">15:30</option><option value="15:45">15:45</option><option value="16:00">16:00</option><option value="16:15">16:15</option><option value="16:30">16:30</option><option value="16:45">16:45</option><option value="17:00">17:00</option><option value="17:15">17:15</option><option value="17:30">17:30</option><option value="17:45">17:45</option><option value="18:00">18:00</option><option value="18:15">18:15</option><option value="18:30">18:30</option><option value="18:45">18:45</option><option value="19:00">19:00</option><option value="19:15">19:15</option><option value="19:30">19:30</option><option value="19:45">19:45</option><option value="20:00">20:00</option><option value="20:15">20:15</option><option value="20:30">20:30</option><option value="20:45">20:45</option><option value="21:00">21:00</option><option value="21:15">21:15</option><option value="21:30">21:30</option><option value="21:45">21:45</option><option value="22:00">22:00</option><option value="22:15">22:15</option><option value="22:30">22:30</option><option value="22:45">22:45</option></select></label>
+      </div>
+      <div class="g2">
+        <label>Cliente / Partner<input id="fMClient" placeholder="es. Confapi Brescia"/></label>
+        <div>
+          <div style="font-size:12px;font-weight:500;color:var(--mid);margin-bottom:6px;">Macro-argomento (anche più di uno)</div>
+          <div class="topic-checks" id="fMTopics">
+            <label class="topic-check"><input type="checkbox" value="commerciale"/>Commerciale</label>
+            <label class="topic-check"><input type="checkbox" value="didattica"/>Didattica</label>
+            <label class="topic-check"><input type="checkbox" value="hr"/>HR</label>
+            <label class="topic-check"><input type="checkbox" value="amministrazione"/>Amministrazione</label>
+            <label class="topic-check"><input type="checkbox" value="mkt"/>MKT</label>
+            <label class="topic-check"><input type="checkbox" value="gestionale"/>Gestionale</label>
+            <label class="topic-check"><input type="checkbox" value="altro"/>Altro</label>
+          </div>
+        </div>
+      </div>
+      <div class="sec-lbl">Partecipanti</div>
+      <div style="display:flex;gap:6px;margin-bottom:8px;">
+        <input id="fMPartInp" placeholder="Nome partecipante" style="flex:1;"/>
+        <button class="btn-navy btn-sm" id="btnAddPart">+ Aggiungi</button>
+      </div>
+      <div id="fMParts" class="pills" style="margin-bottom:14px;"></div>
+      <div class="sec-lbl">Ordine del giorno</div>
+      <div id="fMAgendaList" style="margin-bottom:8px;display:flex;flex-direction:column;gap:6px;"></div>
+      <div style="display:flex;gap:6px;margin-bottom:14px;">
+        <input id="fMAgendaInp" placeholder="Aggiungi punto all'ordine del giorno…" style="flex:1;"/>
+        <button class="btn-navy btn-sm" id="btnAddAgenda">+ Aggiungi</button>
+      </div>
+      <p style="font-size:11.5px;color:var(--muted);margin:-8px 0 14px;">Le note per ogni punto si inseriscono dopo aver salvato la riunione, direttamente nel dettaglio.</p>
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button class="btn-navy" id="mMeetSave" style="flex:1;">💾 Salva</button>
+        <button class="btn-danger btn-sm" id="mMeetDel" style="display:none;">🗑 Elimina</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL AZIONE ── -->
+<div class="modal h" id="mAction">
+  <div class="modal-box" style="width:min(460px,100%);">
+    <div class="modal-hdr">
+      <strong id="mActionTitle">Nuova azione</strong>
+      <button class="btn-sec btn-sm" id="mActionClose">✕ Chiudi</button>
+    </div>
+    <div class="modal-body">
+      <label>Descrizione *<textarea id="fATxt" rows="3" placeholder="Cosa deve essere fatto?"></textarea></label>
+      <div class="g2">
+        <label>Assegnato a<input id="fAWho" placeholder="es. Silvia / Renato"/></label>
+        <label>Scadenza<input id="fADate" type="date"/></label>
+        <label>Stato<select id="fADone">
+          <option value="0">☐ Da fare</option>
+          <option value="1">✓ Completata</option>
+        </select></label>
+      </div>
+      <button class="btn-navy" id="mActionSave" style="width:100%;margin-top:8px;">💾 Salva</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL AZIONI SCADUTE ── -->
+<div class="modal h" id="mOverdue">
+  <div class="modal-box" style="width:min(620px,100%);">
+    <div class="modal-hdr">
+      <strong>🔔 Azioni scadute</strong>
+      <button class="btn-sec btn-sm" id="mOverdueClose">✕ Chiudi</button>
+    </div>
+    <div class="modal-body" id="mOverdueBody"></div>
+  </div>
+</div>
+
+<!-- ── MODAL GITHUB ── -->
+<div class="modal h" id="mGh">
+  <div class="modal-box" style="width:min(480px,100%);">
+    <div class="modal-hdr">
+      <strong>☁️ GitHub Sync</strong>
+      <button class="btn-sec btn-sm" id="mGhClose">✕ Chiudi</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--mid);margin-bottom:14px;">
+        I dati di ogni utente vengono salvati separatamente su GitHub.<br>
+        Usa le stesse credenziali del Sales Vault.
+      </p>
+      <label>Token GitHub (PAT)<input id="fGhTok" type="password" placeholder="ghp_…"/></label>
+      <label>Owner<input id="fGhOwn" placeholder="es. UP2026-gest"/></label>
+      <label>Repository<input id="fGhRepo" placeholder="es. sales-vault-app"/></label>
+      <label>Cartella dati<input id="fGhDir" value="data" placeholder="data"/></label>
+      <p style="font-size:11.5px;color:var(--muted);margin:-4px 0 12px;">
+        I file saranno salvati come <code>data/meeting-[utente].json</code>
+      </p>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-navy" id="mGhSave" style="flex:1;">Salva e sincronizza</button>
+        <button class="btn-danger btn-sm" id="mGhClear">Rimuovi</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL PIN ADMIN (per accedere alla gestione utenti) ── -->
+<div class="modal h" id="mAdminPin">
+  <div class="modal-box" style="width:min(360px,100%);">
+    <div class="modal-hdr">
+      <strong>🔐 PIN Amministratore</strong>
+      <button class="btn-sec btn-sm" id="mAdminPinClose">✕ Chiudi</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--mid);margin-bottom:14px;">Inserisci il PIN amministratore per gestire gli utenti.</p>
+      <input id="adminPinInp" type="password" maxlength="6" placeholder="PIN admin"
+        style="text-align:center;letter-spacing:3px;font-size:16px;margin-bottom:10px;"/>
+      <div id="adminPinErr" style="font-size:12px;color:var(--red);min-height:18px;margin-bottom:8px;"></div>
+      <button class="btn-navy" id="btnAdminPinOk" style="width:100%;">Entra</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL CAMBIA PIN ── -->
+<div class="modal h" id="mChangePin">
+  <div class="modal-box" style="width:min(360px,100%);">
+    <div class="modal-hdr">
+      <strong>🔑 Cambia PIN</strong>
+      <button class="btn-sec btn-sm" id="mChangePinClose">✕ Chiudi</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--mid);margin-bottom:14px;">Cambia il PIN per <strong id="changePinUser"></strong>.</p>
+      <label>PIN attuale<input id="fOldPin" type="password" maxlength="6" placeholder="PIN attuale" style="letter-spacing:3px;text-align:center;"/></label>
+      <label>Nuovo PIN (4-6 cifre)<input id="fNewPin" type="password" maxlength="6" placeholder="Nuovo PIN" style="letter-spacing:3px;text-align:center;"/></label>
+      <label>Conferma nuovo PIN<input id="fNewPin2" type="password" maxlength="6" placeholder="Ripeti nuovo PIN" style="letter-spacing:3px;text-align:center;"/></label>
+      <div id="changePinErr" style="font-size:12px;color:var(--red);min-height:18px;margin-bottom:8px;"></div>
+      <button class="btn-navy" id="btnChangePinSave" style="width:100%;">Salva nuovo PIN</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+// ══════════════════════════════════════════
+// UTILITIES
+// ══════════════════════════════════════════
+const $ = id => document.getElementById(id);
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+const nowIso = () => new Date().toISOString();
+const todayStr = () => { const d=new Date(); return `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`; };
+const p2 = n => String(n).padStart(2,'0');
+const esc = s => String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const fdt = s => { if(!s) return '—'; const [y,m,d]=s.split('-'); return `${d}/${m}/${y}`; };
+const addDays = (s,n) => { const d=new Date(s); d.setDate(d.getDate()+n); return `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`; };
+
+// ══════════════════════════════════════════
+// CONFIGURAZIONE UTENTI
+// ══════════════════════════════════════════
+const CFG_KEY  = 'mv_cfg_v1';   // { users: [{name, pin}] }
+const GH_KEY   = 'mv_gh_v1';    // { tok, own, repo, dir }
+const REMEMBER_KEY = 'mv_remember_v1';  // nome dell'ultimo utente loggato (persistente fino al logout)
+
+// Ricorda l'accesso: dopo un login riuscito l'utente resta autenticato su
+// questo dispositivo/browser finché non preme "Esci". Salviamo solo il NOME,
+// mai il PIN.
+function rememberUser(name){ try { localStorage.setItem(REMEMBER_KEY, name); } catch {} }
+function forgetUser(){ try { localStorage.removeItem(REMEMBER_KEY); } catch {} }
+function getRememberedUser(){
+  try {
+    const name = localStorage.getItem(REMEMBER_KEY);
+    if(!name) return null;
+    const cfg = getCfg();
+    return cfg?.users?.find(u=>u.name===name) || null;
+  } catch { return null; }
+}
+
+function getCfg()  { try { return JSON.parse(localStorage.getItem(CFG_KEY)||'null'); } catch { return null; } }
+function saveCfg(c){ localStorage.setItem(CFG_KEY, JSON.stringify(c)); }
+function getGh()   { try { return JSON.parse(localStorage.getItem(GH_KEY)||'null'); } catch { return null; } }
+function ghOk()    { const g=getGh(); return !!(g?.tok&&g?.own&&g?.repo&&g?.dir); }
+
+// ══════════════════════════════════════════
+// STATO SESSIONE
+// ══════════════════════════════════════════
+let currentUser = null;  // { name, pin }
+let db = { meetings: [] };
+let _selId = null;
+let _filterTopic = 'all';
+let _filterYear  = 'all';
+let _search = '';
+let _editMeetId  = null;
+let _editActionId = null;
+let _tempParts   = [];
+let _tempAgenda  = [];
+let _ghPushing   = false;
+let _filterAction = 'all'; // 'all' | 'open' | 'overdue'
+let _notesDirty  = false;  // ci sono note (riunione o agenda) modificate ma non salvate?
+
+// Se ci sono note non salvate, chiede conferma prima di cambiare riunione/schermata.
+// Ritorna true se si può procedere (nessuna modifica, oppure l'utente ha scelto di
+// scartarle), false se l'utente vuole restare per salvare.
+// Con il salvataggio automatico non serve più chiedere: prima di cambiare
+// riunione o schermata le note in sospeso vengono salvate subito.
+function confirmIfNotesDirty(){ flushNotes(); return true; }
+
+// ── RIORDINO A TRASCINAMENTO ──
+// Rende riordinabili gli elementi di un elenco afferrandoli dalla maniglia.
+// onMove(da, a) riceve gli indici di partenza e di arrivo.
+function enableDragSort(listEl, itemSel, handleSel, onMove){
+  if(!listEl) return;
+  let fromIdx=null;
+  const items=()=>[...listEl.querySelectorAll(itemSel)];
+  items().forEach((it,idx)=>{
+    const h=it.querySelector(handleSel);
+    if(h){
+      h.addEventListener('mousedown',()=>{ it.draggable=true; });
+      h.addEventListener('touchstart',()=>{ it.draggable=true; },{passive:true});
+    }
+    it.addEventListener('dragstart',e=>{ fromIdx=idx; it.classList.add('dragging'); try{ e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain',String(idx)); }catch{} });
+    it.addEventListener('dragend',()=>{ it.draggable=false; it.classList.remove('dragging'); items().forEach(x=>x.classList.remove('drop-target')); });
+    it.addEventListener('dragover',e=>{ if(fromIdx===null) return; e.preventDefault(); items().forEach(x=>x.classList.remove('drop-target')); it.classList.add('drop-target'); });
+    it.addEventListener('drop',e=>{
+      e.preventDefault();
+      const from=fromIdx; fromIdx=null;
+      if(from!==null && from!==idx) onMove(from, idx);
+    });
+  });
+  document.addEventListener('mouseup',()=>items().forEach(x=>{ if(!x.classList.contains('dragging')) x.draggable=false; }),{once:true});
+}
+
+// ── SALVATAGGIO AUTOMATICO NOTE ──
+// Le note (riunione e punti dell'ordine del giorno) si salvano da sole
+// 1,5 secondi dopo l'ultima battitura, quando si esce dal campo, prima di
+// cambiare riunione/schermata e prima di chiudere la pagina.
+let _notesTimer = null;
+const NOTES_DELAY = 1500;
+function setAutosaveStatus(txt, cls){
+  document.querySelectorAll('.autosave-status').forEach(el=>{ el.textContent=txt; el.className='autosave-status '+(cls||''); });
+}
+function scheduleNotesSave(){
+  _notesDirty = true;
+  setAutosaveStatus('✏️ Modifiche in corso…','saving');
+  clearTimeout(_notesTimer);
+  _notesTimer = setTimeout(flushNotes, NOTES_DELAY);
+}
+function flushNotes(){
+  clearTimeout(_notesTimer); _notesTimer=null;
+  if(!_notesDirty) return;
+  const m = db.meetings.find(x=>x.id===_renderedMeetId);
+  const area = $('notesArea');
+  if(!m || !area){ _notesDirty=false; return; }
+  m.notes = area.value;
+  const agItems=(m.agenda||[]).map(a=>typeof a==='string'?{text:a,notes:''}:a);
+  document.querySelectorAll('.agenda-notes-area').forEach(ta=>{
+    const i=Number(ta.dataset.ai);
+    if(agItems[i]) agItems[i].notes=ta.value;
+  });
+  m.agenda=agItems;
+  m.updatedAt=nowIso();
+  _notesDirty=false;
+  dbSave();
+  const t=new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+  setAutosaveStatus(`✓ Salvato automaticamente alle ${t}`,'saved');
+}
+
+// Genera codice riunione YY-NNN
+function nextMeetCode(){
+  const yy = String(new Date().getFullYear()).slice(2);
+  let max = 0;
+  for(const m of db.meetings){
+    const c = String(m.code||'');
+    if(c.startsWith(yy+'-')){
+      const n = parseInt(c.slice(3),10);
+      if(!isNaN(n)&&n>max) max=n;
+    }
+  }
+  return yy+'-'+String(max+1).padStart(3,'0');
+}
+
+// ══════════════════════════════════════════
+// GITHUB — localStorage è fonte di verità
+// ══════════════════════════════════════════
+function dbKey()  { return `mv_db_${currentUser.name.toLowerCase().replace(/\s+/g,'_')}_v1`; }
+function shaKey() { return `mv_sha_${currentUser.name.toLowerCase().replace(/\s+/g,'_')}_v1`; }
+function ghUrl()  { const g=getGh(); const fn=`meeting-${currentUser.name.toLowerCase().replace(/\s+/g,'_')}.json`; return `https://api.github.com/repos/${g.own}/${g.repo}/contents/${g.dir}/${fn}`; }
+function ghHdr()  { const g=getGh(); return {'Authorization':`Bearer ${g.tok}`,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}; }
+function getSha() { return localStorage.getItem(shaKey()); }
+function saveSha(s){ if(s) localStorage.setItem(shaKey(),s); }
+
+function setStatus(msg,cls){ $('ghStatus').textContent=msg; $('ghStatus').className=cls; }
+
+// ── Riparazione accenti ──
+// Le versioni precedenti leggevano i dati da GitHub senza decodificare l'UTF-8:
+// "è" diventava "Ã¨" e, a ogni giro di salvataggio, "ÃÂ¨". Questa funzione
+// ripristina il testo originale (ripetendo la decodifica finché serve).
+function fixMojibake(str){
+  let out=str;
+  for(let i=0;i<4 && /[ÃÂ]/.test(out);i++){
+    try{ const t=decodeURIComponent(escape(out)); if(t===out) break; out=t; } catch{ break; }
+  }
+  return out;
+}
+function deepFix(v){
+  if(typeof v==='string') return fixMojibake(v);
+  if(Array.isArray(v)) return v.map(deepFix);
+  if(v && typeof v==='object'){ const o={}; for(const k in v) o[k]=deepFix(v[k]); return o; }
+  return v;
+}
+// Ripara le riunioni con testo rovinato; marca come aggiornate solo quelle
+// effettivamente corrette, così la versione riparata prevale nella fusione.
+function repairMeetings(list){
+  let changed=0;
+  const out=(list||[]).map(m=>{
+    const before=JSON.stringify(m);
+    const fixed=deepFix(m);
+    if(JSON.stringify(fixed)!==before){ changed++; fixed.updatedAt=nowIso(); }
+    return fixed;
+  });
+  return { list: out, changed };
+}
+
+function normDb(p){
+  const d = (p && Array.isArray(p.meetings)) ? p : { meetings: [] };
+  if(!Array.isArray(d.deleted)) d.deleted = [];   // riunioni eliminate (per non farle ricomparire)
+  return d;
+}
+
+function dbLoad(){
+  try {
+    const raw = localStorage.getItem(dbKey());
+    db = normDb(raw ? JSON.parse(raw) : null);
+  } catch { db = normDb(null); }
+  const rep = repairMeetings(db.meetings);
+  db.meetings = rep.list;
+  if(rep.changed>0){ localStorage.setItem(dbKey(), JSON.stringify(db)); _needsPush = true; }
+}
+
+function dbSave(){
+  db.updatedAt = nowIso();
+  localStorage.setItem(dbKey(), JSON.stringify(db));
+  ghPushBg();
+}
+
+// Fonde un archivio remoto nel locale (per ID riunione):
+// - vince la versione con updatedAt più recente (a parità vince il locale)
+// - le riunioni eliminate su un dispositivo non ricompaiono dall'altro
+function mergeRemote(remote){
+  const r = normDb(remote);
+  const delMap = new Map();
+  for(const x of [...db.deleted, ...r.deleted]){
+    if(x?.id && (!delMap.has(x.id) || (x.at||'') > delMap.get(x.id))) delMap.set(x.id, x.at||'');
+  }
+  const byId = new Map(db.meetings.filter(m=>m?.id).map(m=>[m.id,m]));
+  for(const rm of repairMeetings(r.meetings).list){
+    if(!rm?.id) continue;
+    const lm = byId.get(rm.id);
+    if(!lm || (rm.updatedAt||'') > (lm.updatedAt||'')) byId.set(rm.id, rm);
+  }
+  // una riunione eliminata resta eliminata, salvo che sia stata modificata DOPO l'eliminazione
+  db.meetings = [...byId.values()].filter(m => !delMap.has(m.id) || (m.updatedAt||'') > delMap.get(m.id));
+  db.deleted = [...delMap.entries()].map(([id,at])=>({id,at}));
+}
+
+function decodeGhContent(b64){
+  // decodifica corretta dell'UTF-8 (prima mancava: era la causa degli accenti rovinati)
+  return JSON.parse(decodeURIComponent(escape(atob(b64.replace(/\n/g,'')))));
+}
+
+let _needsPush = false;  // un salvataggio è arrivato mentre un altro era in corso
+async function ghPushBg(){
+  if(!ghOk()) return;
+  if(_ghPushing){ _needsPush = true; return; }   // prima veniva perso: ora si rimette in coda
+  _ghPushing = true;
+  setStatus('🔄 Salvataggio…','sync');
+  try {
+    do {
+      _needsPush = false;
+      let ok = false;
+      for(let attempt=0; attempt<3 && !ok; attempt++){
+        // 1) leggi il remoto  2) fondi  3) scrivi — così non si cancella il lavoro fatto da un altro dispositivo
+        const rg = await fetch(ghUrl(), { headers: ghHdr() });
+        let sha = null;
+        if(rg.ok){
+          const jg = await rg.json(); sha = jg.sha;
+          try { mergeRemote(decodeGhContent(jg.content)); } catch {}
+          localStorage.setItem(dbKey(), JSON.stringify(db));
+        } else if(rg.status !== 404){ throw new Error('read '+rg.status); }
+        const body = { message:'Meeting Vault sync', content: btoa(unescape(encodeURIComponent(JSON.stringify(db,null,2)))) };
+        if(sha) body.sha = sha;
+        const r = await fetch(ghUrl(), { method:'PUT', headers: ghHdr(), body: JSON.stringify(body) });
+        if(r.ok){ const j=await r.json(); saveSha(j.content?.sha); ok = true; }
+        else if(r.status !== 409) throw new Error('write '+r.status);
+      }
+      if(!ok) throw new Error('conflitto');
+    } while(_needsPush);
+    setStatus(`✓ Sincronizzato — ${new Date().toLocaleString('it-IT')}`,'ok');
+    renderList();   // la fusione può aver portato riunioni nuove da un altro dispositivo
+  } catch { setStatus('⚠️ Errore salvataggio GitHub — dati al sicuro in locale','err'); }
+  finally { _ghPushing = false; }
+}
+
+async function ghPull(){
+  if(!ghOk()) return;
+  setStatus('🔄 Sincronizzazione…','sync');
+  try {
+    const r=await fetch(ghUrl(),{headers:ghHdr()});
+    if(r.status===404){ setStatus('✓ Pronto','ok'); return; }
+    if(!r.ok){ setStatus('⚠️ Errore lettura GitHub','err'); return; }
+    const j=await r.json(); saveSha(j.sha);
+    const remote=decodeGhContent(j.content);
+    const beforeTxt = JSON.stringify(remote.meetings||[]);
+    mergeRemote(remote);
+    localStorage.setItem(dbKey(),JSON.stringify(db));
+    setStatus(`✓ Sincronizzato — ${new Date().toLocaleString('it-IT')}`,'ok');
+    renderList(); if(_selId) renderDetail();
+    // se il remoto conteneva testo rovinato o è diverso dal locale, riscrivilo riparato
+    if(_needsPush || JSON.stringify(db.meetings) !== beforeTxt) ghPushBg();
+  } catch(e){ setStatus('⚠️ Errore sync','err'); }
+}
+
+// ══════════════════════════════════════════
+// SETUP UTENTI
+// ══════════════════════════════════════════
+let _setupUsers = [];
+
+function showSetup(fromAdmin){
+  const cfg = getCfg();
+  _setupUsers = cfg?.users ? [...cfg.users] : [];
+  renderSetupList();
+  // Mostra PIN admin esistente come placeholder
+  const adminPinEl = $('setupAdminPin');
+  if(adminPinEl){
+    adminPinEl.placeholder = cfg?.adminPin ? 'PIN admin già impostato (lascia vuoto per non cambiarlo)' : 'Scegli un PIN admin (4-6 cifre)';
+    adminPinEl.value = '';
+  }
+  $('setupScreen').classList.remove('h');
+  $('lockScreen').classList.add('h');
+}
+
+function renderSetupList(){
+  $('setupUserList').innerHTML = _setupUsers.map((u,i)=>
+    `<div class="setup-user">
+      <span>👤 ${esc(u.name)} <span style="color:rgba(255,255,255,.3);font-size:11px;">(PIN: ${'•'.repeat(u.pin.length)})</span></span>
+      <button class="rm" data-i="${i}">✕</button>
+    </div>`
+  ).join('');
+  $('setupUserList').querySelectorAll('.rm').forEach(b=>b.onclick=()=>{
+    _setupUsers.splice(Number(b.dataset.i),1); renderSetupList();
+  });
+}
+
+$('btnSetupAdd').onclick = () => {
+  const name=$('setupNewName').value.trim();
+  const pin=$('setupNewPin').value.trim();
+  $('setupErr').textContent='';
+  if(!name||!pin){ $('setupErr').textContent='Inserisci nome e PIN.'; return; }
+  if(!/^\d{4,6}$/.test(pin)){ $('setupErr').textContent='Il PIN deve essere di 4-6 cifre.'; return; }
+  if(_setupUsers.find(u=>u.name.toLowerCase()===name.toLowerCase())){ $('setupErr').textContent='Nome già presente.'; return; }
+  _setupUsers.push({name,pin});
+  $('setupNewName').value=''; $('setupNewPin').value='';
+  renderSetupList();
+};
+
+$('btnSetupSave').onclick = () => {
+  if(_setupUsers.length===0){ $('setupErr').textContent='Aggiungi almeno un utente.'; return; }
+  const adminPin = $('setupAdminPin')?.value.trim();
+  const existing = getCfg();
+  // Se c'è già un adminPin salvato, mantienilo; altrimenti usa quello inserito
+  const finalAdminPin = adminPin || existing?.adminPin || '';
+  if(!finalAdminPin){ $('setupErr').textContent='Inserisci un PIN amministratore.'; return; }
+  if(adminPin && !/^\d{4,6}$/.test(adminPin)){ $('setupErr').textContent='Il PIN admin deve essere di 4-6 cifre.'; return; }
+  saveCfg({users:_setupUsers, adminPin: finalAdminPin});
+  $('setupScreen').classList.add('h');
+  showLock();
+};
+
+// ══════════════════════════════════════════
+// LOCK SCREEN
+// ══════════════════════════════════════════
+function showLock(){
+  const cfg=getCfg();
+  if(!cfg||!cfg.users||cfg.users.length===0){ showSetup(); return; }
+  const sel=$('lockUserSel');
+  sel.innerHTML=cfg.users.map(u=>`<option value="${esc(u.name)}">${esc(u.name)}</option>`).join('');
+  $('lockPin').value=''; $('lockErr').textContent='';
+  $('lockScreen').classList.remove('h');
+}
+
+$('btnLogin').onclick = doLogin;
+$('lockPin').onkeydown = e => { if(e.key==='Enter') doLogin(); };
+
+function doLogin(){
+  const cfg=getCfg();
+  const name=$('lockUserSel').value;
+  const pin=$('lockPin').value.trim();
+  const user=cfg.users.find(u=>u.name===name&&u.pin===pin);
+  if(!user){ $('lockErr').textContent='PIN errato. Riprova.'; $('lockPin').value=''; return; }
+  currentUser=user;
+  rememberUser(user.name);   // ricorda l'accesso fino al logout esplicito
+  $('lockScreen').classList.add('h');
+  startApp();
+}
+
+$('linkSetup').onclick = () => {
+  const cfg = getCfg();
+  // Se non c'è ancora configurazione, vai direttamente al setup
+  if(!cfg || !cfg.adminPin){ showSetup(); return; }
+  // Altrimenti chiedi il PIN admin
+  $('adminPinInp').value=''; $('adminPinErr').textContent='';
+  $('mAdminPin').classList.remove('h');
+};
+
+// ══════════════════════════════════════════
+// APP PRINCIPALE
+// ══════════════════════════════════════════
+function startApp(){
+  // Nasconde SEMPRE le schermate di login/setup: così sia il login manuale
+  // sia l'auto-login (utente ricordato) arrivano all'app correttamente.
+  $('lockScreen').classList.add('h');
+  const setupEl = $('setupScreen'); if(setupEl) setupEl.classList.add('h');
+  $('barUser').textContent=`👤 ${currentUser.name}`;
+  dbLoad();
+  renderList();
+  renderDetail();
+  if(ghOk()){ setStatus('🔄 Connessione…','sync'); ghPull().then(()=>{ updateBell(); setTimeout(showOverduePopup,600); }); }
+  else { setStatus('GitHub Sync non configurato — clicca ☁️ Sync','info'); updateBell(); setTimeout(showOverduePopup,600); }
+}
+
+$('btnLogout').onclick = () => {
+  forgetUser();   // solo il logout esplicito dimentica l'accesso
+  currentUser=null; db={meetings:[]}; _selId=null;
+  showLock();
+};
+
+// ══════════════════════════════════════════
+// RENDER LISTA
+// ══════════════════════════════════════════
+const TOPIC_LBL={commerciale:'Commerciale',didattica:'Didattica',hr:'HR',
+  amministrazione:'Amministrazione',mkt:'MKT',gestionale:'Gestionale',altro:'Altro'};
+
+function renderList(){
+  let list=db.meetings.filter(m=>m?.id&&m?.title);
+  if(_filterTopic!=='all') list=list.filter(m=>{
+    const topics=Array.isArray(m.topics)?m.topics:(m.topic?[m.topic]:[]);
+    return topics.includes(_filterTopic);
+  });
+  if(_filterAction==='open') list=list.filter(m=>(m.actions||[]).some(a=>!a.done));
+  if(_filterAction==='overdue') list=list.filter(m=>(m.actions||[]).some(a=>!a.done&&a.date&&a.date<todayStr()));
+  if(_filterYear!=='all') list=list.filter(m=>(m.date||'').startsWith(_filterYear));
+  if(_search) list=list.filter(m=>
+    (m.title||'').toLowerCase().includes(_search)||
+    (m.client||'').toLowerCase().includes(_search)||
+    (m.notes||'').toLowerCase().includes(_search)||
+    (m.participants||[]).some(p=>p.toLowerCase().includes(_search))||
+    (m.agenda||[]).some(a=>(typeof a==='string'?a:(a.text||'')).toLowerCase().includes(_search))
+  );
+  list.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+
+  // Aggiorna filtro anni
+  const years=[...new Set(db.meetings.map(m=>(m.date||'').slice(0,4)).filter(Boolean))].sort().reverse();
+  const curYear=$('yearFilter').value;
+  $('yearFilter').innerHTML='<option value="all">Tutti gli anni</option>'+years.map(y=>`<option value="${y}"${y===curYear?' selected':''}>${y}</option>`).join('');
+
+  const el=$('meetList');
+  if(!list.length){ el.innerHTML='<p style="font-size:13px;color:var(--muted);text-align:center;padding:20px;">Nessuna riunione.</p>'; return; }
+  el.innerHTML=list.map(m=>{
+    const actions=(m.actions||[]);
+    const pending=actions.filter(a=>!a.done).length;
+    const overdue=actions.filter(a=>!a.done&&a.date&&a.date<todayStr()).length;
+    const sel=m.id===_selId?' sel':'';
+    return `<div class="meet-card${sel}" data-id="${m.id}">
+      <div class="meet-card-title">${esc(m.title)}</div>
+      <div class="meet-card-meta">${fdt(m.date)}${m.client?' · '+esc(m.client):''}</div>
+      <div class="meet-card-foot">
+        ${m.code?`<span class="meet-code">${esc(m.code)}</span>`:''}
+        ${(Array.isArray(m.topics)?m.topics:(m.topic?[m.topic]:[])).map(t=>`<span class="topic-badge t-${t}">${TOPIC_LBL[t]||t}</span>`).join('')}
+        ${pending>0?`<span style="font-size:11px;color:var(--muted);">${pending} azioni${overdue>0?` · <span style="color:var(--red);font-weight:600;">${overdue} scadute</span>`:''}</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  el.querySelectorAll('.meet-card').forEach(c=>{
+    c.addEventListener('click',()=>{
+      if(c.dataset.id===_selId) return; // stessa riunione, nessun cambio
+      if(!confirmIfNotesDirty()) return; // note non salvate: chiedi conferma
+      _selId=c.dataset.id; renderList(); renderDetail();
+    });
+  });
+}
+
+// ══════════════════════════════════════════
+// RENDER DETTAGLIO
+// ══════════════════════════════════════════
+let _renderedMeetId = null;  // riunione attualmente mostrata nel pannello
+function renderDetail(){
+  const panel=$('mainPanel');
+  // Se ci sono note non salvate sulla stessa riunione, conservo la bozza:
+  // spuntare un'azione o una sincronizzazione ridisegnano il pannello e prima
+  // il testo scritto andava perso.
+  flushNotes();   // le note in sospeso vengono salvate prima di ridisegnare
+  _renderedMeetId = _selId;
+  if(!_selId){ panel.innerHTML='<div class="detail-empty"><div class="icon">◆</div><p>Seleziona una riunione o creane una nuova.</p></div>'; return; }
+  const m=db.meetings.find(x=>x.id===_selId);
+  if(!m){ panel.innerHTML='<div class="detail-empty"><div class="icon">◆</div><p>Riunione non trovata.</p></div>'; return; }
+
+  const td=todayStr();
+  const actions=m.actions||[];
+  const pending=actions.filter(a=>!a.done).length;
+
+  // Ordine del giorno
+  const agendaItems=(m.agenda||[]).map(a=>typeof a==='string'?{text:a,notes:''}:a);
+  const agendaHtml=agendaItems.length
+    ? agendaItems.map((a,i)=>`
+      <div class="agenda-item" data-ai="${i}">
+        <div class="agenda-item-hdr">
+          <span class="ag-handle" data-ai="${i}" title="Trascina per riordinare">⠿</span>
+          <span class="agenda-num">${i+1}.</span>
+          <span class="agenda-txt"><span class="ag-inline inline-edit" data-ai="${i}" title="Clicca per modificare">${esc(a.text||'')}</span></span>
+          <span class="ag-btns">
+            <button class="btn-icon ag-up" data-ai="${i}" title="Sposta su" ${i===0?'disabled':''}>▲</button>
+            <button class="btn-icon ag-down" data-ai="${i}" title="Sposta giù" ${i===agendaItems.length-1?'disabled':''}>▼</button>
+            <button class="btn-icon ag-del" data-ai="${i}" title="Elimina punto" style="color:var(--red);">✕</button>
+          </span>
+        </div>
+        <textarea class="agenda-notes-area" data-ai="${i}" rows="2"
+          placeholder="Note per questo punto…">${esc(a.notes||'')}</textarea>
+      </div>`).join('')
+    : '<p style="font-size:13px;color:var(--muted);">Nessun punto all\'ordine del giorno.</p>';
+
+  // Azioni
+  const actionsHtml=actions.map(a=>{
+    const ov=!a.done&&a.date&&a.date<td;
+    const sn=!a.done&&a.date&&a.date>=td&&a.date<=addDays(td,7);
+    const dc=ov?'ov':sn?'soon':'';
+    return `<div class="action-row${a.done?' done':''}">
+      <div class="chk${a.done?' on':''}" data-aid="${a.id}">
+        ${a.done?'✓':''}
+      </div>
+      <div class="action-body">
+        <div class="action-txt">${esc(a.text)}</div>
+        <div class="action-meta">
+          ${a.who?`<span class="action-who">👤 ${esc(a.who)}</span>`:''}
+          ${a.date?`<span class="action-dt ${dc}">📅 ${fdt(a.date)}</span>`:''}
+        </div>
+      </div>
+      <div class="action-acts">
+        <button class="btn-icon btn-ea" data-aid="${a.id}" title="Modifica">✏️</button>
+        <button class="btn-icon btn-da" data-aid="${a.id}" title="Elimina">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  panel.innerHTML=`
+  <div class="card">
+    <div class="meet-header">
+      <div>
+        <div style="display:flex;gap:7px;align-items:center;margin-bottom:8px;">
+          ${m.code?`<span class="meet-code">${esc(m.code)}</span>`:''}
+          ${(Array.isArray(m.topics)?m.topics:(m.topic?[m.topic]:[])).map(t=>`<span class="topic-badge t-${t}">${TOPIC_LBL[t]||t}</span>`).join('')}
+        </div>
+        <div class="meet-title-big"><span class="inline-edit" data-field="title" title="Clicca per modificare">${esc(m.title)}</span></div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0;">
+        <button class="btn-amber btn-sm" id="btnPdf">📄 Report / PDF</button>
+        <button class="btn-sec btn-sm" id="btnDuplica">⧉ Duplica</button>
+        <button class="btn-sec btn-sm" id="btnEdit">✏️ Modifica</button>
+      </div>
+    </div>
+    <div class="meta-grid">
+      <div class="meta-cell"><div class="lbl">Data</div><div class="val"><span class="inline-edit" data-field="date" title="Clicca per modificare">${fdt(m.date)}</span></div></div>
+      <div class="meta-cell"><div class="lbl">Orario</div><div class="val">${m.timeStart||'—'}${m.timeEnd?' → '+m.timeEnd:''}</div></div>
+      <div class="meta-cell"><div class="lbl">Cliente / Partner</div><div class="val"><span class="inline-edit" data-field="client" title="Clicca per modificare">${esc(m.client||'—')}</span></div></div>
+      <div class="meta-cell"><div class="lbl">Partecipanti</div><div class="val">${(m.participants||[]).join(', ')||'—'}</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div class="card-title" style="margin:0;">Ordine del giorno</div>
+      <span class="autosave-status">Le note si salvano automaticamente</span>
+    </div>
+    <div class="agenda-list" id="agendaList">${agendaHtml}</div>
+    <div class="ag-add">
+      <input id="agNewInp" placeholder="+ Nuovo punto all'ordine del giorno (Invio per aggiungere)"/>
+      <button class="btn-navy btn-sm" id="agNewBtn">+ Aggiungi</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div class="card-title" style="margin:0;">Azioni / Follow-up${pending>0?` <span style="color:var(--orange);font-size:12px;">(${pending} da fare)</span>`:''}</div>
+      <button class="btn-navy btn-sm" id="btnAddAction">+ Aggiungi azione</button>
+    </div>
+    <div id="actionsList">
+      ${actionsHtml||'<p style="font-size:13px;color:var(--muted);padding:8px 0;">Nessuna azione.</p>'}
+    </div>
+    <div class="quick-action">
+      <input class="qa-txt" id="qaActionTxt" placeholder="+ Azione rapida…"/>
+      <input class="qa-who" id="qaActionWho" placeholder="👤 Assegnato a"/>
+      <input class="qa-dt" id="qaActionDt" type="date"/>
+      <button class="btn-navy btn-xs" id="btnQaAction">+ Aggiungi</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <div class="card-title" style="margin:0;">Note riunione</div>
+      <span class="autosave-status">Le note si salvano automaticamente</span>
+    </div>
+    <textarea class="notes-area" id="notesArea" rows="4" placeholder="Note, decisioni prese, punti emersi…">${esc(m.notes||'')}</textarea>
+  </div>`;
+
+  // Listeners
+  $('btnEdit').onclick = ()=>openMeetModal(m.id);
+  $('btnPdf').onclick  = ()=>openPdf(m.id);
+  $('btnDuplica').onclick = ()=>duplicateMeet(m.id);
+
+  // Note: salvataggio automatico (vedi scheduleNotesSave / flushNotes)
+  [$('notesArea'), ...document.querySelectorAll('.agenda-notes-area')].forEach(ta=>{
+    if(!ta) return;
+    ta.addEventListener('input', scheduleNotesSave);
+    ta.addEventListener('blur', flushNotes);
+  });
+
+  // Titolo, data e cliente: clic per modificare direttamente nel pannello.
+  // Invio o clic fuori = salva · Esc = annulla.
+  const inlineText = (field)=> field==='date' ? fdt(m.date) : (field==='client' ? (m.client||'—') : (m.title||''));
+  function attachInline(span){
+    span.addEventListener('click', ()=>{
+      const field=span.dataset.field;
+      const inp=document.createElement('input');
+      inp.className='inline-input';
+      inp.type = field==='date' ? 'date' : 'text';
+      inp.value = m[field]||'';
+      if(field==='client') inp.placeholder='Cliente o partner';
+      span.replaceWith(inp);
+      inp.focus(); if(inp.type==='text') inp.select();
+      let done=false;
+      const finish=(save)=>{
+        if(done) return;
+        const v=inp.value.trim();
+        let changed=false;
+        if(save){
+          if((field==='title' || field==='date') && !v){
+            alert(field==='title' ? 'Il titolo non può essere vuoto.' : 'Inserisci una data.');
+            setTimeout(()=>inp.focus(),0); return;
+          }
+          if(v!==(m[field]||'')){ m[field]=v; m.updatedAt=nowIso(); dbSave(); changed=true; }
+        }
+        done=true;
+        // rimetto solo il campo, senza ridisegnare il pannello (non si perde il clic successivo)
+        const ns=document.createElement('span');
+        ns.className='inline-edit'; ns.dataset.field=field; ns.title='Clicca per modificare';
+        ns.textContent=inlineText(field);
+        if(inp.isConnected) inp.replaceWith(ns);
+        attachInline(ns);
+        if(changed) setTimeout(renderList, 250);   // aggiorna l'elenco a sinistra
+      };
+      inp.addEventListener('keydown',e=>{
+        if(e.key==='Enter'){ e.preventDefault(); finish(true); }
+        else if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); finish(false); }
+      });
+      inp.addEventListener('blur',()=>finish(true));
+    });
+  }
+  panel.querySelectorAll('.inline-edit:not(.ag-inline)').forEach(attachInline);
+
+  // ── Ordine del giorno nel pannello: aggiungi, rinomina, riordina, elimina ──
+  // Ogni modifica si salva subito. Prima salvo le note in sospeso (flushNotes),
+  // perché le note sono legate alla posizione del punto.
+  const agendaArr = ()=> (m.agenda||[]).map(a=>typeof a==='string'?{text:a,notes:''}:a);
+  const commitAgenda = (arr)=>{ m.agenda=arr; m.updatedAt=nowIso(); dbSave(); renderDetail(); };
+  const moveAgenda = (from, to)=>{
+    flushNotes();
+    const arr=agendaArr();
+    if(to<0 || to>=arr.length || from===to) return;
+    const [it]=arr.splice(from,1); arr.splice(to,0,it);
+    commitAgenda(arr);
+  };
+  panel.querySelectorAll('.ag-up').forEach(b=>b.onclick=()=>{ const i=+b.dataset.ai; moveAgenda(i,i-1); });
+  panel.querySelectorAll('.ag-down').forEach(b=>b.onclick=()=>{ const i=+b.dataset.ai; moveAgenda(i,i+1); });
+  panel.querySelectorAll('.ag-del').forEach(b=>b.onclick=()=>{
+    flushNotes();
+    const arr=agendaArr(); const i=+b.dataset.ai;
+    if(arr[i]?.notes && !confirm('Questo punto ha delle note. Eliminarlo comunque?')) return;
+    arr.splice(i,1); commitAgenda(arr);
+  });
+  const addPoint=()=>{
+    const v=$('agNewInp').value.trim(); if(!v) return;
+    flushNotes();
+    const arr=agendaArr(); arr.push({text:v,notes:''}); commitAgenda(arr);
+    setTimeout(()=>$('agNewInp')?.focus(),0);   // pronto per il punto successivo
+  };
+  $('agNewBtn').onclick=addPoint;
+  $('agNewInp').onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); addPoint(); } };
+  // rinomina punto: clic sul testo (Invio/clic fuori salva, Esc annulla)
+  panel.querySelectorAll('.ag-inline').forEach(span=>{
+    span.addEventListener('click', ()=>{
+      const i=+span.dataset.ai;
+      const inp=document.createElement('input'); inp.className='inline-input'; inp.value=agendaArr()[i]?.text||'';
+      span.replaceWith(inp); inp.focus(); inp.select();
+      let done=false;
+      const finish=(save)=>{
+        if(done) return; done=true;
+        const v=inp.value.trim();
+        flushNotes();
+        const arr=agendaArr();
+        if(save && v && arr[i] && v!==arr[i].text){ arr[i].text=v; commitAgenda(arr); return; }
+        renderDetail();
+      };
+      inp.addEventListener('keydown',e=>{
+        if(e.key==='Enter'){ e.preventDefault(); finish(true); }
+        else if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); finish(false); }
+      });
+      inp.addEventListener('blur',()=>finish(true));
+    });
+  });
+  // trascinamento: si afferra dalla maniglia ⠿
+  enableDragSort($('agendaList'), '.agenda-item', '.ag-handle', (from,to)=>moveAgenda(from,to));
+
+  $('btnAddAction').onclick = ()=>openActionModal(null);
+  $('btnQaAction').onclick  = doQuickAction;
+  $('qaActionTxt').onkeydown = e=>{ if(e.key==='Enter') doQuickAction(); };
+
+  // Checkbox azioni
+  panel.querySelectorAll('.chk').forEach(c=>{
+    c.onclick=()=>{
+      const a=m.actions?.find(x=>x.id===c.dataset.aid);
+      if(a){a.done=!a.done;a.updatedAt=nowIso();m.updatedAt=nowIso();dbSave();renderDetail();}
+    };
+  });
+  panel.querySelectorAll('.btn-ea').forEach(b=>b.onclick=()=>openActionModal(b.dataset.aid));
+  panel.querySelectorAll('.btn-da').forEach(b=>b.onclick=()=>{
+    if(!confirm('Eliminare questa azione?')) return;
+    m.actions=m.actions.filter(a=>a.id!==b.dataset.aid); m.updatedAt=nowIso(); dbSave(); renderDetail();
+  });
+}
+
+function doQuickAction(){
+  const txt=$('qaActionTxt').value.trim();
+  if(!txt) return;
+  const m=db.meetings.find(x=>x.id===_selId); if(!m) return;
+  if(!Array.isArray(m.actions)) m.actions=[];
+  m.actions.push({id:uid(),text:txt,who:$('qaActionWho').value.trim(),date:$('qaActionDt').value,done:false,createdAt:nowIso()});
+  m.updatedAt=nowIso(); dbSave(); renderDetail();
+}
+
+// ══════════════════════════════════════════
+// MODAL RIUNIONE
+// ══════════════════════════════════════════
+function openMeetModal(id, prefill){
+  _editMeetId=id||null; _tempParts=[]; _tempAgenda=[];
+  const m=id?db.meetings.find(x=>x.id===id):(prefill||null);
+  $('mMeetTitle').textContent=id?'Modifica riunione':'Nuova riunione';
+  $('mMeetDel').style.display=id?'':'none';
+  $('fMTitle').value      =m?.title||'';
+  $('fMDate').value       =m?.date||todayStr();
+  // Imposta select orari (value es. "09:00")
+  const setSelectVal = (id, val) => {
+    const sel = $(id); if(!sel) return;
+    // Cerca opzione corrispondente
+    const opt = [...sel.options].find(o => o.value === val);
+    sel.value = opt ? val : '';
+  };
+  setSelectVal('fMTimeStart', m?.timeStart||'');
+  setSelectVal('fMTimeEnd', m?.timeEnd||'');
+  $('fMClient').value     =m?.client||'';
+  // Topics multi-select
+  const selTopics = Array.isArray(m?.topics)?m.topics:(m?.topic?[m.topic]:[]);
+  document.querySelectorAll('#fMTopics .topic-check').forEach(lbl=>{
+    const cb=lbl.querySelector('input');
+    const on=selTopics.includes(cb.value);
+    cb.checked=on; lbl.classList.toggle('on',on);
+    lbl.onclick=()=>{ cb.checked=!cb.checked; lbl.classList.toggle('on',cb.checked); };
+  });
+  _tempParts=[...(m?.participants||[])];
+  _tempAgenda=(m?.agenda||[]).map(a=>typeof a==='string'?{text:a,notes:''}:a);
+  renderModalParts(); renderModalAgenda();
+  $('mMeet').classList.remove('h');
+  markModalOpened('mMeet');
+  setTimeout(()=>$('fMTitle').focus(),50);
+}
+
+function renderModalParts(){
+  $('fMParts').innerHTML=_tempParts.map((n,i)=>
+    `<span class="pill">${esc(n)}<span class="rm" data-i="${i}"> ✕</span></span>`
+  ).join('');
+  $('fMParts').querySelectorAll('.rm').forEach(r=>r.onclick=()=>{_tempParts.splice(Number(r.dataset.i),1);renderModalParts();});
+}
+
+function renderModalAgenda(){
+  $('fMAgendaList').innerHTML=_tempAgenda.map((a,i)=>{
+    const txt = typeof a==='string'?a:(a.text||'');
+    return `<div class="ag-modal-row" style="display:flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--border);border-radius:var(--r8);background:var(--bg);" data-i="${i}">
+      <span class="ag-handle" title="Trascina per riordinare">⠿</span>
+      <span style="font-size:11px;font-weight:700;color:var(--muted);min-width:18px;flex-shrink:0;">${i+1}.</span>
+      <input class="agenda-edit-inp" data-i="${i}" value="${esc(txt)}"
+        style="flex:1;border:none;background:transparent;font-size:13px;padding:2px 4px;border-radius:4px;"/>
+      <span class="ag-btns">
+        <button type="button" class="btn-icon btn-up-ag" data-i="${i}" title="Sposta su" ${i===0?'disabled':''}>▲</button>
+        <button type="button" class="btn-icon btn-down-ag" data-i="${i}" title="Sposta giù" ${i===_tempAgenda.length-1?'disabled':''}>▼</button>
+        <button type="button" class="btn-icon btn-del-ag" data-i="${i}" style="color:var(--red);">✕</button>
+      </span>
+    </div>`;
+  }).join('');
+  // Salva modifica testo on-blur
+  $('fMAgendaList').querySelectorAll('.agenda-edit-inp').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      const i=Number(inp.dataset.i);
+      const a=_tempAgenda[i];
+      if(a) { if(typeof a==='string') _tempAgenda[i]={text:inp.value.trim(),notes:''}; else a.text=inp.value.trim(); }
+    });
+    inp.addEventListener('focus', ()=>{ inp.style.background='#fff'; inp.style.border='1px solid var(--blue)'; });
+    inp.addEventListener('blur',  ()=>{ inp.style.background='transparent'; inp.style.border='none'; });
+  });
+  $('fMAgendaList').querySelectorAll('.btn-del-ag').forEach(b=>b.onclick=()=>{_tempAgenda.splice(Number(b.dataset.i),1);renderModalAgenda();});
+  const moveTemp=(from,to)=>{
+    // prima raccolgo eventuali testi modificati ma non ancora confermati
+    $('fMAgendaList').querySelectorAll('.agenda-edit-inp').forEach(inp=>{ const a=_tempAgenda[+inp.dataset.i]; if(a&&typeof a==='object') a.text=inp.value.trim(); });
+    if(to<0||to>=_tempAgenda.length||from===to) return;
+    const [it]=_tempAgenda.splice(from,1); _tempAgenda.splice(to,0,it); renderModalAgenda();
+  };
+  $('fMAgendaList').querySelectorAll('.btn-up-ag').forEach(b=>b.onclick=()=>{ const i=+b.dataset.i; moveTemp(i,i-1); });
+  $('fMAgendaList').querySelectorAll('.btn-down-ag').forEach(b=>b.onclick=()=>{ const i=+b.dataset.i; moveTemp(i,i+1); });
+  enableDragSort($('fMAgendaList'), '.ag-modal-row', '.ag-handle', moveTemp);
+}
+
+$('btnAddPart').onclick=()=>{
+  const v=$('fMPartInp').value.trim();
+  if(v&&!_tempParts.includes(v)){_tempParts.push(v);$('fMPartInp').value='';renderModalParts();}
+};
+$('fMPartInp').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();$('btnAddPart').click();}};
+
+$('btnAddAgenda').onclick=()=>{
+  const v=$('fMAgendaInp').value.trim();
+  if(v){_tempAgenda.push({text:v,notes:''});$('fMAgendaInp').value='';renderModalAgenda();}
+};
+$('fMAgendaInp').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();$('btnAddAgenda').click();}};
+
+$('mMeetSave').onclick=()=>{
+  const title=$('fMTitle').value.trim();
+  if(!title){alert('Inserisci il titolo della riunione.');return;}
+  const date=$('fMDate').value;
+  if(!date){alert('Inserisci la data.');return;}
+  if(_editMeetId){
+    const m=db.meetings.find(x=>x.id===_editMeetId);
+    const selT2=[...document.querySelectorAll('#fMTopics input:checked')].map(c=>c.value);
+    if(m) Object.assign(m,{title,date,timeStart:$('fMTimeStart').value,timeEnd:$('fMTimeEnd').value,
+      client:$('fMClient').value.trim(),topics:selT2,
+      participants:[..._tempParts],agenda:[..._tempAgenda],updatedAt:nowIso()});
+  } else {
+    const selT=[...document.querySelectorAll('#fMTopics input:checked')].map(c=>c.value);
+    const m={id:uid(),code:nextMeetCode(),title,date,timeStart:$('fMTimeStart').value,timeEnd:$('fMTimeEnd').value,
+      client:$('fMClient').value.trim(),topics:selT,
+      participants:[..._tempParts],agenda:[..._tempAgenda],
+      notes:'',actions:[],createdAt:nowIso(),updatedAt:nowIso()};
+    db.meetings.push(m); _selId=m.id;
+  }
+  dbSave(); $('mMeet').classList.add('h'); delete _modalSnap['mMeet']; renderList(); renderDetail();
+};
+
+$('mMeetDel').onclick=()=>{
+  if(!confirm('Eliminare definitivamente questa riunione?')) return;
+  db.meetings=db.meetings.filter(x=>x.id!==_editMeetId);
+  if(!Array.isArray(db.deleted)) db.deleted=[];
+  db.deleted.push({id:_editMeetId, at:nowIso()});  // così non ricompare dagli altri dispositivi
+  delete _modalSnap['mMeet'];
+  if(_selId===_editMeetId) _selId=null;
+  dbSave(); $('mMeet').classList.add('h'); renderList(); renderDetail();
+};
+$('mMeetClose').onclick=()=>tryCloseModal('mMeet');
+
+// ══════════════════════════════════════════
+// MODAL AZIONE
+// ══════════════════════════════════════════
+function openActionModal(aid){
+  _editActionId=aid||null;
+  const m=db.meetings.find(x=>x.id===_selId);
+  const a=aid?m?.actions?.find(x=>x.id===aid):null;
+  $('mActionTitle').textContent=aid?'Modifica azione':'Nuova azione';
+  $('fATxt').value  =a?.text||'';
+  $('fAWho').value  =a?.who||'';
+  $('fADate').value =a?.date||'';
+  $('fADone').value =a?.done?'1':'0';
+  $('mAction').classList.remove('h');
+  markModalOpened('mAction');
+  setTimeout(()=>$('fATxt').focus(),50);
+}
+
+$('mActionSave').onclick=()=>{
+  const txt=$('fATxt').value.trim();
+  if(!txt){alert('Inserisci la descrizione.');return;}
+  const m=db.meetings.find(x=>x.id===_selId); if(!m) return;
+  if(!Array.isArray(m.actions)) m.actions=[];
+  if(_editActionId){
+    const a=m.actions.find(x=>x.id===_editActionId);
+    if(a) Object.assign(a,{text:txt,who:$('fAWho').value.trim(),date:$('fADate').value,done:$('fADone').value==='1',updatedAt:nowIso()});
+  } else {
+    m.actions.push({id:uid(),text:txt,who:$('fAWho').value.trim(),date:$('fADate').value,done:$('fADone').value==='1',createdAt:nowIso()});
+  }
+  m.updatedAt=nowIso(); dbSave(); $('mAction').classList.add('h'); delete _modalSnap['mAction']; renderDetail();
+};
+$('mActionClose').onclick=()=>tryCloseModal('mAction');
+
+// ══════════════════════════════════════════
+// PDF
+// ══════════════════════════════════════════
+function duplicateMeet(id){
+  // Apre la finestra "Nuova riunione" già compilata con i dati di questa.
+  // La copia viene creata solo premendo "Salva": se chiudi, non resta nulla.
+  const m = db.meetings.find(x=>x.id===id);
+  if(!m) return;
+  flushNotes();
+  openMeetModal(null, {
+    title: '(Copia) ' + (m.title||''),
+    date: todayStr(),
+    timeStart: m.timeStart||'', timeEnd: m.timeEnd||'',
+    client: m.client||'',
+    topics: Array.isArray(m.topics)?[...m.topics]:(m.topic?[m.topic]:[]),
+    participants: [...(m.participants||[])],
+    // stessi punti all'ordine del giorno, con le loro note
+    agenda: (m.agenda||[]).map(a=>({ text: typeof a==='string'?a:(a.text||''), notes: typeof a==='string'?'':(a.notes||'') })),
+  });
+  $('mMeetTitle').textContent = 'Nuova riunione — copia di “' + (m.title||'') + '”';
+  setTimeout(()=>{ const t=$('fMTitle'); t.focus(); t.select(); },60);
+}
+
+function openPdf(id){
+  const m=db.meetings.find(x=>x.id===id); if(!m) return;
+  const win=window.open('','_blank');
+  win.document.write(buildPdf(m));
+  win.document.close();
+}
+
+function buildPdf(m){
+  const td=todayStr();
+  const e=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const fd=s=>{if(!s)return'—';const[y,mo,d]=s.split('-');return`${d}/${mo}/${y}`;};
+  const actions=m.actions||[];
+  const pending=actions.filter(a=>!a.done);
+  const done=actions.filter(a=>a.done);
+
+  const actRow=(a,cls='')=>{
+    const ov=!a.done&&a.date&&a.date<td;
+    return `<tr style="${cls}${a.done?'text-decoration:line-through;color:#aaa;':''}">
+      <td style="width:20px;">${a.done?'✓':'☐'}</td>
+      <td>${e(a.text)}</td>
+      <td>${e(a.who||'—')}</td>
+      <td style="font-family:monospace;${ov?'color:#b52a2a;font-weight:600;':''}">${fd(a.date)}</td>
+    </tr>`;
+  };
+
+  return `<!doctype html><html lang="it"><head><meta charset="utf-8"/>
+  <title>Verbale: ${e(m.title)}</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>*{box-sizing:border-box;}body{font-family:'DM Sans',sans-serif;font-size:13px;color:#1a2133;background:#fff;padding:28px 36px;}
+  h1{font-size:20px;font-weight:700;color:#1a2744;margin-bottom:3px;}
+  .sub{color:#7a85a0;font-size:12px;margin-bottom:20px;}
+  .sec{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#7a85a0;border-bottom:1px solid #dde2ec;padding-bottom:5px;margin:16px 0 10px;}
+  .mg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;}
+  .mc{background:#f2f4f8;border-radius:8px;padding:8px 10px;}
+  .ml{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#7a85a0;margin-bottom:2px;}
+  .mv{font-size:12px;font-weight:500;}
+  .notes{background:#fdf3e0;border:1px solid #f0d090;border-radius:8px;padding:11px 13px;font-size:13px;color:#4a5570;white-space:pre-wrap;line-height:1.65;}
+  .ag-item{display:flex;gap:8px;padding:6px 10px;border:1px solid #dde2ec;border-radius:6px;margin-bottom:5px;font-size:12px;}
+  .ag-n{font-size:10px;font-weight:700;color:#7a85a0;min-width:16px;}
+  table{width:100%;border-collapse:collapse;font-size:12px;}
+  th{background:#f2f4f8;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#7a85a0;padding:5px 8px;text-align:left;}
+  td{padding:5px 8px;border-bottom:1px solid #eef0f4;}
+  tr:last-child td{border-bottom:none;}
+  .badge{display:inline-block;font-size:10px;font-weight:700;border-radius:4px;padding:2px 6px;}
+  @media print{.no-print{display:none!important;}}
+  </style></head><body>
+  <div class="no-print" style="background:#1a2744;color:#fff;padding:10px 18px;margin:-28px -36px 22px;display:flex;justify-content:space-between;align-items:center;">
+    <span style="font-weight:600;">📄 Verbale — ${e(m.title)}</span>
+    <button onclick="window.print()" style="background:#e8a020;color:#1a2744;border:none;border-radius:8px;padding:7px 16px;font-weight:700;cursor:pointer;">🖨 Stampa / PDF</button>
+  </div>
+  <h1>${e(m.title)}</h1>
+  <div class="sub">Verbale riunione · ${e(currentUser?.name||'')} · Generato il ${fd(td)}</div>
+  ${m.code?`<div style="margin-bottom:12px;"><span style="font-family:monospace;font-size:11px;font-weight:700;background:#eef3fd;color:#2255c4;border-radius:4px;padding:2px 6px;">${e(m.code)}</span></div>`:''}
+  <div class="mg">
+    <div class="mc"><div class="ml">Data</div><div class="mv">${fd(m.date)}</div></div>
+    <div class="mc"><div class="ml">Orario</div><div class="mv">${m.timeStart||'—'}${m.timeEnd?' → '+m.timeEnd:''}</div></div>
+    <div class="mc"><div class="ml">Cliente / Partner</div><div class="mv">${e(m.client||'—')}</div></div>
+    <div class="mc"><div class="ml">Partecipanti</div><div class="mv">${e((m.participants||[]).join(', ')||'—')}</div></div>
+  </div>
+  ${(m.agenda||[]).length?`<div class="sec">Ordine del giorno</div>
+  ${(m.agenda).map((a,i)=>{
+    const txt=typeof a==='string'?a:(a.text||'');
+    const notes=typeof a==='object'?(a.notes||''):'';
+    return `<div class="ag-item">
+      <span class="ag-n">${i+1}.</span>
+      <div style="flex:1;">
+        <div style="font-weight:600;">${e(txt)}</div>
+        ${notes?`<div style="margin-top:4px;font-size:12px;color:#4a5570;white-space:pre-wrap;line-height:1.55;">${e(notes)}</div>`:''}
+      </div>
+    </div>`;
+  }).join('')}`:''}
+  ${m.notes?`<div class="sec">Note riunione</div><div class="notes">${e(m.notes)}</div>`:''}
+  ${pending.length?`<div class="sec">Azioni da completare (${pending.length})</div>
+  <table><thead><tr><th></th><th>Azione</th><th>Assegnato a</th><th>Scadenza</th></tr></thead>
+  <tbody>${pending.map(a=>actRow(a)).join('')}</tbody></table>`:''}
+  ${done.length?`<div class="sec">Azioni completate (${done.length})</div>
+  <table><thead><tr><th></th><th>Azione</th><th>Assegnato a</th><th>Scadenza</th></tr></thead>
+  <tbody>${done.map(a=>actRow(a)).join('')}</tbody></table>`:''}
+  </body></html>`;
+}
+
+// ══════════════════════════════════════════
+// MODAL GITHUB
+// ══════════════════════════════════════════
+$('btnGhSync').onclick=()=>{
+  if(ghOk()){ ghPull(); return; }
+  const g=getGh();
+  $('fGhTok').value =g?.tok||'';
+  $('fGhOwn').value =g?.own||'';
+  $('fGhRepo').value=g?.repo||'';
+  $('fGhDir').value =g?.dir||'data';
+  $('mGh').classList.remove('h');
+};
+$('mGhSave').onclick=()=>{
+  const g={tok:$('fGhTok').value.trim(),own:$('fGhOwn').value.trim(),
+    repo:$('fGhRepo').value.trim(),dir:$('fGhDir').value.trim()||'data'};
+  if(!g.tok||!g.own||!g.repo){alert('Compila tutti i campi.');return;}
+  localStorage.setItem(GH_KEY,JSON.stringify(g));
+  $('mGh').classList.add('h');
+  if(currentUser) ghPull();
+};
+$('mGhClear').onclick=()=>{
+  if(!confirm('Rimuovere configurazione GitHub?')) return;
+  localStorage.removeItem(GH_KEY);
+  setStatus('GitHub Sync non configurato','info');
+  $('mGh').classList.add('h');
+};
+$('mGhClose').onclick=()=>$('mGh').classList.add('h');
+
+// ══════════════════════════════════════════
+// MODAL PIN ADMIN
+// ══════════════════════════════════════════
+$('mAdminPinClose').onclick = () => $('mAdminPin').classList.add('h');
+$('btnAdminPinOk').onclick = () => {
+  const cfg=getCfg();
+  const pin=$('adminPinInp').value.trim();
+  if(pin !== cfg?.adminPin){ $('adminPinErr').textContent='PIN errato.'; $('adminPinInp').value=''; return; }
+  $('mAdminPin').classList.add('h');
+  showSetup(true);
+};
+$('adminPinInp').onkeydown = e => { if(e.key==='Enter') $('btnAdminPinOk').click(); };
+$('mAdminPin').addEventListener('click', e => { if(e.target===e.currentTarget) $('mAdminPin').classList.add('h'); });
+
+// ══════════════════════════════════════════
+// MODAL CAMBIA PIN
+// ══════════════════════════════════════════
+$('mChangePinClose').onclick = () => $('mChangePin').classList.add('h');
+$('mChangePin').addEventListener('click', e => { if(e.target===e.currentTarget) $('mChangePin').classList.add('h'); });
+
+$('btnChangePin').onclick = () => {
+  if(!currentUser) return;
+  $('changePinUser').textContent = currentUser.name;
+  $('fOldPin').value=''; $('fNewPin').value=''; $('fNewPin2').value='';
+  $('changePinErr').textContent='';
+  $('mChangePin').classList.remove('h');
+  setTimeout(()=>$('fOldPin').focus(),50);
+};
+
+$('btnChangePinSave').onclick = () => {
+  const cfg=getCfg();
+  const oldPin=$('fOldPin').value.trim();
+  const newPin=$('fNewPin').value.trim();
+  const newPin2=$('fNewPin2').value.trim();
+  $('changePinErr').textContent='';
+  if(oldPin !== currentUser.pin){ $('changePinErr').textContent='PIN attuale errato.'; return; }
+  if(newPin.length<4||newPin.length>6||!/^\d+$/.test(newPin)){ $('changePinErr').textContent='Il nuovo PIN deve essere di 4-6 cifre.'; return; }
+  if(newPin !== newPin2){ $('changePinErr').textContent='I PIN non coincidono.'; return; }
+  currentUser.pin=newPin;
+  const u=cfg.users.find(x=>x.name===currentUser.name);
+  if(u){ u.pin=newPin; saveCfg(cfg); }
+  $('mChangePin').classList.add('h');
+  alert('PIN aggiornato con successo!');
+};
+
+// ══════════════════════════════════════════
+// FILTRI
+// ══════════════════════════════════════════
+$('btnNewMeet').onclick=()=>{ if(currentUser) openMeetModal(null); };
+$('searchQ').oninput=e=>{ _search=e.target.value.toLowerCase().trim(); renderList(); };
+$('yearFilter').onchange=e=>{ _filterYear=e.target.value; renderList(); };
+
+document.querySelectorAll('.f-btn[data-t]').forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll('.f-btn[data-t]').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on'); _filterTopic=b.dataset.t; renderList();
+  };
+});
+document.querySelectorAll('.f-btn[data-a]').forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll('.f-btn[data-a]').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on'); _filterAction=b.dataset.a; renderList();
+  };
+});
+
+// ── Chiusura finestre (modal) ──
+// Prima: un clic sullo sfondo chiudeva la finestra. Ma selezionando il testo
+// trascinando il mouse oltre il bordo del riquadro, il rilascio "fuori" veniva
+// letto come clic sullo sfondo → finestra chiusa e modifiche perse.
+// Ora: la finestra si chiude dallo sfondo SOLO se il clic inizia e finisce
+// sullo sfondo, e le finestre di modifica chiedono conferma se ci sono
+// modifiche non salvate. Anche il tasto Esc chiude (con la stessa conferma).
+const _modalSnap = {};   // istantanea dei campi all'apertura, per capire se ci sono modifiche
+function modalFieldsSnapshot(id){
+  const box=$(id); if(!box) return '';
+  return [...box.querySelectorAll('input,select,textarea')]
+    .map(el=>el.type==='checkbox'?el.checked:el.value).join('\u0001')
+    + '\u0002' + JSON.stringify(id==='mMeet'?{p:_tempParts,a:_tempAgenda}:null);
+}
+function markModalOpened(id){ _modalSnap[id]=modalFieldsSnapshot(id); }
+function modalIsDirty(id){ return _modalSnap[id]!==undefined && modalFieldsSnapshot(id)!==_modalSnap[id]; }
+function tryCloseModal(id){
+  const editable = (id==='mMeet' || id==='mAction');
+  if(editable && modalIsDirty(id)){
+    if(!confirm('Hai modifiche non salvate in questa finestra.\n\nOK = chiudi senza salvare\nAnnulla = torna alla modifica')) return;
+  }
+  $(id).classList.add('h');
+  delete _modalSnap[id];
+}
+['mMeet','mAction','mGh','mOverdue'].forEach(id=>{
+  const el=$(id);
+  let downOnBackdrop=false;
+  el.addEventListener('mousedown',e=>{ downOnBackdrop = (e.target===e.currentTarget); });
+  el.addEventListener('click',e=>{
+    if(e.target===e.currentTarget && downOnBackdrop) tryCloseModal(id);
+    downOnBackdrop=false;
+  });
+});
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape') return;
+  const open=['mAction','mMeet','mGh','mOverdue'].find(id=>!$(id).classList.contains('h'));
+  if(open) tryCloseModal(open);
+});
+
+// ── CAMPANELLA E POPUP SCADUTE ──
+function getOverdueActions(){
+  const td=todayStr();
+  const result=[];
+  for(const m of db.meetings){
+    for(const a of (m.actions||[])){
+      if(!a.done&&a.date&&a.date<td) result.push({...a,meetTitle:m.title,meetCode:m.code,meetId:m.id});
+    }
+  }
+  return result.sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+}
+
+function updateBell(){
+  const ov=getOverdueActions();
+  const badge=$('bellBadge'), btn=$('bellBtn');
+  if(ov.length>0){
+    badge.textContent=ov.length; badge.style.display='flex';
+    btn.classList.add('has-overdue');
+  } else {
+    badge.style.display='none'; btn.classList.remove('has-overdue');
+  }
+}
+
+function showOverduePopup(){
+  const ov=getOverdueActions();
+  if(!ov.length){ $('mOverdueBody').innerHTML='<p style="color:var(--muted);font-size:13px;">Nessuna azione scaduta. 🎉</p>'; $('mOverdue').classList.remove('h'); return; }
+  $('mOverdueBody').innerHTML=`
+    <p style="font-size:13px;color:var(--mid);margin-bottom:12px;">${ov.length} azione${ov.length>1?'i':''} scadut${ov.length>1?'e':'a'}:</p>
+    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <thead><tr style="background:var(--bg);">
+        <th style="padding:6px 8px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);">Riunione</th>
+        <th style="padding:6px 8px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);">Azione</th>
+        <th style="padding:6px 8px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);">Assegnato</th>
+        <th style="padding:6px 8px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);">Scadenza</th>
+      </tr></thead>
+      <tbody>${ov.map(a=>`<tr style="cursor:pointer;border-bottom:1px solid var(--border);" data-mid="${a.meetId}">
+        <td style="padding:6px 8px;"><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--blue);">${esc(a.meetCode||'')}</span> ${esc(a.meetTitle)}</td>
+        <td style="padding:6px 8px;">${esc(a.text)}</td>
+        <td style="padding:6px 8px;">${esc(a.who||'—')}</td>
+        <td style="padding:6px 8px;color:var(--red);font-weight:700;font-family:'DM Mono',monospace;">${fdt(a.date)}</td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+  // Click su riga → apri riunione
+  $('mOverdueBody').querySelectorAll('tr[data-mid]').forEach(r=>{
+    r.onclick=()=>{ if(r.dataset.mid!==_selId && !confirmIfNotesDirty()) return; _selId=r.dataset.mid; $('mOverdue').classList.add('h'); renderList(); renderDetail(); };
+  });
+  $('mOverdue').classList.remove('h');
+}
+
+$('bellBtn').onclick=showOverduePopup;
+$('mOverdueClose').onclick=()=>$('mOverdue').classList.add('h');
+
+// ══════════════════════════════════════════
+// PROTEZIONE NOTE NON SALVATE su navigazione/chiusura
+// ══════════════════════════════════════════
+// Link verso Sales / Project: se ci sono note non salvate, chiedi conferma
+['navSales','navProject'].forEach(id=>{
+  const a=$(id);
+  if(a) a.addEventListener('click', e=>{
+    if(!confirmIfNotesDirty()){ e.preventDefault(); }
+  });
+});
+// Chiusura o ricaricamento della pagina con note non salvate
+window.addEventListener('beforeunload', e=>{
+  flushNotes();   // salvataggio immediato in locale (sincronizzato al prossimo avvio)
+});
+// Logout: salva le note in sospeso e aspetta che il salvataggio su GitHub
+// sia finito prima di uscire (altrimenti potrebbe interrompersi a metà).
+(function(){
+  const lb=$('btnLogout');
+  if(lb){
+    const orig=lb.onclick;
+    lb.onclick=async (ev)=>{
+      confirmIfNotesDirty();
+      if(ghOk() && _needsPush && !_ghPushing) ghPushBg();
+      const t0=Date.now();
+      while(ghOk() && (_ghPushing || _needsPush) && Date.now()-t0 < 8000){
+        setStatus('🔄 Salvataggio prima dell\'uscita…','sync');
+        await new Promise(r=>setTimeout(r,150));
+      }
+      if(orig) orig.call(lb,ev);
+    };
+  }
+})();
+
+// ══════════════════════════════════════════
+// AVVIO
+// ══════════════════════════════════════════
+const cfg=getCfg();
+if(!cfg||!cfg.users||cfg.users.length===0){
+  showSetup();
+} else {
+  // Se c'è un utente ricordato da un accesso precedente, entra direttamente
+  // senza chiedere di nuovo il PIN (resta valido fino al logout esplicito).
+  // Se qualcosa va storto nell'auto-login, ricadi sul login manuale invece
+  // di lasciare l'utente bloccato su una schermata rotta.
+  let entered = false;
+  try {
+    const remembered = getRememberedUser();
+    if(remembered){
+      currentUser = remembered;
+      startApp();
+      entered = true;
+    }
+  } catch(e){
+    console.warn('Auto-login non riuscito, mostro il login manuale:', e);
+    entered = false;
+  }
+  if(!entered){
+    currentUser = null;
+    showLock();
+  }
+}
+</script>
+</body>
+</html>
