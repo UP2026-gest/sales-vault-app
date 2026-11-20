@@ -1,0 +1,1577 @@
+{
+  "meetings": [
+    {
+      "id": "mpzmsqlbtib5rh",
+      "code": "26-001",
+      "title": "meeting UP",
+      "date": "2026-06-05",
+      "timeStart": "11:00",
+      "timeEnd": "12:00",
+      "client": "",
+      "topics": [
+        "commerciale",
+        "didattica",
+        "amministrazione",
+        "mkt"
+      ],
+      "participants": [
+        "Stefania",
+        "Silvia",
+        "Valentina",
+        "Lucia"
+      ],
+      "agenda": [
+        {
+          "text": "Database, invio cluster A con proposta test, valutare estensione anche per B e C",
+          "notes": ""
+        },
+        {
+          "text": "Corso Silvia, abbiamo prenotato?",
+          "notes": ""
+        },
+        {
+          "text": "landing page italiano su pagina FB vietnamiti, Chinh ha detto che dobbiamo pubblicare noi",
+          "notes": ""
+        },
+        {
+          "text": "Network up, inviti mandati, contratti da confermare, sala e catering da prenotare, email da fare, canale w.a. da fare, gadget per partecipanti e pacchetto di benvenuto per chi aderisce",
+          "notes": ""
+        },
+        {
+          "text": "Assistenti sociali, hanno risposto a mie richieste",
+          "notes": ""
+        },
+        {
+          "text": "Evento 18/06",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [
+        {
+          "id": "mq0pprsclqkys3",
+          "text": "Stefania ci fa sapere da Sossi che piattaforma usare",
+          "who": "Stefnia",
+          "date": "2026-06-12",
+          "done": true,
+          "createdAt": "2026-06-05T09:19:03.660Z",
+          "updatedAt": "2026-10-23T07:33:05.825Z"
+        },
+        {
+          "id": "mq0qadc0n4pto9",
+          "text": "creare canale whatsapp",
+          "who": "Vale",
+          "date": "2026-06-12",
+          "done": true,
+          "createdAt": "2026-06-05T09:35:04.704Z",
+          "updatedAt": "2026-07-30T08:47:28.893Z"
+        },
+        {
+          "id": "mq0quxxsx4miva",
+          "text": "creare email network@upformazione.com",
+          "who": "Renato",
+          "date": "2026-06-12",
+          "done": true,
+          "createdAt": "2026-06-05T09:51:04.528Z",
+          "updatedAt": "2026-06-19T08:18:18.413Z"
+        },
+        {
+          "id": "mq0qwfugfr6z0r",
+          "text": "gadget",
+          "who": "Vale",
+          "date": "2026-06-12",
+          "done": true,
+          "createdAt": "2026-06-05T09:52:14.392Z",
+          "updatedAt": "2026-06-19T08:18:19.497Z"
+        },
+        {
+          "id": "mq0qx4q019jop5",
+          "text": "Rinfresco",
+          "who": "Stefania",
+          "date": "2026-06-30",
+          "done": true,
+          "createdAt": "2026-06-05T09:52:46.632Z",
+          "updatedAt": "2026-07-30T08:47:30.396Z"
+        },
+        {
+          "id": "mq0qymi1ini478",
+          "text": "Pubblicare pagina italiano per stranieri su pagina FB vietnamita",
+          "who": "Vale",
+          "date": "2026-06-12",
+          "done": true,
+          "createdAt": "2026-06-05T09:53:56.329Z",
+          "updatedAt": "2026-07-30T08:47:48.359Z"
+        }
+      ],
+      "createdAt": "2026-06-04T15:09:37.055Z",
+      "updatedAt": "2026-10-23T07:33:11.870Z"
+    },
+    {
+      "id": "mq0mmpdvmrgnyz",
+      "code": "26-002",
+      "title": "Meeting UP MSF Piazza",
+      "date": "2026-06-05",
+      "timeStart": "12:00",
+      "timeEnd": "12:30",
+      "client": "",
+      "topics": [
+        "gestionale"
+      ],
+      "participants": [
+        "Stefania",
+        "Matteo"
+      ],
+      "agenda": [
+        {
+          "text": "Chinh, pagina su FB",
+          "notes": ""
+        },
+        {
+          "text": "Templus, richiesta per 18/06 ma rimandata",
+          "notes": ""
+        },
+        {
+          "text": "Assistenti sociali, ho avuto risposta, non fanno promozione, faremo un paio di eventi gratuiti e poi uno a pagamento",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-06-05T07:52:41.731Z",
+      "updatedAt": "2026-06-05T08:09:09.955Z"
+    },
+    {
+      "id": "mqahxliqgmwhys",
+      "code": "26-003",
+      "title": "meeting UP",
+      "date": "2026-06-12",
+      "timeStart": "11:00",
+      "timeEnd": "12:00",
+      "client": "",
+      "topics": [
+        "commerciale",
+        "didattica",
+        "amministrazione",
+        "mkt"
+      ],
+      "participants": [
+        "Stefania",
+        "Silvia",
+        "Valentina",
+        "Lucia"
+      ],
+      "agenda": [
+        {
+          "text": "Database, invio email, come sta andando?",
+          "notes": "ma la seconda email la stiamo inviando solo a chi non ha aperto la prima? DA ADESSO LE MANDIAMO A TUTTI"
+        },
+        {
+          "text": "landing page italiano su pagina FB vietnamiti, traduzione? poi pubblicare",
+          "notes": "VALE PREPARA IL TESTO IN ITALIANO, SILVIA LO TRADUCE IN INGLESE E POI STEFANIA IN VIETNAMITA"
+        },
+        {
+          "text": "Network up, inviti mandati, contratti da confermare, email network fatta, canale w.a. da fare (ma è visibile a tutti?), gadget per partecipanti e pacchetto di benvenuto per chi aderisce",
+          "notes": "inviti mandati e un buon numero ha già confermato, scaletta fatta da vedere insieme, casella network@ aperta e pw inviata, novità su contratti? LUNEDì O MARTEDì AVREMO CONFERMA. gadget? VALE CHIEDE IL MINIMO"
+        },
+        {
+          "text": "Assistenti sociali, hanno risposto a mie richieste?",
+          "notes": "se non rispondono entro 19/06, sollecito"
+        },
+        {
+          "text": "Evento 18/06",
+          "notes": "4 iscritti, Dennis più due che non conosciamo + SORELLA STEFANIA. Come promuoviamo ancora? Cosa facciamo per i prossimi eventi? POI STEFANIA SENTIRà IL PERSONAL TRAINER FABIO ZUBANI FIT FACTORY"
+        },
+        {
+          "text": "Ordine medici Como, dobbiamo fare piano per promuovere? E per avvocati? Landing page e materiale sono già pronti",
+          "notes": "VALE DEVE PREPARARE I POST E I CONTENUTI, POI PROMUOVEREMO A SETTEMBRE"
+        }
+      ],
+      "notes": "",
+      "actions": [
+        {
+          "id": "mqai17gy07egf2",
+          "text": "traduzione vietnamita per landing page italiano per stranieri",
+          "who": "stefania",
+          "date": "2026-06-19",
+          "done": true,
+          "createdAt": "2026-06-12T05:41:42.034Z",
+          "updatedAt": "2026-08-27T14:53:14.194Z"
+        },
+        {
+          "id": "mqaocxj7s71r6d",
+          "text": "contratti network da far verificare ad avvocati",
+          "who": "stefania",
+          "date": "2026-06-19",
+          "done": true,
+          "createdAt": "2026-06-12T08:38:46.724Z",
+          "updatedAt": "2026-07-30T08:47:41.305Z"
+        },
+        {
+          "id": "mqarnwwzc02kyh",
+          "text": "traduzione inglese per landing page italiano per stranieri",
+          "who": "Silvia",
+          "date": "2026-06-19",
+          "done": true,
+          "createdAt": "2026-06-12T10:11:17.987Z",
+          "updatedAt": "2026-06-22T08:09:56.362Z"
+        },
+        {
+          "id": "mqarpru32ckcmh",
+          "text": "Fabio Zubani per attività presso Fit Factory",
+          "who": "Stefania",
+          "date": "2026-07-03",
+          "done": true,
+          "createdAt": "2026-06-12T10:12:44.715Z",
+          "updatedAt": "2026-07-30T08:47:43.865Z"
+        },
+        {
+          "id": "mqarqpsv7vvcfz",
+          "text": "Ordini medici Como e Avvocati Milano, lancio dei post e promozione social",
+          "who": "Vale",
+          "date": "2026-09-03",
+          "done": false,
+          "createdAt": "2026-06-12T10:13:28.735Z"
+        }
+      ],
+      "createdAt": "2026-06-12T05:38:53.619Z",
+      "updatedAt": "2026-10-27T14:23:35.076Z"
+    },
+    {
+      "id": "mqknlwdlvc8gtp",
+      "code": "26-004",
+      "title": "meeting UP",
+      "date": "2026-06-19",
+      "timeStart": "11:00",
+      "timeEnd": "12:00",
+      "client": "",
+      "topics": [
+        "commerciale",
+        "didattica",
+        "amministrazione",
+        "mkt"
+      ],
+      "participants": [
+        "Stefania",
+        "Silvia",
+        "Valentina",
+        "Lucia"
+      ],
+      "agenda": [
+        {
+          "text": "Database, invio email, come sta andando?",
+          "notes": "LE HO CHIESTO DI FARMI AVERE ALLA FINE IL RIEPILOGO DI QUELLE CHE NON SONO STATE APERTE E UN FILE EXCEL CON IL RIEPILOGO DI TUTTO, COSì POSSO TELEFONARE. TERREMO COME PROMO SOLO IL TEST ONLINE AZIENDALE MA ANCHE PER TEDESCO OLTRE CHE SPAGNOLO E INGLESE."
+        },
+        {
+          "text": "landing page italiano su pagina FB vietnamiti, traduzione? poi pubblicare",
+          "notes": "LA TRADUZIONE IN INGLESE è PRONTA, VALE SOLLECITA STEFANIA PER VIETNAMITA"
+        },
+        {
+          "text": "Network up, inviti mandati, contratti da confermare, email network fatta, canale w.a. da fare (ma è visibile a tutti?), gadget per partecipanti e pacchetto di benvenuto per chi aderisce",
+          "notes": "email fatta, gadget ordinati, Jelena allertata, CONTRATTI SOLLECITARE STEFANIA, VALE CHIEDE A AI QUALE SIA LO STRUMENTO PER CANALE/COMMUNITY, WHATSAPP/TELEGRAM ETC."
+        },
+        {
+          "text": "globalan, chiesto aggiornamento per collaboratrice su roma",
+          "notes": ""
+        },
+        {
+          "text": "cambiare struttura e promozione attività",
+          "notes": "FISSARE CALENDARIO CON 3 ATTIVITà? FARE QUALCOSA DI PIù TEMATICO (BIRRA, ALTRO)? FARLE ESTERNE? EVENTI SU FB? LUCIA PROPONE LA GITA SUL MOTOSCAFO NOLEGGIATO. VALE PROPONE DI CREARE UNA SEZIONE EVENTI SUL SITO, EVENTUALMENTE CON IL POP UP.\n"
+        }
+      ],
+      "notes": "",
+      "actions": [
+        {
+          "id": "mqoxnozr0aboei",
+          "text": "riepilogo invio email database per mia valutazione e telefonate",
+          "who": "Valentina",
+          "date": "2026-06-30",
+          "done": false,
+          "createdAt": "2026-06-22T08:07:51.879Z"
+        }
+      ],
+      "createdAt": "2026-06-19T08:15:27.273Z",
+      "updatedAt": "2026-10-27T14:23:35.076Z"
+    },
+    {
+      "id": "mqoxrqydcxwtfm",
+      "code": "26-005",
+      "title": "Meeting UP MSF Piazza",
+      "date": "2026-06-22",
+      "timeStart": "14:30",
+      "timeEnd": "15:30",
+      "client": "",
+      "topics": [
+        "gestionale"
+      ],
+      "participants": [
+        "Stefania",
+        "Matteo"
+      ],
+      "agenda": [
+        {
+          "text": "landing page vietnamiti, traduzione in vietnamita?",
+          "notes": "ha girato il testo un paio di giorni fa, restiamo in attesa. PARTIAMO COMUNQUE CON L'INGLESE, POI INSERIREMO IL VIETNAMITA"
+        },
+        {
+          "text": "network docenti UP, 13 docenti già confermati, Jelena farà testimonianza, ci serve conferma dei contratti da avvocati",
+          "notes": "GLI AVVOCATI DOVREBBERO AVER CONFERMATO MA SIAMO IN ATTESA DI EMAIL"
+        },
+        {
+          "text": "Globalan, Umair sta valutando un suo percorso di coaching personale, per poi fare formazione ai collaboratori. Sono in contatto con Linda per fissare appuntamento per progetto su commerciale Roma",
+          "notes": ""
+        },
+        {
+          "text": "Zanelli incisioni, il corso finirà tra poco, è molto contento e vorrebbe riprendere verso autunno/inverno",
+          "notes": ""
+        },
+        {
+          "text": "Evento del 18/06",
+          "notes": "a inizio anno avevamo detto che avremmo dovuto abituare le persone, ma i numeri dicono che nelle 3 attività siamo andati scemando, quindi abbiamo fatto queste riflessioni:\n1) Priorità è aumentare il bacino di utenza diretto di UP, per non passare gli ultimi giorni a invitare a destra e sinistra: \na) creare nuove collaborazioni: Fabio palestra Lucia, Birrificio Trami Renato, Carlo Ristorante Lucia, Yoga Silvia\nb) implementare instagram\nc) implementare linkedin\nd) creazione della sezione Eventi sul sito + Pop Up per chi accede al sito\n2) cambiare tipo di attività, per esempio con partner delle collaborazioni, e/o all'aperto"
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-06-22T08:11:01.045Z",
+      "updatedAt": "2026-10-27T14:23:35.076Z"
+    },
+    {
+      "id": "mr4o3ebo366epf",
+      "code": "26-006",
+      "title": "meeting UP",
+      "date": "2026-07-03",
+      "timeStart": "11:00",
+      "timeEnd": "12:00",
+      "client": "",
+      "topics": [
+        "commerciale",
+        "didattica",
+        "amministrazione",
+        "mkt"
+      ],
+      "participants": [
+        "Stefania",
+        "Silvia",
+        "Valentina",
+        "Lucia"
+      ],
+      "agenda": [
+        {
+          "text": "Database, invio email, come sta andando?",
+          "notes": "LE HO CHIESTO DI FARMI AVERE ALLA FINE IL RIEPILOGO DI QUELLE CHE NON SONO STATE APERTE E UN FILE EXCEL CON IL RIEPILOGO DI TUTTO, COSì POSSO TELEFONARE. TERREMO COME PROMO SOLO IL TEST ONLINE AZIENDALE MA ANCHE PER TEDESCO OLTRE CHE SPAGNOLO E INGLESE."
+        },
+        {
+          "text": "landing page italiano su pagina FB vietnamiti, traduzione, è in fase di approvazione, news?",
+          "notes": "LA TRADUZIONE IN INGLESE è PRONTA, VALE SOLLECITA STEFANIA PER VIETNAMITA"
+        },
+        {
+          "text": "Network up, 15 luglio scadenza, poi concretiziamo canale e chiediamo prima formazione",
+          "notes": "email fatta, gadget ordinati, Jelena allertata, CONTRATTI SOLLECITARE STEFANIA, VALE CHIEDE A AI QUALE SIA LO STRUMENTO PER CANALE/COMMUNITY, WHATSAPP/TELEGRAM ETC."
+        },
+        {
+          "text": "globalan, aggiornamento per collaboratrice su roma",
+          "notes": ""
+        },
+        {
+          "text": "pagamento contanti, come gestiamo cassa?",
+          "notes": ""
+        },
+        {
+          "text": "settimana assenza Silvia, attenzione a didattica@ e poi scrivermi per urgenze",
+          "notes": ""
+        },
+        {
+          "text": "sezione eventi sul sito, â¬ 80, la creiamo?",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-07-03T08:24:27.204Z",
+      "updatedAt": "2026-10-27T14:23:35.076Z"
+    },
+    {
+      "id": "mr4o94mowc0zob",
+      "code": "26-007",
+      "title": "Meeting UP MSF Piazza",
+      "date": "2026-07-03",
+      "timeStart": "12:00",
+      "timeEnd": "12:30",
+      "client": "",
+      "topics": [
+        "gestionale"
+      ],
+      "participants": [
+        "Stefania",
+        "Matteo"
+      ],
+      "agenda": [
+        {
+          "text": "landing page vietnamiti, attesa approvazione",
+          "notes": "ha girato il testo un paio di giorni fa, restiamo in attesa. PARTIAMO COMUNQUE CON L'INGLESE, POI INSERIREMO IL VIETNAMITA"
+        },
+        {
+          "text": "network docenti UP, 15 luglio limite",
+          "notes": "GLI AVVOCATI DOVREBBERO AVER CONFERMATO MA SIAMO IN ATTESA DI EMAIL"
+        },
+        {
+          "text": "Globalan, coaching più italiano e tedesco",
+          "notes": ""
+        },
+        {
+          "text": "Globalan, incontro del 30/06 con Linda e Barbara, molto bene, ci risentiamo quando hanno la prima richiesta",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-07-03T08:28:54.576Z",
+      "updatedAt": "2026-10-27T14:23:35.076Z"
+    },
+    {
+      "id": "mrelvc9fhu9hmj",
+      "code": "26-008",
+      "title": "incontro Fabio Zubani per mkt palestra",
+      "date": "2026-07-10",
+      "timeStart": "10:30",
+      "timeEnd": "11:30",
+      "client": "Fit Factory",
+      "topics": [
+        "commerciale",
+        "mkt"
+      ],
+      "participants": [
+        "Fabio Zubani"
+      ],
+      "agenda": [
+        {
+          "text": "UP è nata nel 2015, i nostri servizi sono corsi di lingua, formazione business e traduzioni",
+          "notes": ""
+        },
+        {
+          "text": "UP è cresciuta soprattutto con il passaparola, e molto di questo passaparola nasceva da collaborazioni sul territorio che avevano lo scopo di sviluppare sinergie utili per entrambe le parti. Eravamo infine arrivati ad avere una buona rete di contatti, ci si conosceva ed invitava ai reciproci eventi, facevamo crescere la rete di tutti.",
+          "notes": ""
+        },
+        {
+          "text": "Il Covid ha bloccato questo, poi tutti noi abbiamo dovuto concentrarci su altre cose, adesso vorrei che ricominciassimo a creare sinergie",
+          "notes": ""
+        },
+        {
+          "text": "Il miglior modo per iniziare è partire da chi si conosce e che ci conosce, dove potenzialmente ci può essere un interesse reciproco (e relativi vantaggi) per la collaborazione,per questo avevo pensato a te.",
+          "notes": ""
+        },
+        {
+          "text": "Quindi vorrei conoscere meglio Fit Factory, la storia, gli obiettivi che tu hai. Ho visto ovviamente il sito e mi è piaciuto molto il \"chi siamo\", si vede che andate oltre il solo concetto di palestra",
+          "notes": ""
+        }
+      ],
+      "notes": "attività gestione del tempo legata al fitness e suoi clienti\nconvenzione reciproca\nore omaggio per referenze e nuovi iscritti\nquando fanno viaggi, dispensa di sopravvivenza (per esempio a formentera metà maggio 2027)\nattività in lingua in generale \nmandare brochure e elenco corsi\ninfo@fitfactory.space",
+      "actions": [],
+      "createdAt": "2026-07-10T07:19:53.811Z",
+      "updatedAt": "2026-10-27T14:23:35.076Z"
+    },
+    {
+      "id": "ms79p7fhjrz3kp",
+      "code": "26-009",
+      "title": "incontro da FIT-Factory Fabio Zubani per mkt palestra",
+      "date": "2026-07-30",
+      "timeStart": "14:00",
+      "timeEnd": "15:00",
+      "client": "Fit Factory",
+      "topics": [
+        "commerciale",
+        "mkt"
+      ],
+      "participants": [
+        "Fabio Zubani"
+      ],
+      "agenda": [
+        {
+          "text": "partnership che preveda (a solo titolo di esempio, valuteremo insieme cosa concretizzare e cosa no) condivisione dei loghi sui rispettivi siti, con eventuale notizia dedicata; condivisione di alcuni comunicati/iniziative sui social; convenzione per agevolazione economica per rispettivi clienti.",
+          "notes": "mandare il modulo convenzione entro fine agosto. Convenzione, ci vuole di più"
+        },
+        {
+          "text": "attività condivisa sulla gestione del tempo, studiata in modo che sia incentrata sul fitness e suoi clienti",
+          "notes": "il 21 ottobre GdT da loro. "
+        },
+        {
+          "text": "ore omaggio per referenze di iscritti che si iscrivano a loro volta Fit Factory",
+          "notes": "mandare prospetto"
+        },
+        {
+          "text": "quando organizzerete viaggi, dispensa di sopravvivenza (per esempio a formentera metà maggio 2027) nella lingua di interesse",
+          "notes": "creare dispensa e organizzare corso di sopravvivenza in spagnolo"
+        },
+        {
+          "text": "libro sulla gestione del tempo nella vostra libreria e, se lo valuterai positivamente, il regalo del libro ai nuovi iscritti",
+          "notes": "attesa riscontro Fabio"
+        },
+        {
+          "text": "altre iniziative da definire, eventualmente anche per il tuo progetto personale",
+          "notes": ""
+        }
+      ],
+      "notes": "Regesta è una società che si occupa di consulenza aziendale, Fabio fornisce gratuitamente formazione ai dipendenti Regesta (una volta l'anno online, circa un'ora) in cambio Regesta inserisce  UP nelle società tra cui i dipendenti possono usufruire",
+      "actions": [],
+      "createdAt": "2026-07-30T08:44:31.325Z",
+      "updatedAt": "2026-10-27T14:23:35.077Z"
+    },
+    {
+      "id": "ms8oxbz3itk433",
+      "code": "26-010",
+      "title": "meeting UP",
+      "date": "2026-07-31",
+      "timeStart": "11:00",
+      "timeEnd": "12:00",
+      "client": "",
+      "topics": [
+        "commerciale",
+        "didattica",
+        "amministrazione",
+        "mkt"
+      ],
+      "participants": [
+        "Stefania",
+        "Silvia",
+        "Valentina",
+        "Lucia"
+      ],
+      "agenda": [
+        {
+          "text": "Database, invio email, come sta andando?",
+          "notes": "LE HO CHIESTO DI FARMI AVERE ALLA FINE IL RIEPILOGO DI QUELLE CHE NON SONO STATE APERTE E UN FILE EXCEL CON IL RIEPILOGO DI TUTTO, COSì POSSO TELEFONARE. TERREMO COME PROMO SOLO IL TEST ONLINE AZIENDALE MA ANCHE PER TEDESCO OLTRE CHE SPAGNOLO E INGLESE."
+        },
+        {
+          "text": "landing page italiano su pagina FB vietnamiti, traduzione, è in fase di approvazione, news?",
+          "notes": "LA TRADUZIONE IN INGLESE è PRONTA, VALE SOLLECITA STEFANIA PER VIETNAMITA"
+        },
+        {
+          "text": "Network up, 8 iscritti + Jelena",
+          "notes": "email fatta, gadget ordinati, Jelena allertata, CONTRATTI SOLLECITARE STEFANIA, VALE CHIEDE A AI QUALE SIA LO STRUMENTO PER CANALE/COMMUNITY, WHATSAPP/TELEGRAM ETC."
+        },
+        {
+          "text": "Fit Factory + Valenti04",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-07-31T08:38:30.879Z",
+      "updatedAt": "2026-10-27T14:24:27.440Z"
+    },
+    {
+      "id": "mtbnaezvdhdp5x",
+      "code": "26-011",
+      "title": "Silvia",
+      "date": "2026-08-27",
+      "timeStart": "10:45",
+      "timeEnd": "11:45",
+      "client": "",
+      "topics": [
+        "commerciale",
+        "didattica"
+      ],
+      "participants": [],
+      "agenda": [
+        {
+          "text": "scuole e bandi",
+          "notes": "mandato a Silvia ultimo risultato di RadarPA, le ho chiesto di verificare effettivamente i risultati e tenere controllato il tempo impiegato. Poi confrontarsi con Stefania per inserimento commerciale."
+        },
+        {
+          "text": "accreditamento presso Ministero Istruzione e Merito (MIM)",
+          "notes": "Silvia tiene monitorato il portale ma ritiene che non valga la pena, anche se ci accreditassimo avremmo poi bisogno di qualcuno che venda i corsi"
+        },
+        {
+          "text": "Accreditamento MSF",
+          "notes": "news da stefania?"
+        },
+        {
+          "text": "Coinvolgimento Erroi, Nicolis, Bruni",
+          "notes": "soprattutto in merito a punto 1. Valutare anche coinvolgimento del network docenti."
+        },
+        {
+          "text": "Anna Pea e moglie del Dorna per contatti",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-08-27T14:55:42.956Z",
+      "updatedAt": "2026-08-27T15:00:22.085Z"
+    },
+    {
+      "id": "mtd0k7e1gr8e2e",
+      "code": "26-012",
+      "title": "situazione del fatturato e bilancio al 31/08/2026 - giorni e orari fittizi",
+      "date": "2026-08-31",
+      "timeStart": "16:00",
+      "timeEnd": "17:00",
+      "client": "",
+      "topics": [
+        "gestionale"
+      ],
+      "participants": [
+        "Stefania"
+      ],
+      "agenda": [
+        {
+          "text": "situazione bilancio e previsione",
+          "notes": "spese previste 2026 â¬ 35000 (17k silvia, 12k io con spese, 6k tra inps banca ammortamenti mutuo\nFatturato attuale â¬ 34,3k di cui circa 3,4k trad con MOL 0,9k e 30,9k corsi con MOL 19,2k - TOTALE MOL 20,1K\nmancano quindi 15k di MOL, di cui:\n- 6,2k di MOL arriveranno dai 8,4K conseguiti e non fatturati\n- 5k di MOL dovrebbero arrivare da 8-10K informalmente accettati\nMANCANO QUINDI 4K DI MOL CHE POSSONO ARRIVARE DA:\n- circa 8k di proposte inviated, cui non abbiamo ancora risposta\n- altre entrate nell'anno, al momento non note"
+        }
+      ],
+      "notes": "spese previste 2026 â¬ 35000 (17k silvia, 12k io con spese, 6k tra inps banca ammortamenti mutuo etc.)\nFatturato attuale â¬ 34,3k di cui circa 3,4k trad con MOL 0,9k e 30,9k corsi con MOL 19,2k - TOTALE MOL 20,1K\nmancano quindi 15k di MOL, di cui:\n- 6,2k di MOL arriveranno dai 8,4K conseguiti e non fatturati\n- 5k di MOL dovrebbero arrivare da 8-10K informalmente accettati\nMANCANO QUINDI 4K DI MOL CHE POSSONO ARRIVARE DA:\n- circa 8k di proposte inviated, cui non abbiamo ancora risposta\n- altre entrate nell'anno, al momento non note\n\nINSERIMENTO DI UN COMMERCIALE PER LAVORO SU SCUOLE? CONTROGARANTISCO CON LA POSSIBILE RINUNCIA DI TRE MESI DI STIPENDIO E UN MESE DI RIMBORSO SPESE (O DUE E DUE)",
+      "actions": [],
+      "createdAt": "2026-08-28T13:55:00.841Z",
+      "updatedAt": "2026-08-28T14:05:50.742Z"
+    },
+    {
+      "id": "mtlp7llhk7nqmm",
+      "code": "26-013",
+      "title": "meeting UP",
+      "date": "2026-09-04",
+      "timeStart": "11:00",
+      "timeEnd": "12:00",
+      "client": "",
+      "topics": [
+        "commerciale",
+        "didattica",
+        "amministrazione",
+        "mkt"
+      ],
+      "participants": [
+        "Stefania",
+        "Silvia",
+        "Valentina",
+        "Lucia"
+      ],
+      "agenda": [
+        {
+          "text": "Database, invio email, è pronto riepilogo excel?",
+          "notes": "LE HO CHIESTO DI FARMI AVERE ALLA FINE IL RIEPILOGO DI QUELLE CHE NON SONO STATE APERTE E UN FILE EXCEL CON IL RIEPILOGO DI TUTTO, COSi POSSO TELEFONARE. TERREMO COME PROMO SOLO IL TEST ONLINE AZIENDALE MA ANCHE PER TEDESCO OLTRE CHE SPAGNOLO E INGLESE."
+        },
+        {
+          "text": "Fit Factory",
+          "notes": "mandata bozza convenzione, oggi caffè, poi il 21/10 farò GdT presso di loro, poi forse mi metterà in contatto con Regesta, società di consulenza che fa scambio merci (propone i servizi di Fabio in cambio di formazione gratuita ai dipendenti, ha parlato di 1-2 volte l'anno online da 40 minuti)"
+        },
+        {
+          "text": "tem plus - partecipero ad attivita del 8/10 al MOCA",
+          "notes": "attività di networking, poi sarà da vedere se parteciperò podcast"
+        },
+        {
+          "text": "1 e 8 ottobre corso GdT, come stanno andando iscrizioni?",
+          "notes": ""
+        },
+        {
+          "text": "Erroi-Nicolis",
+          "notes": ""
+        },
+        {
+          "text": "fatture in cloud, ho bisogno che tutte le spese abbiano una categoria",
+          "notes": "mi serve per calcolare le voci di spesa; inoltre ho visto che ci sono spese con categorie sbagliate, occorre correggerle, per esempio docenti segnati con categoria \"collaboratori\", in altre spese ci sono alcune spese mie, di Silvia e Allinea, etc., oppure spese senza categoria, vanno sistemate"
+        },
+        {
+          "text": "nuovo catalogo",
+          "notes": "si stanno sentendo Vale e Silvia"
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-09-03T15:47:12.533Z",
+      "updatedAt": "2026-10-27T14:23:35.081Z"
+    },
+    {
+      "id": "mtlpg4vysvuuyo",
+      "code": "26-014",
+      "title": "Meeting UP MSF Piazza",
+      "date": "2026-09-04",
+      "timeStart": "12:00",
+      "timeEnd": "12:30",
+      "client": "",
+      "topics": [
+        "gestionale"
+      ],
+      "participants": [
+        "Stefania",
+        "Matteo"
+      ],
+      "agenda": [
+        {
+          "text": "accordo fit factory + proposta Regesta",
+          "notes": ""
+        },
+        {
+          "text": "il 8/10 parteciperò a evento networking tem plus",
+          "notes": ""
+        },
+        {
+          "text": "erroi + nicolis",
+          "notes": ""
+        },
+        {
+          "text": "aggiornamento situazione fatturato/margine",
+          "notes": "basandomi sui precedenti bilanci, il nostro costo (escluso erogazione) dovrebbe essere intorno a € 36000 (18k silvia, 12k renato, 6k varie e ammortamenti). \nAl momento, abbiamo fatturato molto meno dello scorso anno ( 2025 63,3k con MOL 31,1k, 49%, contro € 34,3k con MOL 21,1k, 58,6%) quindi - 29k di fattuato ma, a causa di una margnalità molto più alta, la diminuzione di MOL è -10k. \nNegli ultimi 4 mesi del 2025 abbiamo fatturato 20,8k con MOL di 10.5k, per il 2026 al momento abbiamo 21k approvate con 12,4k di MOL (57%), quindi vuol dire che se entrasse tutto saremmo a 56,2k di fatturato e 32,6k di MOL, quindi ci mancano 4k di MOL al pareggio, corrispondenti a 8k di fatturato - facciamo 12k di fatturato nel caso dovessimo perdere qualcosa che ci è già stato confermato."
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-09-03T15:53:50.782Z",
+      "updatedAt": "2026-10-23T08:21:05.354Z"
+    },
+    {
+      "id": "mtmp89idn7rmd4",
+      "code": "26-015",
+      "title": "Elena Erroi - Alessandro Nicolis",
+      "date": "2026-09-04",
+      "timeStart": "10:30",
+      "timeEnd": "11:30",
+      "client": "",
+      "topics": [
+        "commerciale",
+        "mkt"
+      ],
+      "participants": [
+        "Elena Erroi",
+        "Alessandro Nicolis",
+        "Silvia"
+      ],
+      "agenda": [],
+      "notes": "Alessandro: va nelle scuole medie e esuperiori a proporre i testi scolastici, poi offriva formazione gratuita. Lui crea corsi, vorrebbe creare corsi per noi perché noi li proponiamo su MEPA. Gli ho detto che se lui ci presenta le scuola, puntiamo all'affidamento diretto.\nElena fa anche formazione finanziaria ma dice che deve essere calata maggiormente sulla realta scolatica; ha creato il progetto ???\nMArco Redaelli che lavora per Confap, Elena ce li vuole presentare",
+      "actions": [],
+      "createdAt": "2026-09-04T08:35:29.701Z",
+      "updatedAt": "2026-10-27T14:23:35.081Z"
+    },
+    {
+      "id": "mtv6mgbs6hcqcb",
+      "code": "26-016",
+      "title": "Colloquio commerciale con Alessandro Bruni",
+      "date": "2026-09-10",
+      "timeStart": "09:30",
+      "timeEnd": "10:30",
+      "client": "",
+      "topics": [
+        "hr"
+      ],
+      "participants": [
+        "Stefania",
+        "Alessandro Bruni"
+      ],
+      "agenda": [],
+      "notes": "1 - Partenza dal concreto: \"Raccontaci una settimana tipo quando facevi l'agente per Colorcopy: quante telefonate/visite facevi, come trovavi i nomi da chiamare, come tenevi traccia di chi avevi sentito.\" — Qui capisci il metodo di lavoro reale, non quello dichiarato.\n2 - La domanda che conta di più per te: \"Se ti do un elenco di 50 aziende/scuole, cosa fai lunedì mattina? Come organizzi le prime chiamate, cosa dici, come segni i risultati?\" — Vedi sul momento se ha già in testa un metodo o se lo inventa lì, e come ragiona.\n3 - Motivazione onesta: \"Cosa ti manca di più del fare il commerciale puro rispetto al fare il formatore/coach oggi?\" — Se risponde con entusiasmo genuino su caccia/chiusura contratti, buon segno. Se minimizza e parla solo di formazione, è un campanello.\n4 - Rete personale: \"Hai contatti tuoi — ex clienti, conoscenze, aziende della zona — che potresti attivare per UP?\" Chiedi 2-3 esempi concreti, non in astratto. Chi ha 20+ anni di attività commerciale a Brescia di solito una rete ce l'ha, va solo verificata.\n5 - Disponibilità reale: chiedigli di dirti lui stesso quante ore/settimana pensa di riuscire a garantire con continuità (non \"quante ne vuole dare UP\"), e quali giorni/fasce orarie. Meglio un numero basso ma affidabile che uno alto e fragile.\n6 - Test pratico veloce (facoltativo ma utile): dategli un caso reale semplificato — es. \"una scuola ha fatto una procedura interna andata deserta, come la contatteresti e cosa le proporresti in prima battuta\" — per vedere sul posto come ragiona commercialmente, senza bisogno che conosca il settore PA.\n7 - Chiudi parlando di inquadramento: visto che ha già P.IVA come agente di commercio, potete essere diretti su come immaginate il compenso (fisso ore + provvigioni? solo provvigioni?) e vedere subito se le aspettative combaciano.\n\nNon serve altro: con questo profilo la domanda decisiva è la n.2 e la n.3 — lì capite se è un \"hunter\" vero o se cerca solo qualche ora comoda mentre fa altro.",
+      "actions": [
+        {
+          "id": "mtvbrurmr3k9uj",
+          "text": "riscontro su interesse ed eventualmente incontro per progetto (ore/sett, provv, compenso, progetto)",
+          "who": "Alessandro Bruni",
+          "date": "2026-09-25",
+          "done": false,
+          "createdAt": "2026-09-10T09:28:44.674Z"
+        }
+      ],
+      "createdAt": "2026-09-10T07:04:34.600Z",
+      "updatedAt": "2026-10-27T14:23:35.081Z"
+    },
+    {
+      "id": "mu6mdacnvlidb5",
+      "code": "26-017",
+      "title": "meeting UP",
+      "date": "2026-09-18",
+      "timeStart": "11:00",
+      "timeEnd": "12:00",
+      "client": "",
+      "topics": [
+        "commerciale",
+        "didattica",
+        "amministrazione",
+        "mkt"
+      ],
+      "participants": [
+        "Stefania",
+        "Silvia",
+        "Valentina",
+        "Lucia"
+      ],
+      "agenda": [
+        {
+          "text": "fatture in cloud, fattura 52 per pagamenti compensati da NdC1",
+          "notes": "verifica Lucia e poi mi fa sapere"
+        },
+        {
+          "text": "nuovo catalogo",
+          "notes": "si stanno sentendo Vale e Silvia, stiamo aspettando Globalan per la sicurezza informatica"
+        },
+        {
+          "text": "scuola montichiari ok",
+          "notes": ""
+        },
+        {
+          "text": "assistenti sociali, hanno approvato nuovo regolamento quindi dobbiamo ricominciare da capo",
+          "notes": ""
+        },
+        {
+          "text": "aggiornamento network docenti?",
+          "notes": "link piattaforma incontro della AI inviato, Vale deve mandare comunicazione su whatsapp"
+        },
+        {
+          "text": "corsi msf di GdT e Excel, partono?",
+          "notes": "excel parte, GdT no"
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-09-18T07:10:48.743Z",
+      "updatedAt": "2026-09-18T08:54:42.137Z"
+    },
+    {
+      "id": "mugpizytgqigdy",
+      "code": "26-018",
+      "title": "meeting UP",
+      "date": "2026-09-25",
+      "timeStart": "11:00",
+      "timeEnd": "12:00",
+      "client": "",
+      "topics": [
+        "commerciale",
+        "didattica",
+        "amministrazione",
+        "mkt"
+      ],
+      "participants": [
+        "Stefania",
+        "Silvia",
+        "Valentina",
+        "Lucia"
+      ],
+      "agenda": [
+        {
+          "text": "nuovo catalogo urgente",
+          "notes": "si stanno sentendo Vale e Silvia, stiamo aspettando Globalan per la sicurezza informatica"
+        },
+        {
+          "text": "network docenti, prima segnalazione ma privato",
+          "notes": "link piattaforma incontro della AI inviato, Vale deve mandare comunicazione su whatsapp"
+        },
+        {
+          "text": "inserire data 2015 e logo fit factory in catalogo UP",
+          "notes": ""
+        },
+        {
+          "text": "incontro network docenti, serve comunque iscrizione",
+          "notes": ""
+        },
+        {
+          "text": "newsletter, aggiornamenti? ho iscritto silvia cremaschini",
+          "notes": ""
+        },
+        {
+          "text": "fit factory mi vuole introdurre in Regesta, mercoledì o giovedì settimana prossima potrei avere appuntamento",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-09-25T08:36:55.829Z",
+      "updatedAt": "2026-10-27T14:23:35.082Z"
+    },
+    {
+      "id": "mugpplqkgjoegn",
+      "code": "26-019",
+      "title": "Meeting UP MSF Piazza",
+      "date": "2026-10-02",
+      "timeStart": "12:00",
+      "timeEnd": "13:00",
+      "client": "",
+      "topics": [
+        "gestionale"
+      ],
+      "participants": [
+        "Stefania",
+        "Matteo"
+      ],
+      "agenda": [
+        {
+          "text": "aggiornamento situazione fatturato/margine",
+          "notes": "basandomi sui precedenti bilanci, il nostro costo (escluso erogazione) dovrebbe essere intorno a € 36000 (18k silvia, 12k renato, 6k varie e ammortamenti). \nAl momento, abbiamo fatturato molto meno dello scorso anno ( 2025 71,5k con MOL 32,1k, 45,1%, contro 32,7k con MOL 16,8, 52,7%) quindi - 39k di fattuato ma, a causa di una margnalità molto più alta, la diminuzione di MOL è -16k. \nNegli ultimi 3 mesi del 2025 abbiamo fatturato 16,68k con MOL di 9,4k, per il 2026 al momento abbiamo 20,8 k approvate con 12,3k di MOL (59%), quindi vuol dire che se entrasse tutto saremmo a 53,5k di fatturato e 27,1k di MOL, quindi ci mancano 9k di MOL al pareggio, corrispondenti a 18k di fatturato. Abbiamo fuori proposte per circa 10 k su cui al momento non abbiamo riscontri"
+        },
+        {
+          "text": "accordo fit factory + proposta Regesta",
+          "notes": ""
+        },
+        {
+          "text": "concordato preventivo, 11 k per  2026 e 20k per 2027",
+          "notes": "rifiutare"
+        },
+        {
+          "text": "commerciali, valutazione CV",
+          "notes": ""
+        }
+      ],
+      "notes": "vedi file su C:\\Users\\renat\\OneDrive\\UP srls condivisa\\RENATO\\MEETING VARI\n\n",
+      "actions": [],
+      "createdAt": "2026-09-25T08:42:03.980Z",
+      "updatedAt": "2026-10-27T14:23:35.082Z"
+    },
+    {
+      "id": "muy69tatfbuqj3",
+      "code": "26-020",
+      "title": "Genny Losturdo",
+      "date": "2026-10-02",
+      "timeStart": "09:30",
+      "timeEnd": "10:30",
+      "client": "",
+      "topics": [],
+      "participants": [
+        "Genny Lostumbo",
+        "Silvia"
+      ],
+      "agenda": [],
+      "notes": "le ho detto che in caso di segnalazione riconosciamo il 5% per 3 anni",
+      "actions": [],
+      "createdAt": "2026-10-07T13:57:45.750Z",
+      "updatedAt": "2026-10-23T09:02:58.476Z"
+    },
+    {
+      "id": "mv40c8f5ddudqk",
+      "code": "26-021",
+      "title": "Raffmetal",
+      "date": "2026-10-12",
+      "timeStart": "15:30",
+      "timeEnd": "16:00",
+      "client": "Raffmetal",
+      "topics": [],
+      "participants": [
+        "Silvia",
+        "Raffaella Bruni"
+      ],
+      "agenda": [
+        {
+          "text": "nuovi corsi 2027",
+          "notes": ""
+        },
+        {
+          "text": "adeguamento prezzi",
+          "notes": "prezzi dei corsi online invariati dal 2021 compreso (da quando abbiamo iniiato corsi online) a â¬/h 36, â¬/h 6 MD formato elettronico per inglese e spagnolo, â¬/partecipante 55 per altre lingue adeguato nel 2025 (fino al 2024 era â¬/partecipante 50)"
+        }
+      ],
+      "notes": "stiamo diventando sempre più una azienda che vuole affiancare i nostri clienti e partner per tutte quelle richieste di formazione che esulano da quelle obbligatorie di legge, per fornire corsi aggiornati, su misura dell'azienda, anche con percorsi brevi e molto mirati.\nPer questo continuiamo a integrare la nostra offerta formativa, che adesso ti presenterà Silvia.\nL'altro aspetto è commerciale, per Raffmetal stiamo mantenendo usando gli stessi valori economici dal 2021, l'anno prossimo dovremo adeguarli e la call è anche per dare numeri e motivazioni: nel quinquennio 2021-2026 l'inflazione è aumentate di circa 18-19%, noi prevediamo un aumento di circa il 15% sui corsi e del 10% sui MD",
+      "actions": [],
+      "createdAt": "2026-10-11T15:58:18.017Z",
+      "updatedAt": "2026-10-27T14:23:35.082Z"
+    },
+    {
+      "id": "mv6pfntzgbqlxz",
+      "code": "26-022",
+      "title": "TEMplus preparazione per evento 29 ottobre",
+      "date": "2026-10-13",
+      "timeStart": "15:30",
+      "timeEnd": "16:30",
+      "client": "TEMplus",
+      "topics": [],
+      "participants": [
+        "Micol Vezzoli"
+      ],
+      "agenda": [
+        {
+          "text": "chi è il pubblico?",
+          "notes": "temporary manager liberi professionisti, potrebbe esserci anche qualcuno delle aziende. Accenniamo comunque alla delega, per esempio perché devono formare persone in azienda, oppure perché Tem plus può affiancare il back office del temporary manager"
+        },
+        {
+          "text": "Cosa vorresti che si portassero a casa",
+          "notes": ""
+        },
+        {
+          "text": "hai qualche consiglio su temi che sai che la community ha?",
+          "notes": "hanno più progetti in contemporanea, quindi devono saper gestire più progetti (meglio se sanno gestire più progetti nello stesso giorno), almeno per alcuni periodi dell'anno. Viaggi estero da organizzare e far coincidere con lavoro normale"
+        },
+        {
+          "text": "quando e con che domande vuoi intervenire? Faccio io delle proposte?",
+          "notes": "bene concordarli ma lascia una certa libertà. Posso chiedere anche a lui di fare una domanda."
+        },
+        {
+          "text": "c'è qualche tema da evitare?",
+          "notes": "poche slide, cerchiamo soprattutto di fare una chiaccherata"
+        },
+        {
+          "text": "Chiusiamo con promo commerciale per il pubblico, offerta da UP e templus insieme?",
+          "notes": "accenneremo solo alla agevolazione TEM plus e UP"
+        },
+        {
+          "text": "Se sì, cosa potrebbe funzionare? Sconto? Minipercorso?",
+          "notes": ""
+        },
+        {
+          "text": "C'è un modo per avere i loro contatti? Potrei inviare loro le slide utilizzate",
+          "notes": ""
+        },
+        {
+          "text": "mio libro?",
+          "notes": ""
+        }
+      ],
+      "notes": "scaletta, mando io con anche domande Micol\nti mando una breve bio\nuno o due giorni mi mandano link a cui collegarmi\nmando elenco nostri corsi",
+      "actions": [],
+      "createdAt": "2026-10-13T13:16:20.711Z",
+      "updatedAt": "2026-10-27T14:23:35.082Z"
+    },
+    {
+      "id": "mvakeisu6zo1rr",
+      "code": "26-023",
+      "title": "Nicolis Alessandro per accordo procedura e provvigione scuole",
+      "date": "2026-10-14",
+      "timeStart": "16:30",
+      "timeEnd": "17:30",
+      "client": "Nicolis",
+      "topics": [],
+      "participants": [
+        "Nicolis Alessandro"
+      ],
+      "agenda": [],
+      "notes": "come concordato, riassumo i punti fondamentali della nostra call.\nInformazioni da reperire per le scuole e successivo contatto UP\nPer filtrare le informazioni e concentrarci solo su ciò che serve davvero, gli step da seguire sono:\nSe un docente o chiunque altro manifesta interesse per un corso o argomento, questo corso è già stato discusso e confermato da dirigente scolastico?Se sì, hanno già reperito i fondi?Se sì, a quanto corrispondono questi fondi? Un'indicazione valida è gli €/h, specificando se al lordo o al netto dell'IVAA questo punto, potresti fare un passaggio con me e Silvia per capire la fattibilità del progettoSe il progetto è per noi fattibile, ci potresti poi informare se la richiesta è su MEPA o, meglio ancora, proporre alla scuola di procedere con l'affidamento diretto\nNel momento in cui la richiesta è su MEPA, subentriamo noi per la gestione dello stesso MEPA, per organizzazione, progettazione, erogazione e amministrazione. Ti coinvolgeremo se avremo bisogno di supporto ma, tendenzialmente, le cose poi dovrebbero andare \"lisce\".\nPer il lavoro di segnalazione ti verrà riconosciuto il 5% al netto di eventuale IVA sul fatturato netto generato da quella specifica scuola, per il corso segnalato e per ogni altro lavoro assegnatoci, anche per materie diverse rispetto a quella originale e anche se la scuola ci contattasse direttamente, per un periodo di 3 anni dalla data di sottoscrizione del primo accordo tramite MEPA.\nPer supportare il tuo lavoro di contatto, Silvia ti manderà l'elenco dei corsi aggiornato per il 2027, puoi usarlo come riferimento ma ti invito a informarci anche per richieste non presenti sull'elenco, abbiamo molti contatti in ambiti diversi.\nOltre a questo, ci attiviamo per preparare dei volantini trifold che possano essere lasciati nei tuoi appuntamenti.",
+      "actions": [],
+      "createdAt": "2026-10-16T06:06:34.158Z",
+      "updatedAt": "2026-10-23T08:21:05.354Z"
+    },
+    {
+      "id": "mvakgedxvwy1ph",
+      "code": "26-024",
+      "title": "Regesta Group",
+      "date": "2026-10-14",
+      "timeStart": "14:30",
+      "timeEnd": "15:00",
+      "client": "Regesta Group",
+      "topics": [],
+      "participants": [
+        "Fabio Zubani",
+        "Silvia Cerri"
+      ],
+      "agenda": [],
+      "notes": "grazie per l'incontro online, mi ha fatto piacere vedere che condividiamo le tematiche di equilibrio tra famiglia, carriera e benessere. \nCome concordato, ti trasmetto la brochure di presentazione di UP e l'elenco dei corsi che abbiamo svolto in passato, il quale può essere anche uno spunto per trovare nuove soluzioni formative mirate. \nVisto che la collega che si occupa di formazione è in maternità, possiamo rimandare l'approfondimento a una collaborazione più ampia (se di vostro interesse). Per il momento ti confermo la mia disponibilità a valutare lo speech sulla Gestione del Tempo.\n ",
+      "actions": [],
+      "createdAt": "2026-10-16T06:08:01.749Z",
+      "updatedAt": "2026-10-23T08:21:05.354Z"
+    },
+    {
+      "id": "mvakh3p56im8yg",
+      "code": "26-025",
+      "title": "meeting UP",
+      "date": "2026-10-16",
+      "timeStart": "11:00",
+      "timeEnd": "12:00",
+      "client": "",
+      "topics": [
+        "commerciale",
+        "didattica",
+        "amministrazione",
+        "mkt"
+      ],
+      "participants": [
+        "Stefania",
+        "Silvia",
+        "Valentina",
+        "Lucia"
+      ],
+      "agenda": [
+        {
+          "text": "nuovo catalogo",
+          "notes": "si stanno sentendo Vale e Silvia, stiamo aspettando Globalan per la sicurezza informatica"
+        },
+        {
+          "text": "network docenti, segnalazione per traduzione",
+          "notes": "link piattaforma incontro della AI inviato, Vale deve mandare comunicazione su whatsapp"
+        },
+        {
+          "text": "newsletter, chi si è disiscritto?",
+          "notes": ""
+        },
+        {
+          "text": "Assistenti Sociali, rinnovo approvato",
+          "notes": ""
+        },
+        {
+          "text": "Regesta, mio workshop e inserimento in formazione interna, vedremo per più ampia",
+          "notes": ""
+        },
+        {
+          "text": "Nicolis, continua a proporre per scuole",
+          "notes": ""
+        },
+        {
+          "text": "Jelena, segnalazione per traduzione e possibile nuovo corso a Vicenza",
+          "notes": ""
+        },
+        {
+          "text": "Fit Factory, a fine evento del 21/10 ricorderemo convenzione in essere",
+          "notes": ""
+        },
+        {
+          "text": "Contratti per corso di gruppo excel, devo ancora prepararli",
+          "notes": "un contratto con 2 persone? 3 contratti diversi? Servono i dati fatturazione\n"
+        },
+        {
+          "text": "Ordine assistenti sociali Lombardia, rinnovato convenzione 26-28, gratuito per eventi gratuiti",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-10-16T06:08:34.553Z",
+      "updatedAt": "2026-10-23T08:21:05.354Z"
+    },
+    {
+      "id": "mvakn8gtm4yb30",
+      "code": "26-026",
+      "title": "Meeting UP MSF Piazza",
+      "date": "2026-10-16",
+      "timeStart": "12:00",
+      "timeEnd": "13:00",
+      "client": "",
+      "topics": [
+        "gestionale"
+      ],
+      "participants": [
+        "Stefania",
+        "Matteo"
+      ],
+      "agenda": [
+        {
+          "text": "qualche possibile contratto non previsto - ASA e corso excel",
+          "notes": ""
+        },
+        {
+          "text": "novità su ammortamenti?",
+          "notes": ""
+        },
+        {
+          "text": "va bene spostare fattura Erroi a gennaio 2027?",
+          "notes": ""
+        },
+        {
+          "text": "compenso Piazza 2027?",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-10-16T06:13:20.669Z",
+      "updatedAt": "2026-10-23T08:21:05.354Z"
+    },
+    {
+      "id": "mvknlwmm1wf2i1",
+      "code": "26-027",
+      "title": "meeting UP",
+      "date": "2026-10-23",
+      "timeStart": "11:00",
+      "timeEnd": "12:00",
+      "client": "",
+      "topics": [
+        "commerciale",
+        "didattica",
+        "amministrazione",
+        "mkt"
+      ],
+      "participants": [
+        "Stefania",
+        "Silvia",
+        "Valentina",
+        "Lucia"
+      ],
+      "agenda": [
+        {
+          "text": "Contratti per corso di gruppo excel, sono arrivati? Ho fatto nuovi modelli offerte e ctr",
+          "notes": "Quando arrivano compilati, procediamo alla fatturazione. LUCIA CI TIENE AGGIORNATI\n\n"
+        },
+        {
+          "text": "appuntamenti per revisioni prezzi",
+          "notes": "Raffmetal, fatto con aumento del 15%. Confapi, bozza listino, appuntamento il 6/11. CNA, appuntamento 30/10. Maxion NR. Brebemi da sentire. Confcommercio BS NR. Ordine ingegneri Brescia da sentire. "
+        },
+        {
+          "text": "nuove cose",
+          "notes": "piccola traduzione ita-ceco Jelena. Corso 15 inglese ASA a Vicenza Jelena. Traduzione di un manuale tecnico da Clizia. Piccolo corso mkt OMAL da Manuela. Piccoli corsi meccanica + comunicazione CNA Bergamo."
+        },
+        {
+          "text": "Nicolis,scuola de André, attesa conferma possibile UP",
+          "notes": ""
+        },
+        {
+          "text": "TEMplus, diretta di settimana prossima",
+          "notes": "quando avranno preparato pagina ce la gireranno, promuoviamola sui nostri social"
+        },
+        {
+          "text": "qrcode con rimandi whatsapp",
+          "notes": "preferirei evitare il mio numero privato, ho visto che è possibile associare anche numeri VoIP come quello di Lyber, possiamo verificare? questi sono i passaggi:\nInstalla WhatsApp Business sul tuo telefono. Sta accanto a WhatsApp normale senza toccarlo.\nInserisci il numero Lyber con prefisso internazionale e distrettuale, ad esempio +39 030…\nIl tentativo via SMS fallirà: aspetta che finisca il conto alla rovescia (circa un minuto).\nScegli “Chiamami” e tieni aperta l’app Lyber. Arriva una chiamata con una voce che detta il codice a 6 cifre.\nInserisci il codice e il profilo è attivo.\n\nCosa controllare prima\n\nIn Lyber, verifica che non ci siano filtri sulle chiamate da numeri esteri, anonimi o sconosciuti. La chiamata di verifica spesso arriva da un numero straniero.\nSe c’è un trasferimento di chiamata o una segreteria che risponde subito, disattivali per quel momento.\n\nDopo l’attivazione\n\nAttiva subito la verifica in due passaggi (Impostazioni → Account → Verifica in due passaggi). Chiunque abbia accesso all’app Lyber potrebbe registrare il numero su un altro telefono, e il PIN lo impedisce.\nTieni attivo Lyber. Se cambi telefono o reinstalli WhatsApp Business, ti servirà di nuovo la chiamata di verifica.\nPuoi collegare il profilo anche a WhatsApp Web o desktop sul PC dell’ufficio, così Stefania può rispondere se serve."
+        },
+        {
+          "text": "trifold",
+          "notes": "possiamo metterne qualcuno sul bancone?"
+        },
+        {
+          "text": "Ammortamenti, news?",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-10-23T07:33:59.278Z",
+      "updatedAt": "2026-10-23T09:54:32.447Z"
+    },
+    {
+      "id": "mvqs167fse37j8",
+      "code": "26-028",
+      "title": "meeting UP",
+      "date": "2026-11-06",
+      "timeStart": "11:00",
+      "timeEnd": "12:00",
+      "client": "",
+      "topics": [
+        "commerciale",
+        "didattica",
+        "amministrazione",
+        "mkt"
+      ],
+      "participants": [
+        "Stefania",
+        "Silvia",
+        "Valentina",
+        "Lucia"
+      ],
+      "agenda": [
+        {
+          "text": "Corso excel, è stato annullato?",
+          "notes": "si sono tirare indietro per la modifica delle date, ora silvia prova a sentire Bertoni"
+        },
+        {
+          "text": "appuntamenti per revisioni prezzi",
+          "notes": "Raffmetal, fatto con aumento del 15%. Confapi, bozza listino, appuntamento il 6/11, ci hanno dato l'ok informale. CNA, appuntamento 30/10, ok. Maxion NR. Brebemi da sentire. Confcommercio BS NR. Ordine ingegneri Brescia NR. "
+        },
+        {
+          "text": "trifold",
+          "notes": "possiamo metterne qualcuno sul bancone? VALENTINA li stampa e li mette sul bancone, incarica Dennis di verificare.\nInoltre li stampa per darli all'evento di oggi"
+        },
+        {
+          "text": "Ammortamenti, news?",
+          "notes": ""
+        },
+        {
+          "text": "Gestionale didattica",
+          "notes": "rifacimento per sicurezza PHP, da 8 a 16 ore Anastasi, valutare se spostare nel 2027, se integrare qualche nuova funzione, se MSF è interessata. Vale sente Michela per conferma sito in HTML"
+        },
+        {
+          "text": "adeguamento al tracking pixel entro il 29 ottobre",
+          "notes": "vedi email di Michela del 28/10/2026"
+        },
+        {
+          "text": "aggiornamento sviluppi commerciali",
+          "notes": "Caracciolo, offerta per proseguimento inglese e GdT, poi leadership e altro.\nNicolis ci ha presentato Daniele Arboit, proprietario di 3 centri wall street, distributore italiano marchio pingu's, certificazione cambridge per le scuole. Cerca un partner su brescia per erogazione dei corsi di preparazione, inizieremo piano con un paio di scuole, se va tutto bene potremo estendere anche su altre scuole e province\nWEB Heroes, nulla di definito ma sono molto dinamici, ci hanno portato in CNA Brescia per macchine.\nIl libro, le iniziative a cui ho partecipato, etc. hanno messo in moto una serie di contatti vecchi e nuovi, bene così, io dove puntare a questo."
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-10-27T14:24:27.051Z",
+      "updatedAt": "2026-11-06T10:54:27.068Z"
+    },
+    {
+      "id": "mvs7r3cwm4slqt",
+      "code": "26-029",
+      "title": "Meeting UP MSF Piazza",
+      "date": "2026-11-06",
+      "timeStart": "12:00",
+      "timeEnd": "13:00",
+      "client": "",
+      "topics": [
+        "gestionale"
+      ],
+      "participants": [
+        "Stefania",
+        "Matteo"
+      ],
+      "agenda": [
+        {
+          "text": "ammortamenti, file Mara del 28/10?",
+          "notes": ""
+        },
+        {
+          "text": "crm didattica, vogliono mettere anche in MSF",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-10-28T14:32:16.832Z",
+      "updatedAt": "2026-11-06T10:24:19.805Z"
+    },
+    {
+      "id": "mvum7zwanrtk50",
+      "code": "26-030",
+      "title": "CNA bergamo",
+      "date": "2026-10-30",
+      "timeStart": "10:00",
+      "timeEnd": "11:00",
+      "client": "CNA bergamo",
+      "topics": [
+        "commerciale",
+        "didattica"
+      ],
+      "participants": [
+        "Silvia",
+        "Arianna mulé"
+      ],
+      "agenda": [
+        {
+          "text": "situazione attuale",
+          "notes": "corso comunicazione €/h 70 * 8 h + €/trasf 45 = € 685 + IVA\ncorso macchine €/h 190 * 4 h, trasferta compresa costo docenta = € 760 + IVA + stessa cosa per cyber security altre 4 ore. RIFARE OFFERTA PER 8 ORE CON PREZZO PIù BASSO, POI ORGANIZZARE CALL DOCENTE/AZIENDA"
+        },
+        {
+          "text": "proposta formativa 2027",
+          "notes": ""
+        },
+        {
+          "text": "Loro aspettative su anno 2027? Cosa possiamo fare per lavorare di più insieme?",
+          "notes": ""
+        }
+      ],
+      "notes": "POLIZZA CATASTROFALE OBBLIGTORIA PER I CORSI FINANZIATE",
+      "actions": [],
+      "createdAt": "2026-10-30T06:52:52.475Z",
+      "updatedAt": "2026-10-30T09:20:15.110Z"
+    },
+    {
+      "id": "mvzcsibfbaphtu",
+      "code": "26-031",
+      "title": "Caracciolo",
+      "date": "2026-11-02",
+      "timeStart": "15:30",
+      "timeEnd": "16:30",
+      "client": "Caracciolo Andrea, Esanu Maria",
+      "topics": [],
+      "participants": [],
+      "agenda": [
+        {
+          "text": "capire attuale posizione",
+          "notes": "M. organizzazione di casa - al momento \nA. lavoro per guadagnare - "
+        },
+        {
+          "text": "capire obiettivi futuri",
+          "notes": ""
+        },
+        {
+          "text": "quali aree si sente forte",
+          "notes": "scelta giocatori tecniche, cosa hanno dentro le persone, molto intelligente,"
+        },
+        {
+          "text": "quali deve migliorare",
+          "notes": "nel carattere, la maggior parte delle persone gli sono antipatiche"
+        },
+        {
+          "text": "Tempi e organizzazione",
+          "notes": "lun solo eventuale appuntamento, mart-ven, 9-19\nA. si gestisce\n"
+        }
+      ],
+      "notes": "1) proporre: gestione del tempo entrambi, inglese a A., \n2) leadership e gestione del personale ad. A. - SILVIA sente Giulia per progetto\n3) in un secondo momento: Intelligenza culturale, public speaking",
+      "actions": [
+        {
+          "id": "mvzcspi9xx7phd",
+          "text": "capire attuale posizione",
+          "who": "",
+          "date": "",
+          "done": false,
+          "createdAt": "2026-11-02T14:27:53.505Z"
+        }
+      ],
+      "createdAt": "2026-11-02T14:27:44.188Z",
+      "updatedAt": "2026-11-02T15:20:43.841Z"
+    },
+    {
+      "id": "mw3a8xwuyqlz7h",
+      "code": "26-032",
+      "title": "Daniele Arboit + Nicolis",
+      "date": "2026-11-05",
+      "timeStart": "09:30",
+      "timeEnd": "10:30",
+      "client": "",
+      "topics": [],
+      "participants": [],
+      "agenda": [],
+      "notes": "Andrea Niki referente mondiale certificazioni Cambridge, prima scuola vista con Alessandro il Leonardo ma Brescia non ha aderito.\nHanno bisogno di docenza esterna per potenzialmente linguistico e certificazioni. \nQUINDI HANNO BISOGNO CHE NOI FACCIAMO I CORSI DI PREPARAZIONE E POTENZIAMENTO? Sì\nCHE CARATTERISTICHE DEVONO AVERE I DOCENTI? dipende da cosa viene richiesto. Da vedere per gli speaking examiner, in questo caso ci riconoscono 45 €/h\nCOME SI STRUTTURA IL RAPPORTO COMMERCIALE? Loro ci dicono dove hanno bisogno, noi risolviamo.\nI CORSI TUTTI IN PRESENZA? sì\nTUTELA NOSTRO KNOW HOW? sì\nPARTIAMO SU BRESCIA, MA AVETE ALTRE AREE DI INTERESSE? Partiamo soft, poi vediamo le zone\nNOSTRI COSTI SONO VARIABILI IN BASE A ZONA, TRASFERTE, MADRELINGUA, ETC.? noi stiamo sui 50 €/h\nEnglish skill test, flessibile, da casa, supportata da AI, da una a quattro abilità, costo di € 45 a studente. Non è una certificazione ma è comunque un test fatto da Cambridge. Viene usato come fine corso in aziende. Se ci si distrae, l'AI lo riconosce. Il Client (potenzialmente noi) dobbiamo validarlo, coto client € 32. Deve essere fatto in orario di apertura centro esami (o nostro). \nPOTREMMO DIVENTARE PREPARATION CENTER, CI PRESENTEREBBE MEGLIO CON LE SCUOLE. Non ha costi, ma vanno chiamati loro come centro esami\nora rimaniamo così:\niniziamo con una lettera di intenti per la docenza, per gli esaminatori ci pensiamo, potremmo partire da Arnaldo e scuola Breno\n\n",
+      "actions": [],
+      "createdAt": "2026-11-05T08:27:36.750Z",
+      "updatedAt": "2026-11-05T09:34:44.787Z"
+    },
+    {
+      "id": "mw3e36m9dyikrz",
+      "code": "26-033",
+      "title": "Web heroes",
+      "date": "2026-11-05",
+      "timeStart": "11:15",
+      "timeEnd": "12:00",
+      "client": "",
+      "topics": [],
+      "participants": [
+        "Paolo Heroes"
+      ],
+      "agenda": [],
+      "notes": "sviluppare comunicazione aziende e pmi, 90% digitale per esempio sviluppo siti, adesso lavorano più su siti standard e mno costori (prima erano più custom).\n\nMandato elenco dei nostri corsi e scaletta corsi Macchine che facciamo per CNA Bergamo, vedranno se CNA Brescia è interessato.\nLoro ci hanno mandato loro elenco di docenti e corsi di formazione che possono erogare\n\nSiamo rimasti che, quando incrociamo un'esigenza per cui possiamo lavorare insieme per un servizio maggiore, ci sentiamo. Oltre a questo, coinvolgimento reciproco nelle attività e per noi Confapi, per loro CNA. Valutare anche iniziativa gratuita congiunta presso di noi",
+      "actions": [],
+      "createdAt": "2026-11-05T10:15:06.561Z",
+      "updatedAt": "2026-11-05T13:11:49.289Z"
+    },
+    {
+      "id": "mw3m8zbf70ifg8",
+      "code": "26-034",
+      "title": "Confapi BS",
+      "date": "2026-11-06",
+      "timeStart": "09:30",
+      "timeEnd": "10:30",
+      "client": "Confapi Brescia",
+      "topics": [],
+      "participants": [],
+      "agenda": [
+        {
+          "text": "recap corsi aperti",
+          "notes": "nirox, non riescono\nemployer branding, non parte\nEuromec, francese e inglese, sono praticamente confermati ma non sanno quando\nRide, Francesca sollecita, il finanziamento ce l'hanno, provano a far partire entro anno\nOMV, partenza probabile da gennaio\nItaliano per stranieri per NEW GPR, hanno già il finanziamento"
+        },
+        {
+          "text": "formazione 2027",
+          "notes": ""
+        },
+        {
+          "text": "listino corsi lingua 2027",
+          "notes": "1/01/2020 – 01/01/2024\t+16,1%\tStorico ISTAT ufficiale (Indice FOI: da 102,7 a 119,3) - 01/01/2024 – 01/01/2027\t+6,7%\tPrevisionale (Dati reali 2024-2025 + stime di chiusura per il 2026) - 01/01/2020 – 01/01/2027\t+23,9%\nI nostri aumenti sono leggermente inferiori o allineati.\n"
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-11-05T14:03:33.963Z",
+      "updatedAt": "2026-11-06T08:53:20.216Z"
+    },
+    {
+      "id": "mw9gvv53jz4nvd",
+      "code": "26-035",
+      "title": "meeting UP",
+      "date": "2026-11-13",
+      "timeStart": "11:00",
+      "timeEnd": "12:00",
+      "client": "",
+      "topics": [
+        "commerciale",
+        "didattica",
+        "amministrazione",
+        "mkt"
+      ],
+      "participants": [
+        "Stefania",
+        "Silvia",
+        "Valentina",
+        "Lucia"
+      ],
+      "agenda": [
+        {
+          "text": "trifold",
+          "notes": "possiamo metterne qualcuno sul bancone? VALENTINA li stampa e li mette sul bancone, incarica Dennis di verificare.\nInoltre li stampa per darli all'evento di oggi"
+        },
+        {
+          "text": "Gestionale didattica",
+          "notes": "rifacimento per sicurezza PHP, da 8 a 16 ore Anastasi, valutare se spostare nel 2027, se integrare qualche nuova funzione, se MSF è interessata. Vale sente Michela per conferma sito in HTML"
+        },
+        {
+          "text": "adeguamento al tracking pixel entro il 29 ottobre",
+          "notes": "vedi email di Michela del 28/10/2026"
+        },
+        {
+          "text": "aggiornamento sviluppi commerciali",
+          "notes": "Caracciolo\nArboit, c'è il problema dell'IVA, loro sono esenti IVA, per noi sarebbe complicato perché tornerebbe utile per privati e PA ma ci chiede sforzo di contabilità\nWEB Heroes"
+        },
+        {
+          "text": "corso excel fatturato",
+          "notes": ""
+        },
+        {
+          "text": "PdR125",
+          "notes": "La UNI/PdR 125:2022 è una prassi di riferimento UNI. Definisce i requisiti per la Certificazione di Parità di Genere prevista dal PNRR.\nIn pratica chiede all’azienda di gestire la parità come un sistema, misurato con indicatori (KPI)"
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-11-09T16:20:01.000Z",
+      "updatedAt": "2026-11-20T09:52:14.672Z"
+    },
+    {
+      "id": "mwc82xmge041vr",
+      "code": "26-036",
+      "title": "Call Silvia per Argentea",
+      "date": "2026-11-11",
+      "timeStart": "15:30",
+      "timeEnd": "16:00",
+      "client": "",
+      "topics": [],
+      "participants": [],
+      "agenda": [
+        {
+          "text": "scaricare presenze",
+          "notes": "non ancora fatto."
+        },
+        {
+          "text": "gestione delle cancellazioni",
+          "notes": ""
+        }
+      ],
+      "notes": "lunedi 9/11 si collegano dirigente e docente, il dirigente si stacca prima, olga avvisa silvia con messaggio ma silvia non ha visto. Il giorno dopo Enaip dice che non va bene, Silvia chiede come risolvere . Poi il dirigente scrive a tutti e chiede scusa, chiede per il recupero ma enaip non risponde, risponde invece a silvia e agli altri dirigenti di organizzarsi e mettere in coda.\nOggi Silvia è stata chiamata Nadia Esposito e una collega, Silvia spiega, Esposito dice che Enaip dice diversamente.",
+      "actions": [],
+      "createdAt": "2026-11-11T14:36:52.792Z",
+      "updatedAt": "2026-11-11T14:44:25.082Z"
+    },
+    {
+      "id": "mwdk1wn813ux0e",
+      "code": "26-037",
+      "title": "EDB Elettronica",
+      "date": "2026-11-12",
+      "timeStart": "15:00",
+      "timeEnd": "16:00",
+      "client": "EDB Elettronica",
+      "topics": [],
+      "participants": [
+        "Elisa Scalvini"
+      ],
+      "agenda": [
+        {
+          "text": "UNI/PdR 125:2022",
+          "notes": "La UNI/PdR 125:2022 è una prassi di riferimento UNI. Definisce i requisiti per la Certificazione di Parità di Genere prevista dal PNRR.\nIn pratica chiede all’azienda di gestire la parità come un sistema, misurato con indicatori (KPI)\nI pesi sono questi: Cultura e strategia 15%, Governance 15%, Processi HR 10%, Opportunità di crescita e inclusione delle donne 20%, Equità remunerativa 20%, Genitorialità e conciliazione vita-lavoro 20%. Per ottenere la certificazione basta un punteggio minimo del 60% sui 33 indicatori.\nBias inconsci rientra nei KPI \"Cultura e strategia\""
+        },
+        {
+          "text": "corso Bias inconsci",
+          "notes": ""
+        },
+        {
+          "text": "altri corsi UP",
+          "notes": "Proposte mirate per PdR 125: \nCultura e strategia:\nComunicazione inclusiva e linguaggio rispettoso (da comunicazione efficace). È il seguito naturale del corso sui bias: come si parla e si scrive in azienda, nelle email, negli annunci, nelle riunioni.\nAI e bias. È un ponte tra il loro tema e la tua competenza: come gli strumenti di AI riproducono gli stereotipi (testi, selezione dei CV, immagini) e come usarli in modo consapevole. In un’azienda tecnica funziona bene, perché parla la loro lingua.\n\nGovernance e leadership:\nLeadership inclusiva per direzione e responsabili: come si gestiscono team misti, come si fanno valutazioni eque, come si distribuiscono i progetti e la visibilità.\nTeam working: dinamiche di gruppo, partecipazione nelle riunioni, dare spazio a chi di solito parla meno.\n\nProcessi HR:\nSelezione senza bias per chi fa colloqui: job description, criteri di valutazione, domande da evitare. È anche una buona prassi citata nelle linee guida.\nAmbiente di lavoro rispettoso e prevenzione delle molestie: tra i KPI dei processi HR c’è proprio la presenza di misure contro mobbing e molestie, quindi formare il personale dà un’evidenza concreta.\n\nOpportunità di crescita delle donne (pesa 20%)\nQui il catalogo rende di più, perché è upskilling vero:\nCoaching e mentoring individuali o di gruppo per donne in crescita verso ruoli di responsabilità.\nLeadership personale, public speaking, negoziazione: competenze che pesano sulle promozioni.\nBusiness English, informatica avanzata e AI per donne in ruoli tecnici o commerciali. Nell’elettronica industriale l’inglese tecnico e commerciale fa spesso la differenza per una promozione.\n\nGenitorialità e conciliazione vita-lavoro (pesa 20%):\nTime management e produttività, anche nella versione per genitori che lavorano.\nLavoro da remoto e gestione di team ibridi per i responsabili: la conciliazione funziona solo se chi gestisce il team sa lavorare per obiettivi.\nCoaching per il rientro dalla maternità o dal congedo parentale: un percorso breve per chi rientra, a volte con un incontro insieme al responsabile."
+        }
+      ],
+      "notes": "Quando hanno il prossimo audit di sorveglianza? Da qui capisci la vera urgenza. A METà GEENAIO, QUINDI NESSUNA FRETTA\nIl corso deve coprire l’indicatore sulla formazione, o hanno anche altre lacune nel loro piano strategico?\nChi deve partecipare: direzione, responsabili, chi fa selezione, tutto il personale? Quante persone, e divise in gruppi? LAVORANO IN 9 DIPENDENTI, TRA UFFICIO PRODUZIONE E TECNICO\nPreferiscono in presenza o online? Un’unica sessione o un breve percorso? PREFERIREBBERO DI PERSONA PERCHè ALCUNI NON ERANO COINVOLTI.\nChi segue il sistema di gestione per la parità (comitato guida, HR, un consulente esterno)? Chi decide il budget?\nUsano la formazione finanziata (fondi interprofessionali)? FAPI",
+      "actions": [],
+      "createdAt": "2026-11-12T12:59:46.436Z",
+      "updatedAt": "2026-11-12T14:20:07.523Z"
+    },
+    {
+      "id": "mweqfwg0jgcqx7",
+      "code": "26-038",
+      "title": "Bertoni Sebastian",
+      "date": "2026-11-13",
+      "timeStart": "10:30",
+      "timeEnd": "11:00",
+      "client": "",
+      "topics": [],
+      "participants": [
+        "Sebastian Bertoni"
+      ],
+      "agenda": [
+        {
+          "text": "Collaborazione con Assocamuna",
+          "notes": "sono un incubatore, non fanno formazione. Hanno anche un coworking a cividate camuno (il più grande), e a edolo e a darfo, limes farm."
+        }
+      ],
+      "notes": "1) Sebastian valuta inserimento nel network UP\n2) ci presenta il responsabile Zarneri Diego\n3) serata evento, per evento tipo gestione delle fiere",
+      "actions": [],
+      "createdAt": "2026-11-13T08:46:23.232Z",
+      "updatedAt": "2026-11-13T10:06:12.260Z"
+    }
+  ],
+  "updatedAt": "2026-11-20T09:52:14.673Z",
+  "deleted": []
+}
