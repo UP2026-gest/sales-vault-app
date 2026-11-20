@@ -1601,15 +1601,15 @@
         },
         {
           "text": "Arboit, problema IVA",
-          "notes": ""
+          "notes": "Il nodo è l'IVA: lui non la recupera, noi dobbiamo fatturarla. Lui pagherebbe circa 50 €/h IVA compresa; i nostri docenti costano almeno 35 €/h (più eventuale trasferta). Margine minimo.\n\nSoluzioni che ho pensato (costo docente 35 €/h):\n1) Chiediamo 52 €/h IVA inclusa = 42,62 € + IVA. Margine 7,62 €/h. Con 50 € IVA compresa: 40,98 € netti, margine 5,98 €/h.\n2) UP fattura 30 €/h + IVA; io fatturo 13,40 €/h con la mia P.IVA. Tolto il 15% sul 78%, a UP girano 11,83 €/h: totale 41,83 €/h, margine 6,83 €/h.\n3) Passo tutto dalla mia P.IVA a 50 €/h; tolto il 15% sul 78%, a UP girano 44,15 €/h, margine 9,15 €/h. Il mio commercialista (Sergio La Rosa) dice che è fattibile se la fattura è compatibile con il mio codice ATECO (consulenza). Da chiarire: fatture dei docenti intestate a me e come girare il compenso a UP."
         }
       ],
       "notes": "",
       "actions": [],
       "createdAt": "2026-11-20T09:57:19.060Z",
-      "updatedAt": "2026-11-20T09:57:19.060Z"
+      "updatedAt": "2026-11-20T09:57:22.431Z"
     }
   ],
-  "updatedAt": "2026-11-20T09:57:19.060Z",
+  "updatedAt": "2026-11-20T09:57:22.431Z",
   "deleted": []
 }
