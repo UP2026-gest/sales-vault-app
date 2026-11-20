@@ -1480,7 +1480,7 @@
         },
         {
           "text": "corso excel fatturato",
-          "notes": ""
+          "notes": "marzocchi ha pagato?"
         },
         {
           "text": "PdR125",
@@ -1490,7 +1490,7 @@
       "notes": "",
       "actions": [],
       "createdAt": "2026-11-09T16:20:01.000Z",
-      "updatedAt": "2026-11-20T09:53:16.034Z"
+      "updatedAt": "2026-11-20T09:53:25.677Z"
     },
     {
       "id": "mwc82xmge041vr",
@@ -1572,6 +1572,6 @@
       "updatedAt": "2026-11-13T10:06:12.260Z"
     }
   ],
-  "updatedAt": "2026-11-20T09:53:16.034Z",
+  "updatedAt": "2026-11-20T09:53:25.677Z",
   "deleted": []
 }
