@@ -1485,12 +1485,16 @@
         {
           "text": "corso excel fatturato",
           "notes": "marzocchi ha pagato?"
+        },
+        {
+          "text": "Viviana Magoni, proposta per cercarci bandi e occuparsi della parte burocratica.",
+          "notes": ""
         }
       ],
       "notes": "",
       "actions": [],
       "createdAt": "2026-11-09T16:20:01.000Z",
-      "updatedAt": "2026-11-20T09:54:48.775Z"
+      "updatedAt": "2026-11-20T09:55:38.032Z"
     },
     {
       "id": "mwc82xmge041vr",
@@ -1572,6 +1576,6 @@
       "updatedAt": "2026-11-13T10:06:12.260Z"
     }
   ],
-  "updatedAt": "2026-11-20T09:54:48.775Z",
+  "updatedAt": "2026-11-20T09:55:38.032Z",
   "deleted": []
 }
