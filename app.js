@@ -388,6 +388,10 @@ function normalizeOpp(o){
     leadEmail:       o.leadEmail || "",
     // archivio
     archived: o.archived === true,
+    // Storico contatti: [{ id, date, type, text, createdAt }]
+    contactLog: Array.isArray(o.contactLog) ? o.contactLog.filter(x=>x && x.id) : [],
+    // Controlli "Da sistemare" che l'utente ha deciso di ignorare per questa opportunità
+    ignoredChecks: Array.isArray(o.ignoredChecks) ? o.ignoredChecks.filter(x=>typeof x==="string") : [],
     // contratto
     contractNumber: String(o.contractNumber || "").trim(),
   };
@@ -803,9 +807,9 @@ function persistForm(){
   try{
     const cn = (document.getElementById("contractNumber")?.value||"").trim();
     if(/^\d{5}$/.test(cn)){
-      const m = JSON.parse(localStorage.getItem("sales_vault_contract_seq")||"{}");
+      const m = JSON.parse(localStorage.getItem(CONTRACT_SEQ_KEY)||"{}");
       const yy = cn.slice(0,2), n = parseInt(cn.slice(2),10);
-      if(n > (m[yy]||0)){ m[yy] = n; localStorage.setItem("sales_vault_contract_seq", JSON.stringify(m)); }
+      if(n > (m[yy]||0)){ m[yy] = n; localStorage.setItem(CONTRACT_SEQ_KEY, JSON.stringify(m)); }
     }
   } catch {}
   upsertLeadFromInputs();
@@ -1124,6 +1128,10 @@ function oppToForm(o){
   }
   if(ui.deleteBtn) ui.deleteBtn.style.display = isArch ? "" : "none";
 
+  const contractEl = document.getElementById("contractNumber");
+  if(contractEl) contractEl.value = o.contractNumber || "";
+  renderContactLog(o);
+  if(document.getElementById("logDate")) document.getElementById("logDate").value = todayStr();
   setFormSnapshot();
   clearTimeout(_autoTimer);
   setAutoStatus("Le modifiche si salvano automaticamente", "");
@@ -1154,9 +1162,55 @@ function formToOpp(){
     contractNumber: (document.getElementById("contractNumber")?.value || "").trim(),
     invoices:       inv,
     archived:       existing?.archived === true,   // prima andava perso: salvare un'archiviata la ripristinava
+    contactLog:     existing?.contactLog || [],
+    ignoredChecks:  existing?.ignoredChecks || [],
     createdAtTs:    existing?.createdAtTs || nowIso(),
     updatedAt:      nowIso(),
   });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STORICO CONTATTI
+// Ogni opportunità ha il suo registro: data, tipo di contatto, esito.
+// Si salva subito (come le fatture), senza passare dal salvataggio del form.
+// ═══════════════════════════════════════════════════════════════
+const LOG_TYPE_ICON = { "Telefonata":"📞", "Email":"✉️", "Videochiamata":"🎥", "Incontro":"🤝", "LinkedIn":"💼", "Nota":"📝" };
+function fmtDateIt(s){ if(!s) return "—"; const [y,m,d]=String(s).slice(0,10).split("-"); return `${d}/${m}/${y}`; }
+function lastContactDate(o){ return (o.contactLog||[]).reduce((m,x)=> (x.date||"") > m ? x.date : m, ""); }
+function renderContactLog(o){
+  const el = document.getElementById("logList"); if(!el) return;
+  const list = [...((o && o.contactLog) || [])].sort((a,b)=> (b.date||"").localeCompare(a.date||"") || (b.createdAt||"").localeCompare(a.createdAt||""));
+  if(!list.length){ el.className = "log-list muted"; el.textContent = "Nessun contatto registrato."; return; }
+  el.className = "log-list";
+  el.innerHTML = list.map(x => `<div class="log-row">
+      <span class="log-date">${fmtDateIt(x.date)}</span>
+      <span class="log-type">${LOG_TYPE_ICON[x.type]||"•"} ${escapeHtml(x.type||"")}</span>
+      <span class="log-text">${escapeHtml(x.text||"")}</span>
+      <button type="button" class="log-del" data-id="${escapeHtml(x.id)}" title="Elimina">✕</button>
+    </div>`).join("");
+  el.querySelectorAll(".log-del").forEach(b => b.onclick = () => {
+    if(!confirm("Eliminare questa voce dello storico?")) return;
+    const idx = db.opportunities.findIndex(x => x.id === currentOppId); if(idx === -1) return;
+    db.opportunities[idx].contactLog = (db.opportunities[idx].contactLog||[]).filter(x => x.id !== b.dataset.id);
+    db.opportunities[idx].updatedAt = nowIso();
+    saveDb(); renderAll(); renderContactLog(normalizeOpp(db.opportunities[idx]));
+  });
+}
+function addContactLog(){
+  const text = (document.getElementById("logText")?.value || "").trim();
+  if(!text){ document.getElementById("logText")?.focus(); return; }
+  // un'opportunità nuova va prima salvata (serve almeno il Nome)
+  if(!currentOppId && !autoSaveOpp()){ alert("Inserisci prima il Nome dell'opportunità."); return; }
+  if(isFormDirty()) autoSaveOpp();
+  const idx = db.opportunities.findIndex(x => x.id === currentOppId); if(idx === -1) return;
+  const entry = { id: uid(), date: document.getElementById("logDate").value || todayStr(),
+    type: document.getElementById("logType").value || "Nota", text, createdAt: nowIso() };
+  db.opportunities[idx].contactLog = [...(db.opportunities[idx].contactLog||[]), entry];
+  db.opportunities[idx].updatedAt = nowIso();
+  saveDb(); renderAll();
+  renderContactLog(normalizeOpp(db.opportunities[idx]));
+  document.getElementById("logText").value = "";
+  document.getElementById("logDate").value = todayStr();
 }
 
 function resetInvoiceInputs(){
@@ -1190,6 +1244,10 @@ function newOpp(){
   ui.invList.classList.add("muted");
   ui.calcBox.textContent = "";
   ui.fileInfo.textContent = "";
+  const contractEl = document.getElementById("contractNumber");
+  if(contractEl) contractEl.value = "";
+  renderContactLog(null);
+  if(document.getElementById("logDate")) document.getElementById("logDate").value = todayStr();
   setFormSnapshot();
   clearTimeout(_autoTimer);
   setAutoStatus("Nuova opportunità: si salverà da sola appena inserisci il Nome", "");
@@ -1619,7 +1677,8 @@ function matchesFilters(o){
   if(!matchesIssuedInvoiceFilter(o))  return false;
   if(!q) return true;
   const invText = (o.invoices||[]).map(x=>{const i=normalizeInvoice(x); return [i.status,i.plannedDate,i.plannedAmount,i.number,i.date,i.amount].join(" ");}).join(" ");
-  return [o.lead,o.oppId,o.name,o.owner,o.status,o.phase,o.product,o.probability,o.nextAction,o.nextActionDate,o.notes,o.contractNumber||"" ,invText].join(" ").toLowerCase().includes(q);
+  const logText = (o.contactLog||[]).map(x=>`${x.type} ${x.text}`).join(" ");
+  return [o.lead,o.oppId,o.name,o.owner,o.status,o.phase,o.product,o.probability,o.nextAction,o.nextActionDate,o.notes,o.contractNumber||"" ,invText,logText].join(" ").toLowerCase().includes(q);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1745,7 +1804,7 @@ function renderOppList(){
   ui.oppList.classList.remove("muted");
 
   for(const o of list){
-    const div   = document.createElement("div"); div.className = "item";
+    const div   = document.createElement("div"); div.className = "item"; div.dataset.status = o.status || "";
     const left  = document.createElement("div");
     const title = document.createElement("strong");
 
@@ -1778,6 +1837,7 @@ function renderOppList(){
       ` • ${costHtml}` +
       ` • Emesso: € ${issued.toFixed(2)}` +
       ` • Pianif.: € ${planned.toFixed(2)}` +
+      (lastContactDate(o) ? ` • ultimo contatto ${fmtDateIt(lastContactDate(o))}` : "") +
       (overdue ? ` • ${esc(overdue)}` : "");
 
     left.appendChild(title); left.appendChild(meta);
@@ -1797,6 +1857,112 @@ function renderOppList(){
   }
 }
 
+// ═══════════════════════════════════════════════════════════════
+// DA SISTEMARE
+// Controlli di qualità sui dati delle opportunità non archiviate.
+// Ogni controllo si può "ignorare" per una singola opportunità quando il dato
+// è giusto così (resta salvato nell'opportunità e vale anche per Silvia).
+// ═══════════════════════════════════════════════════════════════
+const ADVANCED_PHASES = ["proposta accettata informalmente - mandare CTR", "proposta accettata - attesa CTR",
+                         "conseguita - non fatturata", "conseguita - fatturata"];
+const DATA_CHECKS = [
+  { id:"noLead",        label:"Cliente mancante",
+    test:o => !String(o.lead||"").trim() },
+  { id:"noNextAction",  label:"Aperta senza prossima azione",
+    test:o => ["aperta","sospesa"].includes(o.status) && !o.nextAction && !o.nextActionDate },
+  { id:"actionNoDate",  label:"Prossima azione senza data",
+    test:o => ["aperta","sospesa"].includes(o.status) && !!o.nextAction && !o.nextActionDate },
+  { id:"noValue",       label:"Valore previsto mancante",
+    test:o => (o.status==="chiusa vinta" || (o.status==="aperta" && ADVANCED_PHASES.includes(o.phase))) && toNum(o.valueExpected)===0 },
+  { id:"noCost",        label:"Costo di erogazione mancante (incarico non splittato)",
+    test:o => (o.status==="chiusa vinta" || (o.status==="aperta" && ADVANCED_PHASES.includes(o.phase))) && !o.split && toNum(o.serviceCost)===0 },
+  { id:"wonNoInvoice",  label:"Vinta senza fatture (né pianificate né emesse)",
+    test:o => o.status==="chiusa vinta" && totalIssued(o)===0 && totalPlanned(o)===0 },
+  { id:"invoiceDiff",   label:"Fatture (emesse + pianificate) diverse dal valore previsto",
+    test:o => { const t = totalIssued(o)+totalPlanned(o), v = toNum(o.valueExpected); return t>0 && v>0 && Math.abs(t-v) > 0.005; },
+    detail:o => `fatture € ${eur(totalIssued(o)+totalPlanned(o))} · previsto € ${eur(o.valueExpected)}` },
+  { id:"plannedPast",   label:"Fattura pianificata con data passata (non ancora emessa)",
+    test:o => (o.invoices||[]).map(normalizeInvoice).some(i => i.status==="pianificata" && i.plannedDate && i.plannedDate < todayStr()),
+    detail:o => (o.invoices||[]).map(normalizeInvoice).filter(i => i.status==="pianificata" && i.plannedDate && i.plannedDate < todayStr()).map(i=>`prevista il ${fmtDateIt(i.plannedDate)}`).join(", ") },
+  { id:"phaseMismatch", label:"Stato e fase non coerenti",
+    test:o => (o.status==="chiusa vinta" && !String(o.phase||"").startsWith("conseguita")) || (o.phase==="conseguita - fatturata" && totalIssued(o)===0),
+    detail:o => `stato "${o.status}" · fase "${o.phase}"` },
+  { id:"pastFiscal",    label:"Competenza di un anno passato ma ancora aperta",
+    test:o => ["aperta","sospesa"].includes(o.status) && Number(fiscalYearOf(o)) < new Date().getFullYear() && totalIssued(o)+totalPlanned(o)===0,
+    detail:o => `competenza ${fiscalYearOf(o)}` },
+];
+function dataIssues(onlyOwner){
+  const out = [];
+  for(const raw of db.opportunities){
+    const o = normalizeOpp(raw);
+    if(o.archived) continue;
+    if(onlyOwner && o.owner !== onlyOwner) continue;
+    for(const c of DATA_CHECKS){
+      if(o.ignoredChecks.includes(c.id)) continue;
+      let hit = false; try { hit = c.test(o); } catch {}
+      if(hit) out.push({ check:c, opp:o });
+    }
+  }
+  return out;
+}
+function updateFixBadge(){
+  const b = document.getElementById("fixBadge"); if(!b) return;
+  const n = new Set(dataIssues().map(x => x.opp.id)).size;
+  b.textContent = n; b.style.display = n > 0 ? "inline-flex" : "none";
+}
+let _fixOwner = "";
+function showFixModal(){
+  const owners = normalizeSalespeopleList(db.salespeople);
+  const issues = dataIssues(_fixOwner);
+  const byCheck = DATA_CHECKS.map(c => ({ c, rows: issues.filter(x => x.check.id === c.id) })).filter(g => g.rows.length);
+  const nOpp = new Set(issues.map(x => x.opp.id)).size;
+  ui.modalTitle.textContent = "🛠 Da sistemare";
+  ui.modalBody.innerHTML = `
+    <div class="fix-top">
+      <span>${nOpp ? `<b>${nOpp}</b> opportunità con qualcosa da sistemare (${issues.length} segnalazioni).` : "✓ Nessun dato da sistemare."}</span>
+      <label>Commerciale <select id="fixOwner"><option value="">tutti</option>${owners.map(n=>`<option ${n===_fixOwner?"selected":""}>${escapeHtml(n)}</option>`).join("")}</select></label>
+    </div>
+    ${byCheck.map(g => `
+      <div class="fix-group">
+        <div class="fix-head">${escapeHtml(g.c.label)} <span>${g.rows.length}</span></div>
+        ${g.rows.map(r => `<div class="fix-row">
+            <div class="fix-main"><span class="oppid-badge">${escapeHtml(r.opp.oppId||"")}</span>
+              <b>${escapeHtml(r.opp.name||"(senza nome)")}</b> — ${escapeHtml(r.opp.lead||"senza cliente")}
+              <div class="fix-meta">${escapeHtml(r.opp.owner||"")} · ${escapeHtml(r.opp.status)} · ${escapeHtml(r.opp.phase)}${r.check.detail ? " · " + escapeHtml(r.check.detail(r.opp)) : ""}</div></div>
+            <button type="button" class="fix-open" data-id="${escapeHtml(r.opp.id)}">Apri</button>
+            <button type="button" class="fix-ignore" data-id="${escapeHtml(r.opp.id)}" data-check="${g.c.id}" title="Il dato è corretto così: non segnalarlo più per questa opportunità">Ignora</button>
+          </div>`).join("")}
+      </div>`).join("")}`;
+  ui.modal.classList.remove("hidden");
+  document.getElementById("fixOwner").onchange = e => { _fixOwner = e.target.value; showFixModal(); };
+  ui.modalBody.querySelectorAll(".fix-open").forEach(b => b.onclick = async () => {
+    if(!await confirmIfDirty()) return;
+    const fresh = db.opportunities.find(x => x.id === b.dataset.id);
+    closeModal();
+    if(fresh) oppToForm(normalizeOpp(fresh));
+  });
+  ui.modalBody.querySelectorAll(".fix-ignore").forEach(b => b.onclick = () => {
+    const idx = db.opportunities.findIndex(x => x.id === b.dataset.id); if(idx === -1) return;
+    const cur = db.opportunities[idx].ignoredChecks || [];
+    db.opportunities[idx].ignoredChecks = [...new Set([...cur, b.dataset.check])];
+    db.opportunities[idx].updatedAt = nowIso();
+    saveDb(); renderAll(); showFixModal();
+  });
+}
+
+// Campanella in alto: numero di azioni commerciali scadute
+function updateBell(){
+  updateFixBadge();
+  const btn = document.getElementById("overdueBtn"), badge = document.getElementById("overdueBadge");
+  if(!btn || !badge) return;
+  const today = todayStr();
+  const count = db.opportunities.map(normalizeOpp)
+    .filter(o => !o.archived && o.nextActionDate && o.nextActionDate < today && ["aperta","sospesa"].includes(o.status)).length;
+  badge.textContent = count;
+  badge.style.display = count > 0 ? "flex" : "none";
+  btn.classList.toggle("bell-has-items", count > 0);
+}
+
 function renderAll(){
   refreshYearFilter();
   refreshFiscalYearFilter();
@@ -1806,6 +1972,7 @@ function renderAll(){
     const fresh = db.opportunities.find(x=>x.id===currentOppId);
     if(fresh){ const n=normalizeOpp(fresh); renderCalcBox(n); renderInvoices(n.invoices); }
   }
+  updateBell();
 }
 
 /**
@@ -1828,6 +1995,7 @@ function renderAllSafe(){
       renderInvoices(n.invoices);
     }
   }
+  updateBell();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -2194,7 +2362,9 @@ ui.fiscalYearFilter?.addEventListener("change", renderAll);
 ui.dueFilter.addEventListener("change", renderAll);
 ui.invPlannedFilter.addEventListener("change", renderAll);
 ui.invIssuedFilter?.addEventListener("change", renderAll);
-ui.oppForm?.addEventListener("input", updateDirtyHint);
+ui.oppForm?.addEventListener("input", (e) => { if(!e.target.closest?.(".log-add")) updateDirtyHint(); });
+document.getElementById("logAddBtn")?.addEventListener("click", addContactLog);
+document.getElementById("logText")?.addEventListener("keydown", (e) => { if(e.key === "Enter"){ e.preventDefault(); e.stopPropagation(); addContactLog(); } });
 ui.oppForm?.addEventListener("change", updateDirtyHint);
 
 // ═══════════════════════════════════════════════════════════════
@@ -2258,8 +2428,25 @@ window.addEventListener("beforeunload", (e) => {
 });
 // uscendo da un campo il salvataggio parte subito (senza attendere 1,5 s)
 ui.oppForm?.addEventListener("focusout", () => { setTimeout(() => { if(isFormDirty()) autoSaveOpp(); }, 0); });
-// il pulsante "+ Assegna" del n° contratto cambia il campo senza digitazione
-document.getElementById("assignContractBtn")?.addEventListener("click", () => setTimeout(updateDirtyHint, 0));
+// ── N° contratto UP: "+ Assegna" propone il prossimo numero libero (AA + progressivo a 3 cifre) ──
+const CONTRACT_SEQ_KEY = "sales_vault_contract_seq";
+function nextContractNumber(){
+  const yy = String(new Date().getFullYear()).slice(2);
+  let maxDb = 0;
+  for(const o of (db.opportunities || [])){
+    const cn = String(o.contractNumber || "");
+    if(cn.startsWith(yy) && cn.length === 5){ const n = parseInt(cn.slice(2), 10); if(!isNaN(n) && n > maxDb) maxDb = n; }
+  }
+  let maxStored = 0;
+  try { maxStored = (JSON.parse(localStorage.getItem(CONTRACT_SEQ_KEY) || "{}")[yy]) || 0; } catch {}
+  return yy + String(Math.max(maxDb, maxStored) + 1).padStart(3, "0");
+}
+document.getElementById("assignContractBtn")?.addEventListener("click", () => {
+  const el = document.getElementById("contractNumber"); if(!el) return;
+  if(el.value.trim() && !confirm("Questo campo ha già un valore. Sovrascrivere con il prossimo numero disponibile?")) return;
+  el.value = nextContractNumber();
+  updateDirtyHint();
+});
 
 // ═══════════════════════════════════════════════════════════════
 // INIZIALIZZAZIONE
@@ -2307,6 +2494,9 @@ if(GH.isConfigured()){
 
 // Promemoria azioni scadute: all'avvio + ogni 15 minuti
 setTimeout(showModalOverdue, 1000);
+document.getElementById("overdueBtn")?.addEventListener("click", showModalOverdue);
+document.getElementById("fixBtn")?.addEventListener("click", showFixModal);
+setInterval(updateBell, 60_000);
 setInterval(showModalOverdue, 15 * 60 * 1000);
 
 // Promemoria competenza fine anno: all'avvio (dopo l'eventuale sync).
@@ -2479,6 +2669,15 @@ function generateReport(opts = {}) {
     .grand-bar .gb-title { font-family: 'DM Sans', sans-serif; margin-right: auto; }
     .grand-bar small { display: block; font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 10px; opacity: .7; text-transform: uppercase; letter-spacing: .4px; }
     .tag { display: inline-block; font-size: 9.5px; font-weight: 700; padding: 0 5px; border-radius: 4px; background: #eef3fd; color: #2255c4; margin-left: 4px; }
+    .chart-box { border:1px solid #dde2ec; border-radius:10px; padding:10px 12px 6px; margin-bottom:12px; break-inside: avoid; }
+    .chart-title { font-size:13px; font-weight:700; color:#1a2744; }
+    .chart-sub { font-size:11px; color:#7a85a0; margin:2px 0 4px; }
+    .chart { width:100%; height:auto; display:block; }
+    .chart .ax { font-size:10px; fill:#7a85a0; font-family:'DM Mono', monospace; }
+    .chart .lb { font-size:11.5px; fill:#1a2133; }
+    .chart .vl { font-size:10.5px; fill:#4a5570; font-family:'DM Mono', monospace; }
+    .chart-legend { display:flex; gap:16px; font-size:11.5px; color:#4a5570; margin:4px 0; }
+    .chart-legend i { display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:5px; vertical-align:-1px; }
     .details-head { font-size: 15px; font-weight: 700; color: #1a2744; margin: 34px 0 14px; padding-top: 14px; border-top: 2px solid #1a2744; }
     .kpi { background: #f2f4f8; border-radius: 10px; padding: 12px 14px; }
     .kpi .val { font-size: 20px; font-weight: 700; color: #1a2744; }
@@ -2804,11 +3003,104 @@ function generateReport(opts = {}) {
       <span><small>MOL</small>${fmtEur(T.mol)}</span><span><small>MOL %</small>${pct(T.base > 0 ? T.mol / T.base * 100 : 0)}</span></div>`;
   }
 
+  // ═════════ GRAFICI (SVG, nessuna libreria esterna) ═════════
+  // Colori: due serie con colori verificati per daltonismo e contrasto.
+  const C1 = "#4565ad", C2 = "#c98411", INK = "#4a5570", GRID = "#e5e8f0";
+  const escT = t => String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+  const kfmt = n => { const a = Math.abs(n); return a >= 1000 ? (n/1000).toFixed(a >= 10000 ? 0 : 1).replace(".", ",") + "k" : String(Math.round(n)); };
+  const niceMax = v => { if(v <= 0) return 1; const p = Math.pow(10, Math.floor(Math.log10(v))); const m = v / p; return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * p; };
+  const legend = items => `<div class="chart-legend">${items.map(([c,l]) => `<span><i style="background:${c}"></i>${escT(l)}</span>`).join("")}</div>`;
+
+  // 1) Fatturato emesso e pianificato per mese (barre affiancate)
+  function chartByMonth(){
+    const m = new Map();
+    for(const o of opps) for(const raw of (o.invoices||[])){
+      const i = normalizeInvoice(raw);
+      const d = i.status === "emessa" ? i.date : i.plannedDate, v = i.status === "emessa" ? toNum(i.amount) : toNum(i.plannedAmount);
+      if(!d || !v) continue;
+      const k = d.slice(0,7); if(!m.has(k)) m.set(k, { e:0, p:0 });
+      m.get(k)[i.status === "emessa" ? "e" : "p"] += v;
+    }
+    if(!m.size) return `<p class="muted">Nessuna fattura emessa o pianificata nelle opportunità del report.</p>`;
+    const keys = [...m.keys()].sort();
+    const months = []; let [y, mo] = keys[0].split("-").map(Number); const [ly, lm] = keys[keys.length-1].split("-").map(Number);
+    while(y < ly || (y === ly && mo <= lm)){ months.push(`${y}-${String(mo).padStart(2,"0")}`); mo++; if(mo > 12){ mo = 1; y++; } }
+    const shown = months.slice(-18);
+    const W = 760, H = 230, L = 46, B = 28, T = 10, plotW = W - L - 8, plotH = H - B - T;
+    const max = niceMax(Math.max(...shown.map(k => Math.max(m.get(k)?.e||0, m.get(k)?.p||0))));
+    const slot = plotW / shown.length, bw = Math.max(3, Math.min(16, (slot - 6) / 2));
+    const MN = ["gen","feb","mar","apr","mag","giu","lug","ago","set","ott","nov","dic"];
+    let svg = "";
+    for(let g = 0; g <= 4; g++){ const yy = T + plotH - plotH * g / 4;
+      svg += `<line x1="${L}" x2="${W-8}" y1="${yy}" y2="${yy}" stroke="${GRID}"/><text x="${L-6}" y="${yy+4}" text-anchor="end" class="ax">${kfmt(max*g/4)}</text>`; }
+    shown.forEach((k, idx) => {
+      const v = m.get(k) || { e:0, p:0 }, x0 = L + idx * slot + slot/2;
+      [[v.e, C1, "emesso", -bw - 1], [v.p, C2, "pianificato", 1]].forEach(([val, col, lab, off]) => {
+        if(!val) return; const h = Math.max(1, plotH * val / max);
+        svg += `<rect x="${x0+off}" y="${T+plotH-h}" width="${bw}" height="${h}" rx="2" fill="${col}"><title>${MN[+k.slice(5)-1]} ${k.slice(0,4)} · ${lab}: ${fmtEur(val)}</title></rect>`;
+      });
+      if(shown.length <= 12 || idx % 2 === 0) svg += `<text x="${x0}" y="${H-10}" text-anchor="middle" class="ax">${MN[+k.slice(5)-1]}${k.slice(5)==="01"||idx===0 ? " "+k.slice(2,4) : ""}</text>`;
+    });
+    return legend([[C1,"Fatturato emesso"],[C2,"Fatture pianificate"]]) +
+      `<svg viewBox="0 0 ${W} ${H}" class="chart" role="img" aria-label="Fatturato emesso e pianificato per mese">${svg}</svg>`;
+  }
+
+  // 2) Valore previsto e MOL per gruppo (barre orizzontali affiancate)
+  function chartByGroup(){
+    const dim = g1 !== "none" ? g1 : "status";
+    const rows = groupBy(opps, dim).map(([k, list]) => { const t = sumOf(list); return { k, ve:t.ve, mol:t.mol }; }).filter(r => r.ve || r.mol);
+    if(!rows.length) return `<p class="muted">Nessun valore da mostrare.</p>`;
+    const W = 760, rowH = 34, L = 230, R = 90, H = rows.length * rowH + 8, plotW = W - L - R;
+    const max = Math.max(...rows.map(r => Math.max(r.ve, r.mol, 0))) || 1;
+    let svg = "";
+    rows.forEach((r, i) => {
+      const y = 4 + i * rowH;
+      svg += `<text x="${L-8}" y="${y+18}" text-anchor="end" class="lb">${escT(r.k.length > 32 ? r.k.slice(0,31)+"…" : r.k)}</text>`;
+      [[r.ve, C1, "valore previsto", 3], [r.mol, C2, "MOL", 16]].forEach(([v, col, lab, dy]) => {
+        const w = Math.max(v > 0 ? 2 : 0, plotW * Math.max(v,0) / max);
+        svg += `<rect x="${L}" y="${y+dy}" width="${w}" height="11" rx="2" fill="${col}"><title>${escT(r.k)} · ${lab}: ${fmtEur(v)}</title></rect>
+                <text x="${L+w+5}" y="${y+dy+10}" class="vl">${fmtEur(v)}</text>`;
+      });
+    });
+    return legend([[C1,"Valore previsto"],[C2,"MOL"]]) + `<div class="chart-sub">per ${escT(REPORT_GROUPS[dim].label.toLowerCase())}</div>` +
+      `<svg viewBox="0 0 ${W} ${H}" class="chart" role="img" aria-label="Valore previsto e MOL per ${escT(REPORT_GROUPS[dim].label)}">${svg}</svg>`;
+  }
+
+  // 3) Percentuale di opportunità vinte per prodotto (vinte / (vinte + perse))
+  function chartWinRate(){
+    const rows = ENUM.productValues.map(p => {
+      const list = opps.filter(o => o.product === p);
+      const v = list.filter(o => o.status === "chiusa vinta").length;
+      const l = list.filter(o => ["chiusa persa","abbandonata"].includes(o.status)).length;
+      return { p, v, n: v + l };
+    }).filter(r => r.n > 0);
+    if(!rows.length) return `<p class="muted">Nessuna opportunità chiusa (vinta o persa) tra quelle del report.</p>`;
+    const W = 760, rowH = 26, L = 230, R = 140, H = rows.length * rowH + 8, plotW = W - L - R;
+    let svg = "";
+    rows.forEach((r, i) => {
+      const y = 4 + i * rowH, pctv = r.v / r.n * 100, w = Math.max(r.v ? 2 : 0, plotW * pctv / 100);
+      svg += `<rect x="${L}" y="${y+5}" width="${plotW}" height="12" rx="2" fill="${GRID}"/>
+              <rect x="${L}" y="${y+5}" width="${w}" height="12" rx="2" fill="${C1}"><title>${escT(r.p)}: ${r.v} vinte su ${r.n} chiuse</title></rect>
+              <text x="${L-8}" y="${y+15}" text-anchor="end" class="lb">${escT(r.p)}</text>
+              <text x="${L+plotW+6}" y="${y+15}" class="vl">${pct(pctv)} (${r.v} su ${r.n})</text>`;
+    });
+    return `<div class="chart-sub">vinte sul totale delle chiuse (vinte + perse + abbandonate)</div>` +
+      `<svg viewBox="0 0 ${W} ${H}" class="chart" role="img" aria-label="Percentuale di opportunità vinte per prodotto">${svg}</svg>`;
+  }
+
+  const chartsHtml = opts.charts === false || opps.length === 0 ? "" : `
+    <div class="section"><div class="section-title">Grafici</div>
+      <div class="chart-box"><div class="chart-title">Fatturato emesso e pianificato per mese</div>${chartByMonth()}</div>
+      <div class="chart-box"><div class="chart-title">Valore previsto e MOL</div>${chartByGroup()}</div>
+      <div class="chart-box"><div class="chart-title">Percentuale di opportunità vinte per prodotto</div>${chartWinRate()}</div>
+    </div>`;
+
   const mainHtml = `
     <h1>Report Commerciale</h1>
     <div class="subtitle">UP Formazione · Generato il ${fmtDate(todayStr())}</div>
     <div class="section"><div class="section-title">Selezioni che hanno generato il report</div>${selHtml}</div>
     <div class="section"><div class="section-title">Riepilogo</div>${kpiHtml}</div>
+    ${chartsHtml}
     <div class="section"><div class="section-title">Opportunità${g1 !== "none" ? " suddivise per " + escapeHtml(REPORT_GROUPS[g1].label.toLowerCase()) + (g2 !== "none" ? " e " + escapeHtml(REPORT_GROUPS[g2].label.toLowerCase()) : "") : ""}</div>${listHtml}</div>`;
 
   return `<!doctype html><html lang="it"><head>
@@ -2912,18 +3204,127 @@ function showReportModal() {
       <input type="checkbox" id="repDetails" ${saved.details ? "checked" : ""} style="width:16px;min-width:16px;max-width:16px;height:16px;margin-top:1px;flex:0 0 auto;"/>
       <span>Aggiungi in fondo le sezioni di dettaglio (fatture emesse e pianificate, vinte e perse, riconciliazione, dettaglio per commerciale)</span>
     </label>
-    <button type="button" id="repGo" style="width:100%;padding:9px;background:#1a2744;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">📄 Genera e apri report</button>`;
+    <label style="display:flex;gap:8px;align-items:flex-start;font-size:12.5px;margin:-8px 0 16px;cursor:pointer;">
+      <input type="checkbox" id="repCharts" ${saved.charts === false ? "" : "checked"} style="width:16px;min-width:16px;max-width:16px;height:16px;margin-top:1px;flex:0 0 auto;"/>
+      <span>Includi i grafici (fatturato per mese, valore e MOL, percentuale di vinte per prodotto)</span>
+    </label>
+    <div style="display:flex;gap:8px;">
+      <button type="button" id="repGo" style="flex:1;padding:9px;background:#1a2744;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">📄 Apri report</button>
+      <button type="button" id="repXls" style="flex:1;padding:9px;background:#1a7a3a;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">📊 Scarica Excel</button>
+    </div>
+    <div id="repMsg" style="font-size:12px;color:#7a85a0;margin-top:8px;"></div>`;
   ui.modal.classList.remove("hidden");
   document.getElementById("repGo").onclick = openReport;
+  document.getElementById("repXls").onclick = downloadReportExcel;
 }
 
-function openReport() {
+function readReportOpts(){
   const opts = {
     g1: document.getElementById("repG1")?.value || "phase",
     g2: document.getElementById("repG2")?.value || "none",
     details: !!document.getElementById("repDetails")?.checked,
+    charts: document.getElementById("repCharts") ? !!document.getElementById("repCharts").checked : true,
   };
-  try { localStorage.setItem("sales_vault_report_opts", JSON.stringify({ details: opts.details })); } catch {}
+  try { localStorage.setItem("sales_vault_report_opts", JSON.stringify({ details: opts.details, charts: opts.charts })); } catch {}
+  return opts;
+}
+
+// Righe del report per l'Excel: stesse opportunità, stessa suddivisione e stessi calcoli della pagina.
+function reportRows(opts){
+  const g1 = REPORT_GROUPS[opts.g1] ? opts.g1 : "none";
+  const g2 = (REPORT_GROUPS[opts.g2] && opts.g2 !== g1) ? opts.g2 : "none";
+  const opps = db.opportunities.map(normalizeOpp).filter(matchesFilters);
+  const order = (dim, k) => { if(dim === "none") return 0; const i = REPORT_GROUPS[dim].order().indexOf(k); return i === -1 ? 999 : i; };
+  const rows = opps.map(o => {
+    const base = molBaseFor(o).base, cost = toNum(o.serviceCost), mol = base - cost;
+    return {
+      gruppo: g1 === "none" ? "" : REPORT_GROUPS[g1].key(o), sottogruppo: g2 === "none" ? "" : REPORT_GROUPS[g2].key(o),
+      oppId: o.oppId || "", nome: o.name, cliente: o.lead, commerciale: o.owner, stato: o.status, fase: o.phase, prodotto: o.product,
+      competenza: fiscalYearOf(o), creata: o.createdAt, previsto: toNum(o.valueExpected), emesso: totalIssued(o), pianificato: totalPlanned(o),
+      costo: cost, base, mol, molPct: base > 0 ? mol / base : 0, splittato: o.split ? "sì" : "no",
+      prossimaAzione: o.nextAction || "", dataAzione: o.nextActionDate || "", ultimoContatto: lastContactDate(o) || "",
+    };
+  });
+  rows.sort((x, y) => order(g1, x.gruppo) - order(g1, y.gruppo) || String(x.gruppo).localeCompare(String(y.gruppo), "it")
+    || order(g2, x.sottogruppo) - order(g2, y.sottogruppo) || String(x.sottogruppo).localeCompare(String(y.sottogruppo), "it")
+    || String(x.oppId).localeCompare(String(y.oppId)));
+  return { rows, g1, g2 };
+}
+
+// Carica la libreria per i file Excel solo quando serve
+function loadXlsxLib(){
+  if(window.XLSX) return Promise.resolve(window.XLSX);
+  return new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.src = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
+    s.onload = () => window.XLSX ? resolve(window.XLSX) : reject(new Error("libreria non disponibile"));
+    s.onerror = () => reject(new Error("impossibile scaricare la libreria Excel (connessione?)"));
+    document.head.appendChild(s);
+  });
+}
+
+async function downloadReportExcel(){
+  const opts = readReportOpts();
+  const msg = document.getElementById("repMsg");
+  if(msg) msg.textContent = "Preparazione del file Excel…";
+  let XLSX;
+  try { XLSX = await loadXlsxLib(); } catch(e){ if(msg) msg.textContent = "⚠️ " + e.message; return; }
+  const { rows, g1, g2 } = reportRows(opts);
+  const gl = d => d === "none" ? "" : REPORT_GROUPS[d].label;
+
+  // Foglio 1: selezioni
+  const sel = reportSelections();
+  const s1 = [["Report Commerciale UP Formazione"], ["Generato il", fmtDateIt(todayStr())], [],
+    ["Selezione", "Valore", "Attiva"], ...sel.map(x => [x.label, x.value, x.active ? "sì" : "no"]), [],
+    ["Suddivisione", g1 === "none" ? "nessuna" : gl(g1) + (g2 !== "none" ? " → " + gl(g2) : "")], ["Opportunità", rows.length]];
+
+  // Foglio 2: opportunità
+  const head = [...(g1 !== "none" ? [gl(g1)] : []), ...(g2 !== "none" ? [gl(g2)] : []),
+    "OppID","Opportunità","Cliente","Commerciale","Stato","Fase","Prodotto","Anno competenza","Data creazione",
+    "Valore previsto","Fatturato emesso","Fatture pianificate","Costo erogazione","Base MOL","MOL","MOL %","Splittato",
+    "Prossima azione","Data prossima azione","Ultimo contatto"];
+  const body = rows.map(r => [...(g1 !== "none" ? [r.gruppo] : []), ...(g2 !== "none" ? [r.sottogruppo] : []),
+    r.oppId, r.nome, r.cliente, r.commerciale, r.stato, r.fase, r.prodotto, r.competenza, r.creata,
+    r.previsto, r.emesso, r.pianificato, r.costo, r.base, r.mol, r.molPct, r.splittato, r.prossimaAzione, r.dataAzione, r.ultimoContatto]);
+  const tot = rows.reduce((t, r) => { ["previsto","emesso","pianificato","costo","base","mol"].forEach(k => t[k] += r[k]); return t; },
+    { previsto:0, emesso:0, pianificato:0, costo:0, base:0, mol:0 });
+  const pad = (g1 !== "none" ? 1 : 0) + (g2 !== "none" ? 1 : 0);
+  body.push([...Array(pad).fill(""), "TOTALE", `${rows.length} opportunità`, "", "", "", "", "", "", "",
+    tot.previsto, tot.emesso, tot.pianificato, tot.costo, tot.base, tot.mol, tot.base > 0 ? tot.mol / tot.base : 0, "", "", "", ""]);
+
+  // Foglio 3: totali per gruppo
+  const s3 = [[g1 === "none" ? "Stato" : gl(g1), "Opportunità", "Valore previsto", "Fatturato emesso", "Fatture pianificate", "Costo erogazione", "MOL", "MOL %"]];
+  const dim = g1 === "none" ? "stato" : "gruppo";
+  const gm = new Map();
+  for(const r of rows){ const k = g1 === "none" ? r.stato : r.gruppo; if(!gm.has(k)) gm.set(k, { n:0, previsto:0, emesso:0, pianificato:0, costo:0, base:0, mol:0 });
+    const t = gm.get(k); t.n++; ["previsto","emesso","pianificato","costo","base","mol"].forEach(x => t[x] += r[x]); }
+  for(const [k, t] of gm) s3.push([k, t.n, t.previsto, t.emesso, t.pianificato, t.costo, t.mol, t.base > 0 ? t.mol / t.base : 0]);
+
+  const wb = XLSX.utils.book_new();
+  const ws1 = XLSX.utils.aoa_to_sheet(s1); ws1["!cols"] = [{ wch: 28 }, { wch: 60 }, { wch: 8 }];
+  const ws2 = XLSX.utils.aoa_to_sheet([head, ...body]);
+  const ws3 = XLSX.utils.aoa_to_sheet(s3);
+  // formati: euro e percentuali
+  const fmtCols = (ws, euroCols, pctCols, nRows) => {
+    for(let r = 1; r < nRows; r++){
+      euroCols.forEach(c => { const a = XLSX.utils.encode_cell({ r, c }); if(ws[a] && typeof ws[a].v === "number") ws[a].z = '#,##0.00 "€"'; });
+      pctCols.forEach(c => { const a = XLSX.utils.encode_cell({ r, c }); if(ws[a] && typeof ws[a].v === "number") ws[a].z = '0.0%'; });
+    }
+  };
+  fmtCols(ws2, [9,10,11,12,13,14].map(c => c + pad), [15 + pad], body.length + 1);
+  fmtCols(ws3, [2,3,4,5,6], [7], s3.length);
+  ws2["!cols"] = head.map(hh => ({ wch: Math.min(40, Math.max(10, String(hh).length + 2)) }));
+  ws2["!autofilter"] = { ref: XLSX.utils.encode_range({ s:{ r:0, c:0 }, e:{ r:body.length - 1, c:head.length - 1 } }) };
+  ws3["!cols"] = s3[0].map(() => ({ wch: 18 }));
+  XLSX.utils.book_append_sheet(wb, ws1, "Selezioni");
+  XLSX.utils.book_append_sheet(wb, ws2, "Opportunità");
+  XLSX.utils.book_append_sheet(wb, ws3, "Totali per gruppo");
+  XLSX.writeFile(wb, `Report UP ${todayStr()}.xlsx`);
+  if(msg) msg.textContent = `✓ Excel scaricato (${rows.length} opportunità).`;
+}
+
+function openReport() {
+  const opts = readReportOpts();
   const html = generateReport(opts);
   const win  = window.open("", "_blank");
   win.document.write(html);

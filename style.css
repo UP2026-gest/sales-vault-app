@@ -836,3 +836,34 @@ hr {
 #dirtyHint.autosave-status.saving { color: var(--orange, #c75a00); background: #fff8ee; border-color: #f0d8b8; }
 #dirtyHint.autosave-status.saved  { color: var(--green, #1a7a3a); background: #edf7f1; border-color: #bfe3cc; }
 #dirtyHint.autosave-status.warn   { color: var(--red, #b52a2a);   background: #fdf0f0; border-color: #f0b0b0; }
+
+/* ══════════════════════════════════════════════
+   DA SISTEMARE
+   ══════════════════════════════════════════════ */
+.fix-badge { display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px; padding:0 5px;
+  margin-left:4px; border-radius:9px; background:#b52a2a; color:#fff; font-size:11px; font-weight:700; }
+.fix-top { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px; font-size:13px; }
+.fix-top label { display:flex; align-items:center; gap:6px; font-size:12px; margin:0; }
+.fix-top select { width:auto; }
+.fix-group { margin-bottom:14px; }
+.fix-head { font-size:12px; font-weight:700; color:#1a2744; text-transform:uppercase; letter-spacing:.4px;
+  border-bottom:1px solid var(--border); padding-bottom:4px; margin-bottom:6px; }
+.fix-head span { background:#fdf0f0; color:#b52a2a; border-radius:8px; padding:0 7px; margin-left:4px; }
+.fix-row { display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px dashed var(--border); }
+.fix-main { flex:1; min-width:0; font-size:13px; }
+.fix-meta { font-size:11.5px; color:var(--text-muted); margin-top:2px; }
+.fix-row button { width:auto; padding:4px 10px; font-size:12px; flex:0 0 auto; }
+
+/* ══════════════════════════════════════════════
+   STORICO CONTATTI
+   ══════════════════════════════════════════════ */
+.log-add { display:grid; grid-template-columns: 130px 130px 1fr auto; gap:6px; margin-bottom:8px; }
+.log-add button { width:auto; }
+.log-list { display:flex; flex-direction:column; gap:4px; max-height:220px; overflow-y:auto; font-size:13px; }
+.log-row { display:grid; grid-template-columns: 82px 130px 1fr auto; gap:8px; align-items:start; padding:5px 0; border-bottom:1px dashed var(--border); }
+.log-date { font-family:'DM Mono', monospace; font-size:12px; color:var(--text-muted); }
+.log-type { font-size:12px; font-weight:600; }
+.log-text { white-space:pre-wrap; }
+.log-del { width:auto; padding:0 6px; border:none; background:transparent; color:var(--text-muted); cursor:pointer; }
+.log-del:hover { color:#b52a2a; }
+@media (max-width: 1100px){ .log-add, .log-row { grid-template-columns: 1fr 1fr; } }
