@@ -1043,12 +1043,13 @@ function refreshYearFilter(){
   if(years.includes(current)) ui.yearFilter.value = current;
 }
 
-/** Elenco anni da mostrare nei menu competenza: da 2025 all'anno corrente+2,
- *  più eventuali anni già presenti nei dati (creazione o competenza). */
+/** Elenco anni da mostrare nei menu competenza: da 2025 fino a 5 anni dopo
+ *  l'anno corrente (si sposta da solo ogni anno), più eventuali anni già
+ *  presenti nei dati (creazione o competenza). */
 function relevantYears(){
   const set = new Set();
   const nowY = new Date().getFullYear();
-  for(let y = 2025; y <= nowY + 2; y++) set.add(String(y));
+  for(let y = 2025; y <= nowY + 5; y++) set.add(String(y));
   (db.opportunities||[]).forEach(o=>{
     const cy = (o.createdAt||"").slice(0,4); if(/^\d{4}$/.test(cy)) set.add(cy);
     if(o.fiscalYear && /^\d{4}$/.test(String(o.fiscalYear))) set.add(String(o.fiscalYear));
@@ -2271,16 +2272,12 @@ refreshLeadDatalist();
 // corrente; tutti gli altri filtri partono neutri. Popolo prima i menu anni.
 refreshFiscalYearFilter();
 // Riporta TUTTI i filtri allo stato di default:
-// - Anno competenza fattura → anno corrente (se disponibile), altrimenti "tutti"
+// - Anno competenza fattura → tutti gli anni (prima era l'anno corrente: creava problemi a cavallo d'anno)
 // - Anno creazione, stato, commerciale, fatture, archivio → neutri
 // - Fase e Prodotto (caselle multiple) → nessuna spuntata
 // Usata sia all'avvio sia dal pulsante "Pulisci filtri".
 function clearAllFilters(rerender){
-  const cy = String(new Date().getFullYear());
-  if(ui.fiscalYearFilter){
-    const hasCy = Array.from(ui.fiscalYearFilter.options).some(o=>o.value===cy);
-    ui.fiscalYearFilter.value = hasCy ? cy : "all";
-  }
+  if(ui.fiscalYearFilter)  ui.fiscalYearFilter.value = "all";
   if(ui.yearFilter)        ui.yearFilter.value = "all";
   if(ui.statusFilter)      ui.statusFilter.value = "";
   if(ui.phaseFilterBox)    ui.phaseFilterBox.querySelectorAll('input[type="checkbox"]').forEach(c=>c.checked=false);
