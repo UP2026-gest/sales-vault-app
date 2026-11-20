@@ -1574,8 +1574,42 @@
       "actions": [],
       "createdAt": "2026-11-13T08:46:23.232Z",
       "updatedAt": "2026-11-13T10:06:12.260Z"
+    },
+    {
+      "id": "mwot22xf9bzmid",
+      "code": "26-039",
+      "title": "Meeting UP MSF Piazza",
+      "date": "2026-11-20",
+      "timeStart": "12:00",
+      "timeEnd": "13:00",
+      "client": "",
+      "topics": [
+        "gestionale"
+      ],
+      "participants": [
+        "Stefania",
+        "Matteo"
+      ],
+      "agenda": [
+        {
+          "text": "ammortamenti, file Mara del 28/10?",
+          "notes": ""
+        },
+        {
+          "text": "crm didattica, vogliono mettere anche in MSF",
+          "notes": ""
+        },
+        {
+          "text": "Arboit, problema IVA",
+          "notes": ""
+        }
+      ],
+      "notes": "",
+      "actions": [],
+      "createdAt": "2026-11-20T09:57:19.060Z",
+      "updatedAt": "2026-11-20T09:57:19.060Z"
     }
   ],
-  "updatedAt": "2026-11-20T09:55:38.032Z",
+  "updatedAt": "2026-11-20T09:57:19.060Z",
   "deleted": []
 }
